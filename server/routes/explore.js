@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { problembankController,
+const { problemsController,
     detailedProblemController,
     verdictController,
     leaderboardController } = require('../controllers/explore');
 
 // api/explore/problembank/
-router.get('/problembank', problembankController);
-router.get('/problem/:id', detailedProblemController);
+router.get('/problems', problemsController);
+router.get('/problems/:id', detailedProblemController);
 router.post('/problem/:id', verdictController); // unknown
 router.get('/leaderboard', leaderboardController);
 

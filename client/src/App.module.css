@@ -1,0 +1,11 @@
+.App {
+    overflow-x: hidden;
+    text-align: center;
+    min-height: 100vh;
+    height: auto !important;
+    color: black;
+}
+
+.routes {
+    margin-top: 5rem;
+}

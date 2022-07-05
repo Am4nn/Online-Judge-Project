@@ -9,9 +9,43 @@ const explore = require('./routes/explore');
 const user = require('./routes/user');
 const app = express();
 const connectDB = require('./DataBase/connectDB');
+const Question = require('./DataBase/Model/Question');
+
+async function seedDB() {
+    await Question.deleteMany({});
+    const newQuestion = new Question({
+        difficulty: 'medium',
+        name: 'Simple Search',
+        description: 'A simple searching question, search key in an array',
+        examples: [
+            {
+                input: 'key: 7,  arr[] = [5, 9, 6, 7, 3]',
+                output: '3',
+                explaination: 'in arr array 7 key is at 3rd index'
+            },
+            {
+                input: 'key: 18,  arr[] = [94, 12, 78, 23, 19, 48, 12, 36, 45]',
+                output: '1',
+                explaination: "in arr array 18 key's first occurance is at 3rd index"
+            }
+        ],
+        noOfSubm: 185,
+        noOfSuccess: 94,
+        code: 'SIMSRCH'
+    });
+    await newQuestion.save();
+    const allQuestions = await Question.find({});
+    console.log(...allQuestions);
+}
+
 
 connectDB();
 
+// try {
+// seedDB();
+// } catch (err) {
+// console.log(err);
+// }
 
 // parse json request body
 app.use(express.json());

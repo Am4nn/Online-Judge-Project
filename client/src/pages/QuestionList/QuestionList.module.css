@@ -1,0 +1,16 @@
+.questions {
+    color: black;
+    display: flex;
+}
+
+.filter {
+    position: relative;
+    margin-top: 3rem;
+    width: 250px;
+    border: 1px solid grey;
+    min-height: 80vh;
+}
+
+.cards {
+    width: 90%;
+}

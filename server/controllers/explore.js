@@ -1,5 +1,8 @@
-const problembankController = (req, res) => {
-    res.status(200).json('problembankController');
+const { getQuestionList } = require('../DataBase/database');
+
+const problemsController = async (req, res) => {
+    const questions = await getQuestionList();
+    res.status(200).json(questions);
 }
 const detailedProblemController = (req, res) => {
     res.status(200).json('detailedProblemController');
@@ -12,7 +15,7 @@ const leaderboardController = (req, res) => {
 }
 
 module.exports = {
-    problembankController,
+    problemsController,
     detailedProblemController,
     verdictController,
     leaderboardController

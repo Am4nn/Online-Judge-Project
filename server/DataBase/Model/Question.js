@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 // id, difficulty, Name, Description, exampleCases, numberOfSubmissions, numberOfSuccess, questionCode
-const QuesListSchema = new mongoose.Schema({
+const QuesSchema = new mongoose.Schema({
     difficulty: {
         type: String,
         enum: ['easy', 'medium', 'hard'],
@@ -15,7 +15,7 @@ const QuesListSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    example: {
+    examples: [{
         type: Object,
         input: {
             type: String,
@@ -28,7 +28,7 @@ const QuesListSchema = new mongoose.Schema({
         explaination: {
             type: String
         }
-    },
+    }],
     noOfSubm: {
         type: Number,
         required: true,
@@ -41,8 +41,9 @@ const QuesListSchema = new mongoose.Schema({
     },
     code: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     }
 })
 
-module.exports = mongoose.model('QuestionList', QuesListSchema);
+module.exports = mongoose.model('Question', QuesSchema);

@@ -1,0 +1,51 @@
+/* .left,
+.right {
+    border: 1px orange solid;
+} */
+
+
+.Card {
+    font-family: 'gotham';
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    min-height: 8rem;
+    /* background-color: hsl(160, 80%, 95%); */
+    /* border-radius: 1rem; */
+    margin: 1.5rem 5rem;
+    padding: 1.5rem 0 0 0;
+    border-bottom: 1px solid rgba(34, 36, 38, .15);
+}
+
+.level::first-letter {
+    text-transform: capitalize;
+    font-size: 1.3em;
+}
+
+.left {
+    width: 50%;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Raleway&display=swap');
+
+.mid {
+    width: 20%;
+    /* color: hsla(0, 0%, 96%, .6); */
+    font-family: 'Raleway', 'gotham';
+    font-weight: 800;
+    font-size: 13px !important;
+    letter-spacing: 2.7px;
+}
+
+.right {
+    display: flex;
+    justify-content: end;
+    width: 40%;
+}
+
+.questionName {
+    font-size: 1.7em;
+    margin-left: 1rem;
+    text-align: start;
+}

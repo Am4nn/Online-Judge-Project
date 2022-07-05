@@ -1,109 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+@font-face {
+  font-family: gotham;
+  src: url('./assests/fonts/gotham-medium.woff2');
+}
 
-* {
-  box-sizing: border-box;
+:root {
+  scroll-behavior: smooth !important;
+}
+
+body {
   margin: 0;
   padding: 0;
+  font-family: 'gotham', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--background-universal) !important;
 }
 
-html {
-  font-family: 'Noto Sans JP', sans-serif;
-  color: rgb(62, 159, 195);
-}
-
-.form-app {
-  width: 90%;
-  max-width: 43rem;
-  padding: 1rem;
-  border-radius: 12px;
-  background-color: hsl(0, 0%, 100%, 0.08);
-  border: 1px solid white;
-}
-
-.form-control {
-  margin-bottom: 1rem;
-}
-
-.form-control input,
-.form-control label {
-  display: block;
-}
-
-.form-control label {
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-
-.form-control input,
-.form-control select {
-  font: inherit;
-  padding: 0.5rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  width: 20rem;
-  max-width: 100%;
-}
-
-.form-control input:focus {
-  outline: none;
-  border-color: #240370;
-  background-color: #ffffff;
-}
-
-.control-group {
-  display: flex;
-  column-gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.control-group .form-control {
-  min-width: 15rem;
-  flex: 1;
-}
-
-button {
-  font: inherit;
-  background-color: hsl(197, 61%, 59%);
-  color: black;
-  border: 1px solid #240370;
-  padding: 0.5rem 1.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:hover,
-button:active {
-  background-color: hsl(197, 90%, 30%);
-  border-color: #33059e;
-}
-
-button:disabled,
-button:disabled:hover,
-button:disabled:active {
-  background-color: #cccccc;
-  color: hsl(0, 0%, 16%);
-  border-color: #ccc;
-  cursor: not-allowed;
-}
-
-.form-actions {
-  text-align: right;
-}
-
-.form-actions button {
-  margin-left: 1rem;
-}
-
-.invalid input {
-  border: 1px solid hsl(0, 56%, 38%);
-  background-color: hsl(0, 59%, 93%);
-}
-
-.invalid input:focus {
-  border-color: hsl(32, 70%, 50%);
-  background-color: hsl(32, 54%, 90%);
-}
-
-.error-text {
-  color: hsl(0, 56%, 38%);
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+      monospace;
 }
