@@ -1,11 +1,14 @@
 import { questionsActions } from './questions-slice'
 import { uiActions } from './ui-slice';
 
+import { SERVER_LINK } from '../../dev-server-link';
+
+
 export const fetchQuestionListData = () => {
     return async (dispatch) => {
         const fetchData = async () => {
             const response = await fetch(
-                'http://localhost:5000/api/explore/problems',
+                `${SERVER_LINK}/api/explore/problems`,
                 {
                     headers: {
                         'Content-Type': 'application/json'
@@ -57,7 +60,7 @@ export const sendQuestionListData = (cart) => {
 
         const sendRequest = async () => {
             const response = await fetch(
-                'https://react-http-bc7c5-default-rtdb.firebaseio.com/cart.json',
+                `${SERVER_LINK}/api/explore/problems`,
                 {
                     headers: {
                         'Content-Type': 'application/json'

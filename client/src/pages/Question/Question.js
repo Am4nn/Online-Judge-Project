@@ -15,11 +15,13 @@ import InputLabel from '@mui/material/InputLabel'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 
+import { SERVER_LINK } from '../../dev-server-link';
+
 const Question = () => {
     const { id } = useParams();
 
     const { loading, error, value: question } = useFetch(
-        `http://localhost:5000/api/explore/problems/${id}`,
+        `${SERVER_LINK}/api/explore/problems/${id}`,
         {
             headers: {
                 'Content-Type': 'application/json'
@@ -51,7 +53,7 @@ const Question = () => {
 
         try {
             const response = await fetch(
-                `http://localhost:5000/api/explore/problems/${id}`,
+                `${SERVER_LINK}/api/explore/problems/${id}`,
                 {
                     headers: {
                         'Content-Type': 'application/json'
