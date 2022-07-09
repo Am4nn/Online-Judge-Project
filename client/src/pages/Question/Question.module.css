@@ -1,0 +1,303 @@
+.contain {
+    margin-bottom: 15rem;
+}
+
+.back {
+    display: flex;
+    margin-left: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.back a {
+    margin-top: unset;
+}
+
+.backbtn {
+    padding: 0.5rem 2.5rem;
+}
+
+/* top | right | bottom | left */
+.head {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    margin: 0.7rem 3rem 2rem 3rem;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Headland+One&display=swap');
+
+.heading {
+    font-size: 3em;
+    padding: 0 0.2em;
+    font-weight: 800;
+    font-family: 'Headland One';
+    text-align: justify;
+}
+
+.extraContent {
+    padding: 0 0.2em;
+    border-top: 2px solid rgba(70, 71, 72, 0.192);
+    display: flex;
+    letter-spacing: 0.03em;
+}
+
+.level[diff-color="easy"] {
+    color: var(--easy-difficulty);
+}
+
+.level[diff-color="medium"] {
+    color: var(--medium-difficulty);
+}
+
+.level[diff-color="hard"] {
+    color: var(--hard-difficulty);
+}
+
+.level {
+    text-transform: capitalize;
+}
+
+.succ span,
+.subm span {
+    color: #40424eb4;
+}
+
+.succ,
+.subm {
+    margin-left: 1em;
+}
+
+.body {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 70%;
+    margin-top: 5rem;
+}
+
+.desc {
+    padding: 2em;
+    width: 100%;
+    /* width: auto; */
+    background-color: hsla(42, 44%, 76%, 0.09);
+    border: 1px solid hsla(42, 44%, 76%, 0.5);
+    letter-spacing: 0.03em;
+    position: relative;
+}
+
+.desc::before {
+    background-color: white;
+    border: 1px solid hsla(42, 44%, 76%, 0.5);
+    font-size: 1.5em;
+    content: "Problem Statement";
+    position: absolute;
+    top: -1em;
+    left: 1em;
+    padding: 0 1rem;
+    font-weight: 600;
+}
+
+
+
+.example {
+    padding: 2em;
+    width: 100%;
+    /* width: auto; */
+    background-color: hsla(167, 44%, 76%, 0.09);
+    border: 1px solid hsla(167, 44%, 76%, 0.5);
+    letter-spacing: 0.03em;
+    position: relative;
+    text-align: justify;
+}
+
+.example::before {
+    background-color: white;
+    border: 1px solid hsla(167, 44%, 76%, 0.5);
+    font-size: 1.5em;
+    content: "Example : " attr(exn);
+    position: absolute;
+    top: -1em;
+    left: 1em;
+    padding: 0 1rem;
+    font-weight: 600;
+}
+
+.example span {
+    font-weight: 600;
+}
+
+.example div {
+    padding: 0.4em;
+    border-bottom: 1px solid rgba(70, 70, 70, 0.1);
+}
+
+.example :last-child {
+    border-bottom: unset;
+}
+
+
+.editor {
+    margin-top: 5rem;
+    padding: 2em;
+    max-width: 70%;
+    width: auto;
+    background-color: hsla(270, 44%, 76%, 0.09);
+    border: 1px solid hsla(270, 44%, 76%, 0.5);
+    letter-spacing: 0.03em;
+    position: relative;
+    text-align: justify;
+}
+
+.editor::before {
+    background-color: white;
+    border: 1px solid hsla(270, 44%, 76%, 0.5);
+    font-size: 1.5em;
+    content: "Code";
+    position: absolute;
+    top: -1em;
+    left: 1em;
+    padding: 0 1rem;
+    font-weight: 700;
+}
+
+.editorText {
+    border: 1px solid hsla(270, 44%, 76%, 0.5);
+    padding: 2px;
+    background-color: white;
+}
+
+.submitBtn {
+    margin-top: 5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.submitBtn a {
+    margin: unset !important;
+}
+
+.notHead {
+    margin-left: 8rem;
+}
+
+.spin {
+    padding-left: 0.5em;
+    display: inline-block;
+}
+
+.spin:after {
+    content: ' ';
+    display: block;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    border: 0.2rem solid hsl(180, 100%, 40%);
+    border-color: hsl(180, 100%, 40%) transparent hsl(180, 100%, 40%) transparent;
+    animation: spinner 1s ease-in-out infinite;
+}
+
+@keyframes spinner {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    50% {
+        transform: rotate(360deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+@font-face {
+    font-family: SFMono;
+    src: url('../../assests/fonts/sf-mono/SFMonoLight.woff');
+}
+
+.codeSnippet {
+    color: hsl(208, 100%, 15%);
+    letter-spacing: 0.02em;
+    font-size: 0.7em;
+    position: relative;
+    top: -8px;
+    left: -8px;
+    padding: 0 1rem;
+    font-weight: 100;
+    font-family: SFMono, "Fira Code", "Fira Mono", "Roboto Mono", monospace;
+}
+
+.changeFont {
+    background-color: white;
+    font-size: 1.5em;
+    position: absolute;
+    top: -1em;
+    right: 3em;
+    font-weight: 600;
+    width: auto;
+    padding: 0em 0.2em;
+    border: 1px solid hsla(167, 44%, 76%, 0.5);
+}
+
+.changeLang {
+    position: absolute;
+    top: -2.5em;
+    right: 13em;
+    background-color: white !important;
+}
+
+.fontSnippet {
+    color: hsl(208, 100%, 15%);
+    letter-spacing: 0.02em;
+    font-size: 0.7em;
+    padding: 0 1rem;
+    font-weight: 100;
+    font-family: SFMono, "Fira Code", "Fira Mono", "Roboto Mono", monospace;
+    position: absolute;
+    top: -4.2em;
+    right: 4em;
+}
+
+.changeFont input,
+.changeFont input:focus,
+.changeFont input:active,
+.changeFont input:hover {
+    border: unset !important;
+    outline: unset !important;
+    box-shadow: unset !important;
+}
+
+.changeFont input {
+    text-align: center !important;
+    width: 3em;
+}
+
+@media (max-width:1000px) {
+    .notHead {
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+    }
+
+    .body {
+        width: 100%;
+    }
+
+    .editor {
+        max-width: 100%;
+    }
+
+    .back {
+        margin-top: 7rem;
+    }
+
+    .head {
+        margin-left: 1rem;
+    }
+
+    /* .desc {
+        padding-top: 3em !important;
+    } */
+}

@@ -5,10 +5,10 @@ const { problemsController,
     verdictController,
     leaderboardController } = require('../controllers/explore');
 
-// api/explore/problembank/
+// api/explore/
 router.get('/problems', problemsController);
 router.get('/problems/:id', detailedProblemController);
-router.post('/problem/:id', verdictController); // unknown
+router.post('/problems/:id', verdictController);
 router.get('/leaderboard', leaderboardController);
 
 module.exports = router;

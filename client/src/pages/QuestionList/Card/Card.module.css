@@ -18,9 +18,36 @@
     border-bottom: 1px solid rgba(34, 36, 38, .15);
 }
 
+@media (max-width:1000px) {
+    .Card {
+        margin: 1.5rem 0.01rem;
+    }
+
+    .questionName {
+        font-size: 1.4em !important;
+    }
+
+    .mid {
+        margin-left: 0.5em;
+        margin-right: 0.5em;
+    }
+}
+
 .level::first-letter {
     text-transform: capitalize;
     font-size: 1.3em;
+}
+
+.level[diff-color="easy"] {
+    color: var(--easy-difficulty);
+}
+
+.level[diff-color="medium"] {
+    color: var(--medium-difficulty);
+}
+
+.level[diff-color="hard"] {
+    color: var(--hard-difficulty);
 }
 
 .left {
@@ -40,7 +67,7 @@
 
 .right {
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
     width: 40%;
 }
 

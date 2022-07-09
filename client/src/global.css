@@ -1,0 +1,10 @@
+:root {
+    --easy-difficulty: hsl(120, 60%, 50%);
+    --medium-difficulty: hsl(240, 60%, 50%);
+    --hard-difficulty: hsl(0, 60%, 50%);
+}
+
+@font-face {
+    font-family: 'POLYA';
+    src: url('./assests/fonts/POLYA.otf');
+}

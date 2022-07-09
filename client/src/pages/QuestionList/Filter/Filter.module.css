@@ -1,0 +1,23 @@
+.heading {
+    margin: 0.1em 0.1em 0.4em 0.1em;
+    letter-spacing: 0.1em;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    font-size: 2em;
+    padding: 0.3em 0;
+    font-weight: 600;
+    background-color: rgba(220, 174, 227, 0.1);
+    /* font-family: 'POLYA'; */
+    font-family: 'raleway';
+    border-bottom: 1px solid rgba(34, 36, 38, 0.15);
+}
+
+.clearFilter {
+    padding-bottom: 1em;
+    border-bottom: 1px solid rgba(34, 36, 38, 0.15);
+}
+
+/* top | right | bottom | left */
+.checkboxes {
+    margin: 1em 0 1em 1.5em;
+}

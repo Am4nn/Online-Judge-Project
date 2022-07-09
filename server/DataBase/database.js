@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const Model = require('./Model/Question');
 
 const getQuestionList = async () => {
@@ -6,4 +5,9 @@ const getQuestionList = async () => {
     return questions;
 }
 
-module.exports = { getQuestionList };
+const getQuestionById = async id => {
+    const question = await Model.findById(`${id}`);
+    return question;
+}
+
+module.exports = { getQuestionList, getQuestionById };

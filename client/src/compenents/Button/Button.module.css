@@ -24,9 +24,6 @@
     position: absolute;
     width: 100%;
     height: 3.5rem;
-    background-color: hsl(180, 100%, 50%);
-    /* background-color: hsl(161, 100%, 80%); */
-    /* background-color: hsl(60, 80%, 60%); */
     clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
 }
 
@@ -35,10 +32,33 @@
     transform: scale(1);
 }
 
-.btn:hover::after {
+.btn span {
+    z-index: 20;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.blue::after {
+    background-color: hsl(180, 100%, 50%);
+}
+
+.blue:hover::after {
     background-color: hsl(180, 100%, 40%);
 }
 
-.btn span {
-    z-index: 20;
+.green::after {
+    background-color: hsl(161, 100%, 50%);
+}
+
+.green:hover::after {
+    background-color: hsl(161, 100%, 40%);
+}
+
+.yellow::after {
+    background-color: hsl(60, 80%, 50%);
+}
+
+.yellow:hover::after {
+    background-color: hsl(60, 80%, 40%);
 }

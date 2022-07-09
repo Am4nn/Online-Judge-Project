@@ -4,13 +4,41 @@
 }
 
 .filter {
-    position: relative;
-    margin-top: 3rem;
-    width: 250px;
-    border: 1px solid grey;
-    min-height: 80vh;
+    width: 15.66rem;
+}
+
+.filterabs {
+    margin-top: 0.8rem;
+    width: 15.66rem;
+    min-height: 85vh;
+    position: fixed;
+    z-index: 999;
+    backdrop-filter: blur(5px);
+    padding: 0, 0.08em;
+    margin-left: 0.5rem;
+    border-radius: 0.5rem;
+    box-shadow:
+        rgb(0 0 0 / 10%) 0px 0px 2px 0px,
+        rgb(0 0 0 / 10%) 0px 0px 5px 0px;
+
 }
 
 .cards {
     width: 90%;
+}
+
+@media (max-width:1000px) {
+    .cards {
+        width: 100%;
+    }
+
+    .filter {
+        /* display: none; */
+        width: 0;
+    }
+
+    .filterabs {
+        width: 50%;
+        background-color: rgba(255, 255, 255, 0.7);
+    }
 }

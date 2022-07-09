@@ -12,11 +12,11 @@ const Card = props => {
                 </div>
             </div>
             <div className={classes.mid}>
-                <div className={classes.level}>{question.difficulty}</div>
-                <div className={classes.succ}>{question.noOfSuccess}% Success</div>
+                <div className={classes.level} diff-color={question.difficulty}>{question.difficulty}</div>
+                <div className={classes.succ}>{question.noOfSuccess === 0 ? 0 : ((question.noOfSuccess / question.noOfSubm * 100).toFixed(2))}% Success</div>
             </div>
             <div className={classes.right}>
-                <Button to={`/questions/${question._id}`}>Solve</Button>
+                <Button to={`/questions/${question._id}`} color='blue'>Solve</Button>
             </div>
         </div>
     )

@@ -1,6 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Marcellus&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani&display=swap');
 
+@font-face {
+    font-family: 'NexaRust';
+    src: url('../../assests/fonts/NexaRustHandmade-Extended.otf');
+}
+
 .navfontfamily {
     /* font-family: 'Marcellus', gotham; */
     font-family: 'Rajdhani', gotham;
@@ -9,14 +14,13 @@
 }
 
 .nav_ac {
+    font-family: 'NexaRust' !important;
     padding: 5px 15px;
     border: unset;
     font-size: 1.25rem;
-    font-family: Marcellus;
-    color: hsl(60, 70%, 50%) !important;
+    color: white !important;
     line-height: 2;
     height: 40px;
-    font-weight: bold;
     z-index: 1000;
     /* text-shadow: 0 0 2px #001716, 0 0 3px #03edf975, 0 0 5px #03edf975, 0 0 8px #03edf975; */
 }
@@ -76,10 +80,13 @@
     position: relative !important;
     background-color: transparent !important;
     border-color: transparent !important;
+    backdrop-filter: blur(3px) !important;
+    box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.305);
 }
 
 .navbar-toggler:focus,
 .navbar-toggler:active {
+    box-shadow: 0 0 5px 3px rgba(255, 255, 255, 0.305);
     outline: 0 !important;
 }
 

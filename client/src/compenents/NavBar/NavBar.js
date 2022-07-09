@@ -13,12 +13,12 @@ const NavBar = () => {
             expanded={expand}
             fixed="top"
             expand="md"
-            className='navbar navfontfamily'
+            className='navbar navfontfamily bg-dark'
         >
             <Container>
                 <Navbar.Brand href="/" className="d-flex">
                     <span className='nav_ac navbar-brand' to="/">
-                        OnlineJudge
+                        OJ
                     </span>
                 </Navbar.Brand>
                 <Navbar.Toggle

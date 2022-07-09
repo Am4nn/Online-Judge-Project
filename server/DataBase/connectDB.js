@@ -14,4 +14,13 @@ const connectDB = () => {
         });
 }
 
-module.exports = connectDB;
+const closeDB = () => {
+    mongoose.connection.close().then(() => {
+        console.log("Database Disconnected !!!");
+    })
+};
+
+module.exports = {
+    connectDB,
+    closeDB
+};
