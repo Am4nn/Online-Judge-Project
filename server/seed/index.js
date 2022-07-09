@@ -1,5 +1,5 @@
 const Question = require('../DataBase/Model/Question');
-const { connectDB, closeDB } = require('../DataBase/connectDB');
+const mongoose = require('mongoose')
 
 const data = [
     {
@@ -115,11 +115,24 @@ const data = [
     },
 ]
 
+const connectDB = () => {
+    mongoose.connect(
+        ''
+    )
+        .then(() => {
+            console.log("Database Connected !!!");
+        })
+        .catch(error => {
+            console.log("Oh no MONGOOSE Error !!!");
+            console.log(error);
+        });
+}
+
 connectDB();
 
 async function seedDB() {
     await Question.deleteMany({});
-    
+
     data.forEach(async question => {
         const newQuestion = new Question({ ...question });
         await newQuestion.save();
@@ -132,7 +145,7 @@ async function seedDB() {
 seedDB().then(() => {
     console.log('Seeded successfully !!!');
     setTimeout(() => {
-        closeDB();
+        mongoose.connection.close();
     }, 5000);
 }).catch(err => {
     console.log('Here comes error : \n', err);

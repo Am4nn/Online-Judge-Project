@@ -1,7 +1,7 @@
 import { questionsActions } from './questions-slice'
 import { uiActions } from './ui-slice';
 
-import { SERVER_LINK } from '../../dev-server-link';
+import { SERVER_LINK } from '../dev-server-link';
 
 
 export const fetchQuestionListData = () => {
