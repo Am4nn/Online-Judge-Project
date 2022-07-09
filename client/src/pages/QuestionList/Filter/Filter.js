@@ -6,8 +6,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import FormGroup from '@mui/material/FormGroup'
 import { Button } from '@mui/material'
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const Filter = props => {
 
@@ -28,7 +27,7 @@ const Filter = props => {
 
             <div className={classes.clearFilter}>
                 <Button color="error" onClick={clearFilter} variant="outlined" startIcon={
-                    <FontAwesomeIcon icon={faTrash} style={{ marginRight: '1em' }} />
+                    <DeleteIcon fontSize='large' style={{ marginRight: '0.5em', fontSize: '2em' }} />
                 }>
                     ClearFilter
                 </Button>

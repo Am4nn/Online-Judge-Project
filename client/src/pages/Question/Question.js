@@ -7,13 +7,13 @@ import classes from './Question.module.css';
 import CodeEditor from './Editor/CodeEditor';
 import Button from '../../compenents/Button/Button';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
+import SendIcon from '@mui/icons-material/Send';
 
 import { SERVER_LINK } from '../../dev-server-link';
 
@@ -36,10 +36,10 @@ const Question = () => {
 
     // not-initialized, submitting, response-ok, response-not-ok, error
     const [codeSubmittingState, setcodeSubmittingState] = useState('not-initialized');
-    const [code, setCode] = useState('');
-    const [codeFont, setCodeFont] = useState(15);
+
+    const [code, setCode] = useState(`#include <bits/stdc++.h>\nusing namespace std;\n\nint main()\n{\n    cout << "Hello World";\n    return 0;\n}`);
+    const [codeFontSize, setcodeFontSize] = useState(15);
     const [selectedLang, setSelectedLang] = useState('CPP');
-    const onValueChange = useCallback(code => setCode(code), [])
 
     const submitHandler = async event => {
         event.preventDefault();
@@ -59,7 +59,7 @@ const Question = () => {
                         'Content-Type': 'application/json'
                     },
                     method: 'POST',
-                    body: JSON.stringify({ code }),
+                    body: JSON.stringify({ code, language: selectedLang }),
                 }
             );
             if (response.ok) {
@@ -88,7 +88,7 @@ const Question = () => {
                             &#60; go back to questions /&#62;
                         </div>
                         <Button to='/' onClick={backHandler} color='yellow'>
-                            <FontAwesomeIcon icon={faArrowLeft} style={{ marginRight: '1em' }} />
+                            <ArrowBackIcon style={{ marginRight: '0.3em', transform: 'translateX(-12px)', fontSize: '1.2em' }} />
                             Back
                         </Button>
                     </div>
@@ -125,32 +125,33 @@ const Question = () => {
                                 &#60; Font Size /&#62;
                             </div>
                             <div className={classes.changeFont}>
-                                <input type='number' min={2} max={50} defaultValue={15} onChange={e => setCodeFont(e.target.value)} />
+                                <input type='number' min={2} max={50} defaultValue={codeFontSize} onChange={e => setcodeFontSize(e.target.value)} />
                             </div>
 
                             <div className={classes.changeLang}>
                                 <FormControl>
-                                    <InputLabel id="demo-simple-select-label">Language</InputLabel>
+                                    <InputLabel id="changeLang-select-label">Language</InputLabel>
                                     <Select
-                                        labelId="demo-simple-select-label"
-                                        id="demo-simple-select"
+                                        labelId="changeLang-select-label"
+                                        id="changeLang-select"
                                         value={selectedLang}
-                                        defaultValue='CPP'
                                         label="Language"
+                                        style={{ width: '8em', height: '2.8em' }}
                                         onChange={e => setSelectedLang(e.target.value)}
                                     >
-                                        <MenuItem value={'cpp'}>CPP</MenuItem>
-                                        <MenuItem value={'java'}>JAVA</MenuItem>
-                                        <MenuItem value={'python'}>PYTHON</MenuItem>
-                                        <MenuItem value={'javascript'}>JAVASCRIPT</MenuItem>
+                                        <MenuItem value={'CPP'}>CPP</MenuItem>
+                                        <MenuItem value={'JAVA'}>JAVA</MenuItem>
+                                        <MenuItem value={'PYTHON'}>PYTHON</MenuItem>
+                                        <MenuItem value={'JS'}>JS</MenuItem>
                                     </Select>
                                 </FormControl>
                             </div>
 
                             <div className={classes.editorText}>
                                 <CodeEditor
-                                    onValueChange={onValueChange}
-                                    fontSize={codeFont}
+                                    code={code}
+                                    setCode={setCode}
+                                    fontSize={codeFontSize}
                                 />
                             </div>
                         </div>
@@ -164,7 +165,7 @@ const Question = () => {
                             </div>
                             <Button to='/' onClick={submitHandler} color='green'>
                                 {codeSubmittingState === 'submitting' ? 'Submitting' : 'Submit'}
-                                {codeSubmittingState === 'submitting' && <div className={classes.spin} />}
+                                {codeSubmittingState === 'submitting' ? <div className={classes.spin} /> : <SendIcon style={{ marginLeft: '0.6em', fontSize: '1.2em' }} />}
                             </Button>
                         </div>
                     </div>

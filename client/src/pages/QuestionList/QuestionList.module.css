@@ -12,7 +12,7 @@
     width: 15.66rem;
     min-height: 85vh;
     position: fixed;
-    z-index: 999;
+    z-index: 899;
     backdrop-filter: blur(5px);
     padding: 0, 0.08em;
     margin-left: 0.5rem;

@@ -34,9 +34,9 @@ const detailedProblemController = async (req, res) => {
 
 const verdictController = async (req, res) => {
     try {
-        const code = req.body.code;
+        const body = req.body;
 
-        console.log(code);
+        console.log(body);
 
         setTimeout(() => {
             return res.status(200).json('verdictController');

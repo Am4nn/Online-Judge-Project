@@ -1,9 +1,11 @@
 import React, { Suspense, useEffect } from 'react'
-import classes from './App.module.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+
+import classes from './App.module.css';
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 import NavBar from './compenents/NavBar/NavBar';
+import ScrollToTop from './compenents/ScrollToTop/ScrollToTop';
 import LoadingSpinner from './compenents/LoadingSpinner/LoadingSpinner';
 
 import { useSelector, useDispatch } from 'react-redux';
@@ -43,6 +45,7 @@ const App = () => {
         <BrowserRouter>
             <div className={classes.App}>
                 <NavBar />
+                <ScrollToTop />
                 <div className={classes.routes}>
                     <Suspense
                         fallback={<div className='centered'><LoadingSpinner /></div>}>
