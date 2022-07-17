@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 const data = [
     {
         name: "Binary Search ",
-        description: "Given a sorted array of size N and an integer K, find the position at which K is present in the array using binary search.",
+        description: "Given a sorted array of size N and an integer K, find the position at which K is present in the array using binary search. If key lnot found return -1",
         difficulty: "easy",
         examples: [
             {
@@ -23,7 +23,8 @@ const data = [
             }
         ],
         noOfSubm: 185,
-        noOfSuccess: 83
+        noOfSuccess: 83,
+        testcase: 'bs0'
     },
     {
         name: "Allocate minimum number of pages  ",
@@ -46,7 +47,8 @@ const data = [
             }
         ],
         noOfSubm: 0,
-        noOfSuccess: 0
+        noOfSuccess: 0,
+        testcase: 'amnop0'
     },
     {
         difficulty: 'easy',
@@ -65,7 +67,8 @@ const data = [
             }
         ],
         noOfSubm: 109,
-        noOfSuccess: 53
+        noOfSuccess: 53,
+        testcase: 'ss0'
     },
     {
         name: "Save Your Life ",
@@ -90,7 +93,8 @@ const data = [
             }
         ],
         noOfSubm: 0,
-        noOfSuccess: 0
+        noOfSuccess: 0,
+        testcase: 'syl0'
     },
     {
         name: "Maximum difference of zeros and ones in binary string",
@@ -111,13 +115,14 @@ const data = [
             }
         ],
         noOfSubm: 0,
-        noOfSuccess: 0
+        noOfSuccess: 0,
+        testcase: 'mdozaoibs0'
     },
 ]
 
 const connectDB = () => {
     mongoose.connect(
-        ''
+        'mongodb://localhost:27017/oj-server'
     )
         .then(() => {
             console.log("Database Connected !!!");
@@ -146,7 +151,8 @@ seedDB().then(() => {
     console.log('Seeded successfully !!!');
     setTimeout(() => {
         mongoose.connection.close();
-    }, 5000);
+        console.log('Disconnected !!!');
+    }, 1000);
 }).catch(err => {
     console.log('Here comes error : \n', err);
 });

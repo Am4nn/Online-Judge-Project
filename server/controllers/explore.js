@@ -1,6 +1,8 @@
 const { getQuestionList, getQuestionById } = require('../DataBase/database');
 const ObjectId = require('mongoose').Types.ObjectId;
 
+const { createFile, deleteFile, execCppCode } = require('../CodeExecutor/codeExecuter')
+
 // Validator function
 function isValidObjectId(id) {
     return (ObjectId.isValid(id) && ((String)(new ObjectId(id)) === id))
@@ -34,13 +36,13 @@ const detailedProblemController = async (req, res) => {
 
 const verdictController = async (req, res) => {
     try {
-        const body = req.body;
+        const { language, code, testcase } = req.body;
 
-        console.log(body);
+        const filePath = createFile(language, code);
+        const response = await execCppCode(filePath, testcase);
+        // deleteFile(filePath);
 
-        setTimeout(() => {
-            return res.status(200).json('verdictController');
-        }, 2000)
+        return res.status(200).json(response);
     } catch (error) {
         return res.status(400).json(error);
     }

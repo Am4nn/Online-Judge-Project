@@ -38,6 +38,10 @@ const QuesSchema = new mongoose.Schema({
         type: Number,
         required: true,
         default: 0,
+    },
+    testcase: {
+        type: String,
+        required: true
     }
 })
 

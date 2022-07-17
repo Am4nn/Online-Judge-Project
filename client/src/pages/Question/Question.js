@@ -1,24 +1,36 @@
-import React, { Fragment, useCallback, useState } from 'react';
+import React, { Fragment, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import LoadingSpinner from '../../compenents/LoadingSpinner/LoadingSpinner';
 import useFetch from '../../hooks/useFetch';
 import classes from './Question.module.css';
 
-import CodeEditor from './Editor/CodeEditor';
-import Button from '../../compenents/Button/Button';
+import CodeEditorv3 from './Editor/CodeEditorv3';
+import ButtonCustom from '../../compenents/Button/Button';
 
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
-import Select from '@mui/material/Select'
-import MenuItem from '@mui/material/MenuItem'
 import SendIcon from '@mui/icons-material/Send';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import Settings from '@mui/icons-material/Settings'
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+
+import {
+    Fab,
+    Select,
+    MenuItem,
+    InputLabel,
+    FormControl,
+    Drawer,
+    TextField,
+    Button
+} from '@mui/material';
 
 import { SERVER_LINK } from '../../dev-server-link';
+import { defaultCppCode, defaultJsCode, defaultPythonCode } from './defaultCodes/defaultCodes';
 
 const Question = () => {
     const { id } = useParams();
+
+    const navigator = useNavigate();
+    const backBtnHandler = () => navigator(-1);
 
     const { loading, error, value: question } = useFetch(
         `${SERVER_LINK}/api/explore/problems/${id}`,
@@ -31,25 +43,23 @@ const Question = () => {
         [id]
     )
 
-    const navigator = useNavigate();
-    const backHandler = () => navigator(-1);
-
     // not-initialized, submitting, response-ok, response-not-ok, error
     const [codeSubmittingState, setcodeSubmittingState] = useState('not-initialized');
 
-    const [code, setCode] = useState(`#include <bits/stdc++.h>\nusing namespace std;\n\nint main()\n{\n    cout << "Hello World";\n    return 0;\n}`);
+    const [code, setCode] = useState(() => defaultCppCode);
     const [codeFontSize, setcodeFontSize] = useState(15);
-    const [selectedLang, setSelectedLang] = useState('CPP');
+    const [selectedLang, setSelectedLang] = useState('cpp');
+    const [drawerOpen, toggleDrawerOpen] = useState(false);
+    const [response, setResponse] = useState([]);
+
+    const endRef = useRef(null);
 
     const submitHandler = async event => {
         event.preventDefault();
         if (codeSubmittingState === 'submitting') return;
 
         console.log('submitting code');
-
         setcodeSubmittingState('submitting');
-
-        // after getting response from server setcodeSubmittingState to false
 
         try {
             const response = await fetch(
@@ -59,21 +69,41 @@ const Question = () => {
                         'Content-Type': 'application/json'
                     },
                     method: 'POST',
-                    body: JSON.stringify({ code, language: selectedLang }),
+                    body: JSON.stringify({ code, language: selectedLang, testcase: question.testcase }),
                 }
             );
+            const data = await response.json();
             if (response.ok) {
-                const data = await response.json();
                 setcodeSubmittingState('response-ok');
-                console.log(data);
+                console.info(data);
             }
             else {
                 setcodeSubmittingState('response-not-ok');
-                console.log('response not ok', response);
+                console.error('response not ok\n', data);
             }
+            setResponse(data);
+            endRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } catch (error) {
-            console.log('caught errors while sending code to server for getting verdict', error);
+            setResponse({ msg: 'caught errors while sending code to server for getting verdict', serverError: error });
             setcodeSubmittingState('error');
+        }
+    }
+
+    const resetCode = () => {
+        switch (selectedLang) {
+            case 'cpp':
+                setCode(defaultCppCode);
+                break;
+            case 'js':
+                setCode(defaultJsCode);
+                break;
+            case 'py':
+                setCode(defaultPythonCode);
+                break;
+            // case 'java':
+            //     setCode(defaultJavaCode);
+            //     break;
+            default:
         }
     }
 
@@ -87,10 +117,10 @@ const Question = () => {
                         <div className={classes.codeSnippet}>
                             &#60; go back to questions /&#62;
                         </div>
-                        <Button to='/' onClick={backHandler} color='yellow'>
+                        <ButtonCustom to='/' onClick={backBtnHandler} color='yellow'>
                             <ArrowBackIcon style={{ marginRight: '0.3em', transform: 'translateX(-12px)', fontSize: '1.2em' }} />
                             Back
-                        </Button>
+                        </ButtonCustom>
                     </div>
                     <div className={classes.head}>
                         <div style={{ display: 'inline-block' }}>
@@ -119,38 +149,85 @@ const Question = () => {
                         ))}
                         <div className={classes.editor}>
                             <div className={classes.codeSnippet}>
-                                &#60; write your code here /&#62;
-                            </div>
-                            <div className={classes.fontSnippet}>
-                                &#60; Font Size /&#62;
-                            </div>
-                            <div className={classes.changeFont}>
-                                <input type='number' min={2} max={50} defaultValue={codeFontSize} onChange={e => setcodeFontSize(e.target.value)} />
+                                &#60; write your code here in <span style={{ color: 'red', textTransform: 'uppercase' }}>{selectedLang}</span> /&#62;
                             </div>
 
-                            <div className={classes.changeLang}>
-                                <FormControl>
-                                    <InputLabel id="changeLang-select-label">Language</InputLabel>
-                                    <Select
-                                        labelId="changeLang-select-label"
-                                        id="changeLang-select"
-                                        value={selectedLang}
-                                        label="Language"
-                                        style={{ width: '8em', height: '2.8em' }}
-                                        onChange={e => setSelectedLang(e.target.value)}
-                                    >
-                                        <MenuItem value={'CPP'}>CPP</MenuItem>
-                                        <MenuItem value={'JAVA'}>JAVA</MenuItem>
-                                        <MenuItem value={'PYTHON'}>PYTHON</MenuItem>
-                                        <MenuItem value={'JS'}>JS</MenuItem>
-                                    </Select>
-                                </FormControl>
-                            </div>
+
+                            <Fab style={{
+                                zIndex: '899',
+                                position: 'absolute',
+                                top: '-2rem',
+                                right: '18%'
+                            }} onClick={() => toggleDrawerOpen(prev => !prev)} color="secondary" aria-label="add">
+                                <div className={classes.optionSnippet}
+                                    style={{
+                                        top: '-1.5rem',
+                                        whiteSpace: 'nowrap',
+                                        textTransform: 'lowercase'
+                                    }}
+                                >
+                                    &#60; change lang, font size, ... /&#62;
+                                </div>
+                                <Settings />
+                            </Fab>
+                            <Drawer
+                                anchor='right'
+                                open={drawerOpen}
+                                onClose={() => toggleDrawerOpen(prev => !prev)}
+                            >
+                                <div style={{ width: '15rem', margin: '1rem' }}>
+                                    <h1 className={classes.optionHeading} >Options</h1>
+
+
+                                    <div className={classes.fontSnippet}>
+                                        &#60; Font Size /&#62;
+                                    </div>
+                                    <div className={classes.changeFont}>
+                                        <TextField
+                                            type={'number'}
+                                            value={codeFontSize}
+                                            onChange={e => { if (e.target.value > 50 || e.target.value < 2) return; setcodeFontSize(e.target.value); }}
+                                            // variant="filled"
+                                            style={{ width: '100%' }}
+                                            variant='standard'
+                                        />
+                                    </div>
+
+                                    <div className={classes.changeLang}>
+                                        <FormControl>
+                                            <InputLabel id="changeLang-select-label">Language</InputLabel>
+                                            <Select
+                                                labelId="changeLang-select-label"
+                                                id="changeLang-select"
+                                                value={selectedLang}
+                                                label="Language"
+                                                style={{ width: '8em', height: '2.8em' }}
+                                                onChange={e => setSelectedLang(e.target.value)}
+                                            >
+                                                <MenuItem value={'cpp'}>CPP</MenuItem>
+                                                {/* <MenuItem value={'java'}>JAVA</MenuItem> */}
+                                                <MenuItem value={'py'}>PYTHON</MenuItem>
+                                                <MenuItem value={'js'}>JS</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </div>
+
+                                    <div className={classes.resetCode}>
+                                        <Button color="error" onClick={resetCode} variant='contained' startIcon={
+                                            <RestartAltIcon fontSize='large' style={{ marginRight: '0.5em', fontSize: '2em' }} />
+                                        } style={{ textTransform: 'capitalize' }}>
+                                            ResetCode
+                                        </Button>
+                                    </div>
+                                </div>
+                            </Drawer>
 
                             <div className={classes.editorText}>
-                                <CodeEditor
+                                <CodeEditorv3
+                                    selectedLang={selectedLang}
                                     code={code}
                                     setCode={setCode}
+                                    language={selectedLang}
                                     fontSize={codeFontSize}
                                 />
                             </div>
@@ -163,12 +240,24 @@ const Question = () => {
                                         'click here to submit' : 'wanna submit again')}
                                 &#160;/&#62;
                             </div>
-                            <Button to='/' onClick={submitHandler} color='green'>
+                            <ButtonCustom to='/' onClick={submitHandler} color='green'>
                                 {codeSubmittingState === 'submitting' ? 'Submitting' : 'Submit'}
                                 {codeSubmittingState === 'submitting' ? <div className={classes.spin} /> : <SendIcon style={{ marginLeft: '0.6em', fontSize: '1.2em' }} />}
-                            </Button>
+                            </ButtonCustom>
                         </div>
+                        {codeSubmittingState !== 'not-initialized' && codeSubmittingState !== 'submitting' && (
+                            <div className={classes.body}>
+                                <div style={{ "--col": (codeSubmittingState === 'response-ok' ? 127 : 0) }} className={classes.response}>
+                                    {response.msg && <div><span>Msg : </span>{response.msg}</div>}
+                                    {response.stdout && <div><span>STDOUT : </span>{response.stdout}</div>}
+                                    {response.stderr && <div><span>STDERR : </span>{response.stderr}</div>}
+                                    {response.error && response.error.signal && <div><span>Signal : </span>{response.error.signal}</div>}
+                                    {response.serverError && <div><span>serverError : </span>{response.serverError.toString()}</div>}
+                                </div>
+                            </div>
+                        )}
                     </div>
+                    <div aria-hidden ref={endRef}></div>
                 </div>
             )}
         </Fragment >
