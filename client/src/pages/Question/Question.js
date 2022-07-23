@@ -1,30 +1,31 @@
 import React, { Fragment, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import LoadingSpinner from '../../compenents/LoadingSpinner/LoadingSpinner';
-import useFetch from '../../hooks/useFetch';
-import classes from './Question.module.css';
 
+import classes from './Question.module.css';
+import useFetch from '../../hooks/useFetch';
 import CodeEditorv3 from './Editor/CodeEditorv3';
 import ButtonCustom from '../../compenents/Button/Button';
+import useLocalStorage from '../../hooks/useLocalStorage';
+import LoadingSpinner from '../../compenents/LoadingSpinner/LoadingSpinner';
 
 import SendIcon from '@mui/icons-material/Send';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Settings from '@mui/icons-material/Settings'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 import {
     Fab,
     Select,
-    MenuItem,
-    InputLabel,
-    FormControl,
     Drawer,
+    Button,
+    MenuItem,
     TextField,
-    Button
+    InputLabel,
+    FormControl
 } from '@mui/material';
 
 import { SERVER_LINK } from '../../dev-server-link';
-import { defaultCppCode, defaultJsCode, defaultPythonCode } from './defaultCodes/defaultCodes';
+import { defaultCppCode, defaultPythonCode } from './defaultCodes/defaultCodes';
 
 const Question = () => {
     const { id } = useParams();
@@ -44,11 +45,12 @@ const Question = () => {
     )
 
     // not-initialized, submitting, response-ok, response-not-ok, error
+    // not-initialized, submitting, submitted
     const [codeSubmittingState, setcodeSubmittingState] = useState('not-initialized');
 
     const [code, setCode] = useState(() => defaultCppCode);
     const [codeFontSize, setcodeFontSize] = useState(15);
-    const [selectedLang, setSelectedLang] = useState('cpp');
+    const [selectedLang, setSelectedLang] = useLocalStorage('selectedlangoj', 'cpp');
     const [drawerOpen, toggleDrawerOpen] = useState(false);
     const [response, setResponse] = useState([]);
 
@@ -56,13 +58,14 @@ const Question = () => {
 
     const submitHandler = async event => {
         event.preventDefault();
+
         if (codeSubmittingState === 'submitting') return;
 
         console.log('submitting code');
         setcodeSubmittingState('submitting');
 
         try {
-            const response = await fetch(
+            const query = await fetch(
                 `${SERVER_LINK}/api/explore/problems/${id}`,
                 {
                     headers: {
@@ -72,20 +75,46 @@ const Question = () => {
                     body: JSON.stringify({ code, language: selectedLang, testcase: question.testcase }),
                 }
             );
-            const data = await response.json();
-            if (response.ok) {
-                setcodeSubmittingState('response-ok');
-                console.info(data);
+            const queryData = await query.json();
+            setResponse(queryData);
+
+            if (query.ok) {
+                console.info("response-ok", queryData);
+                const intervalID = setInterval(async () => {
+                    const response = await fetch(
+                        `${SERVER_LINK}/api/explore/status/${queryData.queryId}`,
+                        {
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            method: 'GET'
+                        }
+                    );
+                    const data = await response.json();
+                    if (!response.ok) {
+                        clearInterval(intervalID);
+                        setcodeSubmittingState('submitted');
+                        setResponse(data);
+                        console.log("response-not-ok ", data);
+                    }
+                    else if (data.status !== 'pending') {
+                        clearInterval(intervalID);
+                        setcodeSubmittingState('submitted');
+                        setResponse({ ...data.output, status: data.status });
+                        console.log(`status -> ${data.status}`, data);
+                    }
+                    else console.log('status -> pending', data);
+                }, 1000);
             }
             else {
-                setcodeSubmittingState('response-not-ok');
-                console.error('response not ok\n', data);
+                console.error('response not ok ', queryData);
+                setcodeSubmittingState('submitted');
             }
-            setResponse(data);
+
             endRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } catch (error) {
-            setResponse({ msg: 'caught errors while sending code to server for getting verdict', serverError: error });
-            setcodeSubmittingState('error');
+            setResponse({ msg: 'caught errors while sending code to server for getting verdict', serverError: JSON.stringify(error) });
+            setcodeSubmittingState('submitted');
         }
     }
 
@@ -94,12 +123,12 @@ const Question = () => {
             case 'cpp':
                 setCode(defaultCppCode);
                 break;
-            case 'js':
-                setCode(defaultJsCode);
-                break;
             case 'py':
                 setCode(defaultPythonCode);
                 break;
+            // case 'js':
+            //     setCode(defaultJsCode);
+            //     break;
             // case 'java':
             //     setCode(defaultJavaCode);
             //     break;
@@ -110,7 +139,12 @@ const Question = () => {
     return (
         <Fragment>
             {loading && <LoadingSpinner />}
-            {!loading && error && <div>{error}</div>}
+            {!loading && error && (<div>
+                <div className={classes.serverError}>
+                    <div><span>Msg : </span>Wasn't able to connect to server check if your are not offline or server might not be working !</div>
+                    {error && <div><span>Error : </span>{JSON.stringify(error)}</div>}
+                </div>
+            </div>)}
             {!loading && !error && (
                 <div className={classes.contain}>
                     <div className={classes.back}>
@@ -205,9 +239,9 @@ const Question = () => {
                                                 onChange={e => setSelectedLang(e.target.value)}
                                             >
                                                 <MenuItem value={'cpp'}>CPP</MenuItem>
-                                                {/* <MenuItem value={'java'}>JAVA</MenuItem> */}
                                                 <MenuItem value={'py'}>PYTHON</MenuItem>
-                                                <MenuItem value={'js'}>JS</MenuItem>
+                                                {/* <MenuItem value={'java'}>JAVA</MenuItem> */}
+                                                {/* <MenuItem value={'js'}>JS</MenuItem> */}
                                             </Select>
                                         </FormControl>
                                     </div>
@@ -245,14 +279,15 @@ const Question = () => {
                                 {codeSubmittingState === 'submitting' ? <div className={classes.spin} /> : <SendIcon style={{ marginLeft: '0.6em', fontSize: '1.2em' }} />}
                             </ButtonCustom>
                         </div>
-                        {codeSubmittingState !== 'not-initialized' && codeSubmittingState !== 'submitting' && (
+                        {codeSubmittingState !== 'not-initialized' && (
                             <div className={classes.body}>
-                                <div style={{ "--col": (codeSubmittingState === 'response-ok' ? 127 : 0) }} className={classes.response}>
+                                <div style={{ "--col": (response.status === 'success' ? 127 : 0) }} className={classes.response}>
                                     {response.msg && <div><span>Msg : </span>{response.msg}</div>}
                                     {response.stdout && <div><span>STDOUT : </span>{response.stdout}</div>}
                                     {response.stderr && <div><span>STDERR : </span>{response.stderr}</div>}
-                                    {response.error && response.error.signal && <div><span>Signal : </span>{response.error.signal}</div>}
+                                    {response.error && <div><span>Error : </span>{JSON.stringify(response.error)}</div>}
                                     {response.serverError && <div><span>serverError : </span>{response.serverError.toString()}</div>}
+                                    {response.status === 'pending' && <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}> <LoadingSpinner /> </div>}
                                 </div>
                             </div>
                         )}

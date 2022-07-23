@@ -1,7 +1,14 @@
 const { getQuestionList, getQuestionById } = require('../DataBase/database');
 const ObjectId = require('mongoose').Types.ObjectId;
 
-const { createFile, deleteFile, execCppCode } = require('../CodeExecutor/codeExecuter')
+const Query = require('../DataBase/Model/Query');
+const { addQueryToQueue } = require('../CodeExecuter/queryQueue');
+const Leader = require('../DataBase/Model/Leader');
+
+const {
+    createFile,
+    deleteFile,
+} = require('../CodeExecuter/codeExecuter');
 
 // Validator function
 function isValidObjectId(id) {
@@ -38,14 +45,50 @@ const verdictController = async (req, res) => {
     try {
         const { language, code, testcase } = req.body;
 
-        const filePath = createFile(language, code);
-        const response = await execCppCode(filePath, testcase);
-        // deleteFile(filePath);
+        if (language !== 'py' && language !== 'cpp')
+            return res.status(400).json({ msg: 'Please select a language / valid language !' });
 
-        return res.status(200).json(response);
-    } catch (error) {
-        return res.status(400).json(error);
+        const filepath = createFile(language, code);
+        const query = new Query({ language, filepath, testcase });
+        await query.save();
+
+        // const leader = new Leader();
+
+        const queryId = query['_id'];
+        addQueryToQueue(queryId);
+
+        res.status(201).json({ status: 'pending', msg: "Request queued, wait for response !", queryId });
+    } catch (err) {
+        return res.status(400).json({ status: 'error', msg: 'some error occured submitting the code !', error: JSON.stringify(err) });
     }
+}
+
+const statusController = async (req, res) => {
+    const queryId = req.params.queryId;
+    if (!isValidObjectId(queryId))
+        return res.status(404).json({ msg: 'not a valid object id' });
+    let query = null;
+    try {
+        query = await Query.findById(queryId);
+        if (!query) {
+            return res.status(404).json({ msg: 'invalid queryId or this query has been deleted !' });
+        }
+        res.status(200).json(query);
+    } catch (err) {
+        res.status(400).json({ msg: 'on error', error: JSON.stringify(err) });
+    }
+
+    // code to delete files not required anymore or can be saved to display in leaderboard
+    // try {
+    //     if (query) {
+    //         deleteFile(query.filepath);
+    //         deleteOutFile(query.filepath, 'out');
+    //         await Query.findByIdAndDelete(queryId);
+    //         console.log('Deleted without errors !');
+    //     }
+    // } catch (err) {
+    //     console.log('Error in deleting step ! ', err);
+    // }
 }
 
 const leaderboardController = async (req, res) => {
@@ -57,8 +100,9 @@ const leaderboardController = async (req, res) => {
 }
 
 module.exports = {
-    problemsController,
-    detailedProblemController,
+    statusController,
     verdictController,
-    leaderboardController
+    problemsController,
+    leaderboardController,
+    detailedProblemController
 };

@@ -365,3 +365,27 @@
 .response :last-child {
     border-bottom: unset;
 }
+
+.serverError {
+    padding: 2em;
+    background-color: hsla(0, 44%, 56%, 0.1);
+    border: 1px solid hsla(0, 44%, 56%, 0.6);
+    letter-spacing: 0.03em;
+    position: relative;
+    text-align: justify;
+    margin: 2em;
+}
+
+.serverError span {
+    font-weight: 600;
+    margin-right: 1em;
+}
+
+.serverError div {
+    padding: 0.4em;
+    border-bottom: 1px solid rgba(70, 70, 70, 0.1);
+}
+
+.serverError :last-child {
+    border-bottom: unset;
+}
