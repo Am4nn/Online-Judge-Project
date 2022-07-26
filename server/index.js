@@ -4,7 +4,6 @@ if (process.env.NODE_ENV !== "production") { // if in development
 
 const express = require('express');
 const cors = require('cors');
-const test = require('./routes/test');
 const explore = require('./routes/explore');
 const user = require('./routes/user');
 const app = express();
@@ -17,9 +16,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-
-// set api routes
-app.use('/api/test', test);
 
 // set api route to get all questions
 app.use('/api/explore', explore);

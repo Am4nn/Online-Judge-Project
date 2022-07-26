@@ -9,8 +9,5 @@
 
 /server/.env
 /server/node_modules
-/server/CodeExecuter/codeFiles
-/server/CodeExecuter/outputFiles
-/server/CodeExecuter/correctCodes
 
 testing

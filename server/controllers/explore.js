@@ -3,12 +3,13 @@ const ObjectId = require('mongoose').Types.ObjectId;
 
 const Query = require('../DataBase/Model/Query');
 const { addQueryToQueue } = require('../CodeExecuter/queryQueue');
-const Leader = require('../DataBase/Model/Leader');
 
 const {
+    readFile,
     createFile,
-    deleteFile,
-} = require('../CodeExecuter/codeExecuter');
+    deleteFile
+} = require('../CodeExecuter/codeExecutor_dockerv');
+const Question = require('../DataBase/Model/Question');
 
 // Validator function
 function isValidObjectId(id) {
@@ -43,19 +44,22 @@ const detailedProblemController = async (req, res) => {
 
 const verdictController = async (req, res) => {
     try {
-        const { language, code, testcase } = req.body;
+        const { language, code, testcase, quesName } = req.body;
+        const quesId = req.params.id;
 
         if (language !== 'py' && language !== 'cpp')
             return res.status(400).json({ msg: 'Please select a language / valid language !' });
 
         const filepath = createFile(language, code);
-        const query = new Query({ language, filepath, testcase });
+        const query = new Query({ language, filepath, testcase, quesId, quesName });
         await query.save();
-
-        // const leader = new Leader();
 
         const queryId = query['_id'];
         addQueryToQueue(queryId);
+
+        const question = await Question.findById(quesId);
+        question.noOfSubm += 1;
+        await question.save();
 
         res.status(201).json({ status: 'pending', msg: "Request queued, wait for response !", queryId });
     } catch (err) {
@@ -77,29 +81,33 @@ const statusController = async (req, res) => {
     } catch (err) {
         res.status(400).json({ msg: 'on error', error: JSON.stringify(err) });
     }
-
-    // code to delete files not required anymore or can be saved to display in leaderboard
-    // try {
-    //     if (query) {
-    //         deleteFile(query.filepath);
-    //         deleteOutFile(query.filepath, 'out');
-    //         await Query.findByIdAndDelete(queryId);
-    //         console.log('Deleted without errors !');
-    //     }
-    // } catch (err) {
-    //     console.log('Error in deleting step ! ', err);
-    // }
 }
 
 const leaderboardController = async (req, res) => {
+    console.log('leaderboard requested !');
     try {
-        return res.status(200).json('leaderboardController');
+        const leaders = await Query.find({}).sort({ _id: -1 });
+        return res.status(200).json(leaders);
     } catch (error) {
         return res.status(400).json(error);
     }
 }
 
+const codesController = async (req, res) => {
+    console.log('requested getcode !');
+    try {
+        const { filepath } = req.body;
+        const code = readFile(filepath);
+        if (!code) return res.status(404).json({ error: 'filename does not exists or is deleted !' });
+        console.log(code, code.toString());
+        res.status(200).json({code : code.toString()});
+    } catch (error) {
+        res.status(400).json({ error: JSON.stringify(error) });
+    }
+}
+
 module.exports = {
+    codesController,
     statusController,
     verdictController,
     problemsController,

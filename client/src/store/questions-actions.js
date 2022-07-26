@@ -1,8 +1,5 @@
-import { questionsActions } from './questions-slice'
-import { uiActions } from './ui-slice';
-
 import { SERVER_LINK } from '../dev-server-link';
-
+import { questionsActions } from './questions-slice'
 
 export const fetchQuestionListData = () => {
     return async (dispatch) => {
@@ -34,13 +31,7 @@ export const fetchQuestionListData = () => {
                 })
             );
         } catch (error) {
-            dispatch(
-                uiActions.showNotification({
-                    status: 'error',
-                    title: 'Error!',
-                    message: 'Fetching cart data failed!',
-                })
-            );
+            console.error(error);
         }
     };
 };
@@ -50,14 +41,6 @@ export const fetchQuestionListData = () => {
 
 export const sendQuestionListData = (cart) => {
     return async (dispatch) => {
-        dispatch(
-            uiActions.showNotification({
-                status: 'pending',
-                title: 'Sending...',
-                message: 'Sending cart data!',
-            })
-        );
-
         const sendRequest = async () => {
             const response = await fetch(
                 `${SERVER_LINK}/api/explore/problems`,
@@ -79,22 +62,8 @@ export const sendQuestionListData = (cart) => {
 
         try {
             await sendRequest();
-
-            dispatch(
-                uiActions.showNotification({
-                    status: 'success',
-                    title: 'Success!',
-                    message: 'Sent cart data successfully!',
-                })
-            );
         } catch (error) {
-            dispatch(
-                uiActions.showNotification({
-                    status: 'error',
-                    title: 'Error!',
-                    message: 'Sending cart data failed!',
-                })
-            );
+            console.error(error);
         }
     };
 };

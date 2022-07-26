@@ -14,7 +14,7 @@ import 'ace-builds/src-noconflict/ext-language_tools'
 
 const CodeEditorv3 = props => {
 
-    const { code, setCode, language, fontSize } = props;
+    const { code, setCode, language, fontSize, isReadOnly = false } = props;
 
     let mode = 'c_cpp';
     switch (language) {
@@ -43,8 +43,9 @@ const CodeEditorv3 = props => {
             onLoad={() => console.log('loaded')}
             onChange={value => setCode(value)}
             fontSize={parseInt(fontSize)}
-            showPrintMargin={true}
+            showPrintMargin={false}
             showGutter={true}
+            readOnly={isReadOnly}
             highlightActiveLine={true}
             value={code}
             width='100%'

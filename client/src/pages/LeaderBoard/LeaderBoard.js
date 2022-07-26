@@ -1,35 +1,46 @@
-import React, { Fragment } from 'react';
-import useFetch from '../../hooks/useFetch';
+import React, { Fragment, useEffect, useState } from 'react';
 import { SERVER_LINK } from '../../dev-server-link';
 
-import classes from './LeaderBoard.module.css';
+import LeaderTable from './LeaderTable/LeaderTable';
 import LoadingSpinner from '../../compenents/LoadingSpinner/LoadingSpinner';
 
 const LeaderBoard = () => {
 
-    const { loading, error, value: leaders } = useFetch(
-        `${SERVER_LINK}/api/explore/leaderboard`,
-        {
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            method: 'GET',
-        }
-    )
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(undefined);
+    const [leaders, setLeaders] = useState(undefined);
 
-    console.log(leaders);
+    useEffect(() => {
+        fetch(
+            `${SERVER_LINK}/api/explore/leaderboard`,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                method: 'GET'
+            }
+        )
+            .then(data => data.json())
+            .then(response => {
+                if (!response.ok) {
+                    setLeaders(response);
+                }
+            })
+            .catch(setError)
+            .finally(() => setLoading(false))
+    }, []);
 
     return (
         <Fragment>
             {loading && <LoadingSpinner />}
             {!loading && error && (<div>
-                <div className={classes.serverError}>
+                <div className='errorTemplate'>
                     <div><span>Msg : </span>Wasn't able to connect to server check if your are not offline or server might not be working !</div>
                     {error && <div><span>Error : </span>{JSON.stringify(error)}</div>}
                 </div>
             </div>)}
             {!loading && !error && (
-                <div>Leader Board</div>
+                <LeaderTable leaders={[...leaders]} />
             )}
         </Fragment>
     )

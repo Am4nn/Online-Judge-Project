@@ -72,7 +72,7 @@ const Question = () => {
                         'Content-Type': 'application/json'
                     },
                     method: 'POST',
-                    body: JSON.stringify({ code, language: selectedLang, testcase: question.testcase }),
+                    body: JSON.stringify({ code, language: selectedLang, testcase: question.testcase, quesName: question.name })
                 }
             );
             const queryData = await query.json();
@@ -140,7 +140,7 @@ const Question = () => {
         <Fragment>
             {loading && <LoadingSpinner />}
             {!loading && error && (<div>
-                <div className={classes.serverError}>
+                <div className='errorTemplate'>
                     <div><span>Msg : </span>Wasn't able to connect to server check if your are not offline or server might not be working !</div>
                     {error && <div><span>Error : </span>{JSON.stringify(error)}</div>}
                 </div>

@@ -1,0 +1,28 @@
+.succRow {
+    background-color: hsl(134, 41%, 83%);
+}
+
+.succRow:hover {
+    background-color: hsl(134, 41%, 80%) !important;
+}
+
+.errRow {
+    background-color: hsl(354, 70%, 87%);
+}
+
+.errRow:hover {
+    background-color: hsl(354, 70%, 84%) !important;
+}
+
+.headRow {
+    background-color: rgb(38, 45, 51) !important;
+}
+
+.quesRow {
+    color: hsl(215, 100%, 26%);
+}
+
+.quesRow:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+}

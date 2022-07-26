@@ -6,6 +6,14 @@ const QuerySchema = new mongoose.Schema({
         required: true,
         enum: ['cpp', 'py']
     },
+    quesId: {
+        type: String,
+        required: true
+    },
+    quesName: {
+        type: String,
+        required: true
+    },
     filepath: {
         type: String,
         required: true

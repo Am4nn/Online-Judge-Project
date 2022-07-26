@@ -2,6 +2,7 @@
 
 const Queue = require('bull');
 const Query = require('../DataBase/Model/Query');
+const Question = require('../DataBase/Model/Question');
 
 const {
     execPyCode,
@@ -38,12 +39,17 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
         query.output = response;
         await query.save();
 
+        const question = await Question.findById(query.quesId);
+        question.noOfSuccess += 1;
+        await question.save();
+
     } catch (error) {
+        if (!error.msg) error = { ...error, msg: 'some server side errors' };
+
         query.completeTime = new Date();
         query.status = 'error';
         query.output = error;
         await query.save();
-
     }
     return true;
 })

@@ -29,6 +29,12 @@ const createFile = (fileExtension, content) => {
     return filepath;
 }
 
+const readFile = filepath => {
+    if (!fs.existsSync(filepath))
+        return undefined;
+    return fs.readFileSync(filepath);
+}
+
 const deleteFile = filepath => {
     if (!fs.existsSync(filepath)) return;
     fs.unlinkSync(filepath);
@@ -88,8 +94,9 @@ const execPyCode = (filePath, testcase) => {
 }
 
 module.exports = {
+    readFile,
     createFile,
-    execCppCode,
     execPyCode,
-    deleteFile
+    deleteFile,
+    execCppCode
 };

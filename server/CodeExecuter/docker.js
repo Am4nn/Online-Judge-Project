@@ -1,7 +1,7 @@
 const { exec, spawn } = require('child_process');
 const path = require('path');
 
-const codeDirectory = 'C:\\Aman\\Coding-Bamzii\\Web Development\\MERN STACK\\Online-Judge-Project\\testing\\Docker\\code.cpp';
+// use promisify
 
 // image => gcc, python
 const createContainer = image => {

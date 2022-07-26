@@ -8,3 +8,28 @@
     font-family: 'POLYA';
     src: url('./assests/fonts/POLYA.otf');
 }
+
+.errorTemplate {
+    padding: 2em;
+    border-radius: 4px;
+    background-color: hsla(0, 44%, 56%, 0.1);
+    border: 1px solid hsla(0, 44%, 56%, 0.6);
+    letter-spacing: 0.03em;
+    position: relative;
+    text-align: justify;
+    margin: 2em;
+}
+
+.errorTemplate span {
+    font-weight: 600;
+    margin-right: 1em;
+}
+
+.errorTemplate div {
+    padding: 0.4em;
+    border-bottom: 1px solid rgba(70, 70, 70, 0.1);
+}
+
+.errorTemplate :last-child {
+    border-bottom: unset;
+}
