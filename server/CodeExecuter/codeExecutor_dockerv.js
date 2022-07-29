@@ -7,8 +7,12 @@ const {
 } = require('./docker');
 
 let gccContainerId = null, pythonContainerId = null;
-createContainer('gcc').then(data => gccContainerId = data);
-createContainer('python').then(data => pythonContainerId = data);
+createContainer('gcc')
+    .then(data => gccContainerId = data)
+    .catch(error => console.error('Docker Error : ', error));
+createContainer('python')
+    .then(data => pythonContainerId = data)
+    .catch(error => console.error('Docker Error : ', error));
 
 const fs = require("fs");
 const path = require("path");

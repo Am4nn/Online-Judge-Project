@@ -72,7 +72,7 @@ const createData = leaders => {
     submitTime = moment(submitTime).fromNow();
     status === 'pending' ? (status = 'Pending') : (status === 'success' ? (status = 'Accepted') : (status = 'Rejected'));
 
-    return { quesName, status, language, time, submitTime, quesId, msg: (output.msg || 'NA'), filepath };
+    return { quesName, status, language, time, submitTime, quesId, msg: ((!output || !output.msg) ? 'NA' : output.msg), filepath };
 }
 
 const LeaderTable = props => {
