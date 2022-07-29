@@ -56,7 +56,7 @@ export const sendQuestionListData = (cart) => {
             );
 
             if (!response.ok) {
-                throw new Error('Sending cart data failed.');
+                throw new Error('Sending question data failed.');
             }
         };
 

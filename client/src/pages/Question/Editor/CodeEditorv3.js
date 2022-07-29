@@ -40,7 +40,9 @@ const CodeEditorv3 = props => {
             mode={mode}
             theme="monokai"
             name="editorv3"
-            onLoad={() => console.log('loaded')}
+            onLoad={() => {
+                // console.log('loaded')
+            }}
             onChange={value => setCode(value)}
             fontSize={parseInt(fontSize)}
             showPrintMargin={false}

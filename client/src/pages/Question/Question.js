@@ -79,7 +79,7 @@ const Question = () => {
             setResponse(queryData);
 
             if (query.ok) {
-                console.info("response-ok", queryData);
+                // console.info("response-ok", queryData);
                 const intervalID = setInterval(async () => {
                     const response = await fetch(
                         `${SERVER_LINK}/api/explore/status/${queryData.queryId}`,
@@ -95,19 +95,19 @@ const Question = () => {
                         clearInterval(intervalID);
                         setcodeSubmittingState('submitted');
                         setResponse(data);
-                        console.log("response-not-ok ", data);
+                        // console.log("response-not-ok ", data);
                     }
                     else if (data.status !== 'pending') {
                         clearInterval(intervalID);
                         setcodeSubmittingState('submitted');
                         setResponse({ ...data.output, status: data.status });
-                        console.log(`status -> ${data.status}`, data);
+                        // console.log(`status -> ${data.status}`, data);
                     }
-                    else console.log('status -> pending', data);
+                    // else console.log('status -> pending', data);
                 }, 1000);
             }
             else {
-                console.error('response not ok ', queryData);
+                // console.log('response not ok ', queryData);
                 setcodeSubmittingState('submitted');
             }
 

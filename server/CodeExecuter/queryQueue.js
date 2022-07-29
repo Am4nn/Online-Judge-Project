@@ -57,11 +57,11 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
 
 // set status of query to error with some appropriate msg
 queryQueue.on('failed', error => {
-    console.log(error.data.id, 'failed', error.failedReason);
+    console.error(error.data.id, 'failed', error.failedReason);
 })
 
 queryQueue.on('error', error => {
-    console.log('error', error);
+    console.error('error', error);
 })
 
 

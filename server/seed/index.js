@@ -128,8 +128,8 @@ const connectDB = () => {
             console.log("Database Connected !!!");
         })
         .catch(error => {
-            console.log("Oh no MONGOOSE Error !!!");
-            console.log(error);
+            console.error("Oh no MONGOOSE Error !!!");
+            console.error(error);
         });
 }
 
@@ -154,5 +154,5 @@ seedDB().then(() => {
         console.log('Disconnected !!!');
     }, 1000);
 }).catch(err => {
-    console.log('Here comes error : \n', err);
+    console.error('Here comes error : \n', err);
 });

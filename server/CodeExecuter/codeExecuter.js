@@ -110,7 +110,7 @@ const execPyCode = (filePath, testcase) => {
                 }
             });
             cmd.on('close', code => {
-                console.log(`child closed with code ${code}`);
+                // console.log(`child closed with code ${code}`);
             });
         });
     });

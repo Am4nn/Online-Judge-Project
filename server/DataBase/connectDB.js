@@ -9,8 +9,8 @@ const connectDB = () => {
             console.log("Database Connected !!!");
         })
         .catch(error => {
-            console.log("Oh no MONGOOSE Error !!!");
-            console.log(error);
+            console.error("Oh no MONGOOSE Error !!!");
+            console.error(error);
         });
 }
 

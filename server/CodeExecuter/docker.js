@@ -53,7 +53,7 @@ const execOutFile = (containerId, id, testInput) => {
             resolve(exOut);
         });
         cmd.on('close', code => {
-            console.log(`child process exited with code ${code}`);
+            // console.log(`child process exited with code ${code}`);
         });
     });
 }
@@ -74,7 +74,7 @@ const execPyFile = (containerId, filename, testInput) => {
             resolve(exOut);
         });
         cmd.on('close', code => {
-            console.log(`child process exited with code ${code}`);
+            // console.log(`child process exited with code ${code}`);
         });
     });
 }
