@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Fragment } from 'react'
 import Card from './Card/Card';
 import Filter from './Filter/Filter';
 import classes from './QuestionList.module.css'
@@ -46,32 +46,42 @@ const QuestionList = () => {
 
     return (
         <div className={classes.questions}>
+            {(problems && problems.questions && problems.questions.length !== 0) ? (
+                <Fragment>
+                    {isMobile && (
+                        <Fab
+                            onClick={() => setSideBar(prev => !prev)}
+                            style={{ position: 'fixed', marginLeft: '1em', marginTop: '0.6rem' }} color="secondary"
+                            aria-label="filter"
+                        >
+                            {isSideBar ? <CloseIcon /> : <EditIcon />}
+                        </Fab>
+                    )}
+                    {(isSideBar || !isMobile) && (<div className={classes.filter}>
+                        <div className={classes.filterabs}>
+                            <Filter
+                                setEasy={setEasy}
+                                setMedium={setMedium}
+                                setHard={setHard}
+                                easy={easy}
+                                medium={medium}
+                                hard={hard}
+                            />
+                        </div>
+                    </div>)}
 
-            {isMobile && (
-                <Fab
-                    onClick={() => setSideBar(prev => !prev)}
-                    style={{ position: 'fixed', marginLeft: '1em', marginTop: '0.6rem' }} color="secondary"
-                    aria-label="filter"
-                >
-                    {isSideBar ? <CloseIcon /> : <EditIcon />}
-                </Fab>
-            )}
-            {(isSideBar || !isMobile) && (<div className={classes.filter}>
-                <div className={classes.filterabs}>
-                    <Filter
-                        setEasy={setEasy}
-                        setMedium={setMedium}
-                        setHard={setHard}
-                        easy={easy}
-                        medium={medium}
-                        hard={hard}
-                    />
+                    <div className={classes.cards}>
+                        {questions.map(problem => <Card key={problem._id} question={problem} />)}
+                    </div>
+                </Fragment>
+            ) : (
+                <div style={{ width: '100%' }}>
+                    <div className='errorTemplate'>
+                        <div><span>Msg : </span>Looks like there are no questions here !</div>
+                        {<div><span>Cause : </span>Check if your not offline / Or may be server is down.</div>}
+                    </div>
                 </div>
-            </div>)}
-
-            <div className={classes.cards}>
-                {questions.map(problem => <Card key={problem._id} question={problem} />)}
-            </div>
+            )}
         </div>
     )
 }

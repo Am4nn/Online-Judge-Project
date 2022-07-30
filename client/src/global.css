@@ -4,11 +4,6 @@
     --hard-difficulty: hsl(0, 60%, 50%);
 }
 
-@font-face {
-    font-family: 'POLYA';
-    src: url('./assests/fonts/POLYA.otf');
-}
-
 .errorTemplate {
     padding: 2em;
     border-radius: 4px;
