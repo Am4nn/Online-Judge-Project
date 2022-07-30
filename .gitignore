@@ -8,3 +8,4 @@
 
 /server/.env
 /server/node_modules
+/server/client/node_modules
