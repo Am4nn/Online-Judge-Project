@@ -1,0 +1,35 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+
+.back {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.back a {
+    margin-top: unset;
+}
+
+.codeSnippet {
+    color: hsl(208, 100%, 15%);
+    letter-spacing: 0.02em;
+    font-size: 0.7em;
+    position: relative;
+    top: -8px;
+    left: -8px;
+    padding: 0 1rem;
+    font-weight: 100;
+    font-family: SFMono, "Fira Code", "Fira Mono", "Roboto Mono", monospace;
+}
+
+@media (max-width: 767px) {
+    .container {
+        padding-top: 2rem;
+    }
+}

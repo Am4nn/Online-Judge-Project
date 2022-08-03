@@ -21,13 +21,11 @@ const columns = [
     {
         id: 'quesName',
         label: 'Question Name',
-        // minWidth: 150,
         align: 'center',
     },
     {
         id: 'status',
         label: 'Status',
-        // minWidth: 150,
         align: 'center'
     },
     {
@@ -38,20 +36,17 @@ const columns = [
     {
         id: 'time',
         label: 'Total Time(s)',
-        // minWidth: 150,
         align: 'center',
         format: (value) => value.toFixed(2),
     },
     {
         id: 'language',
         label: 'Language',
-        // minWidth: 150,
         align: 'center',
     },
     {
         id: 'submitTime',
         label: 'Submit Time',
-        // minWidth: 150,
         align: 'center',
     },
     {

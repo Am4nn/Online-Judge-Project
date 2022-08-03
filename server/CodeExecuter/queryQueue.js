@@ -17,9 +17,7 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
     let query = null;
     try {
         query = await Query.findById(queryId);
-        if (!query) {
-            throw Error("Query not found");
-        }
+        if (!query) throw Error("Query not found");
 
         query.startTime = new Date();
         let response;
@@ -44,7 +42,10 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
         await question.save();
 
     } catch (error) {
-        if (!error.msg) error = { ...error, msg: 'some server side errors' };
+        if (!error.msg) {
+            console.error('Error without msg in bull.process', error);
+            error = { ...error, msg: 'some server side errors' };
+        }
 
         query.completeTime = new Date();
         query.status = 'error';
@@ -57,11 +58,11 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
 
 // set status of query to error with some appropriate msg
 queryQueue.on('failed', error => {
-    console.error(error.data.id, 'failed', error.failedReason);
+    console.error('bull/redis failed', error.data.id, error.failedReason);
 })
 
 queryQueue.on('error', error => {
-    console.error('error', error);
+    console.error('bull/redis error', error);
 })
 
 

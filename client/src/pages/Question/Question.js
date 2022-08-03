@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState } from 'react';
+import React, { Fragment, useRef, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 import classes from './Question.module.css';
@@ -28,6 +28,11 @@ import { SERVER_LINK } from '../../dev-server-link';
 import { defaultCppCode, defaultPythonCode } from './defaultCodes/defaultCodes';
 
 const Question = () => {
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     const { id } = useParams();
 
     const navigator = useNavigate();
@@ -48,9 +53,9 @@ const Question = () => {
     // not-initialized, submitting, submitted
     const [codeSubmittingState, setcodeSubmittingState] = useState('not-initialized');
 
-    const [code, setCode] = useState(() => defaultCppCode);
     const [codeFontSize, setcodeFontSize] = useState(15);
     const [selectedLang, setSelectedLang] = useLocalStorage('selectedlangoj', 'cpp');
+    const [code, setCode] = useState(() => (selectedLang === 'cpp' ? defaultCppCode : defaultPythonCode));
     const [drawerOpen, toggleDrawerOpen] = useState(false);
     const [response, setResponse] = useState([]);
 

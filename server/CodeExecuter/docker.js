@@ -7,8 +7,7 @@ const path = require('path');
 const createContainer = image => {
     return new Promise((resolve, reject) => {
         exec(`docker run -i -d ${image}`, (error, stdout, stderr) => {
-            error && reject({ msg: 'on error', error, stderr });
-            stderr && reject({ msg: 'on stderr', stderr });
+            (error || stderr) && reject({ msg: 'on docker error', error, stderr });
             const containerId = stdout;
             resolve(containerId.trim());
         });

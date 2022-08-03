@@ -5,8 +5,12 @@ const questionsSlice = createSlice({
     initialState: {
         questions: [],
         changedQuestions: false,
+        isLoading: true,
     },
     reducers: {
+        setLoading(state, action) {
+            state.isLoading = action.payload.isLoading;
+        },
         replaceQuestionsList(state, action) {
             state.questions = action.payload.questions;
         },

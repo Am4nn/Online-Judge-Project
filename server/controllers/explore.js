@@ -1,15 +1,20 @@
-const { getQuestionList, getQuestionById } = require('../DataBase/database');
 const ObjectId = require('mongoose').Types.ObjectId;
+const {
+    getQueryById,
+    createNewQuery,
+    getQuestionList,
+    getQuestionById,
+    getAllQueriesReverseSorted
+} = require('../DataBase/database');
 
-const Query = require('../DataBase/Model/Query');
+// const Query = require('../DataBase/Model/Query');
+// const Question = require('../DataBase/Model/Question');
 const { addQueryToQueue } = require('../CodeExecuter/queryQueue');
 
 const {
     readFile,
-    createFile,
-    deleteFile
+    createFile
 } = require('../CodeExecuter/codeExecutor_dockerv');
-const Question = require('../DataBase/Model/Question');
 
 // Validator function
 function isValidObjectId(id) {
@@ -17,8 +22,8 @@ function isValidObjectId(id) {
 }
 
 const problemsController = async (req, res) => {
+    console.log('GET /api/explore/problems getAllQuestions');
     try {
-        // console.log('requested all problems');
         const questions = await getQuestionList();
         return res.status(200).json(questions);
     } catch (error) {
@@ -27,8 +32,8 @@ const problemsController = async (req, res) => {
 }
 
 const detailedProblemController = async (req, res) => {
+    console.log('GET /api/explore/problems/:id getDetailedQuestion');
     try {
-        // console.log('requested detailed problem');
         const id = req.params.id;
         if (!isValidObjectId(id))
             return res.status(404).json('not a valid object id');
@@ -43,6 +48,7 @@ const detailedProblemController = async (req, res) => {
 }
 
 const verdictController = async (req, res) => {
+    console.log('POST /api/explore/problems/:id sentCodeForVerdict');
     try {
         const { language, code, testcase, quesName } = req.body;
         const quesId = req.params.id;
@@ -51,13 +57,15 @@ const verdictController = async (req, res) => {
             return res.status(400).json({ msg: 'Please select a language / valid language !' });
 
         const filepath = createFile(language, code);
-        const query = new Query({ language, filepath, testcase, quesId, quesName });
-        await query.save();
+        // const query = new Query({ language, filepath, testcase, quesId, quesName });
+        // await query.save();
+        const query = await createNewQuery({ language, filepath, testcase, quesId, quesName });
 
         const queryId = query['_id'];
         addQueryToQueue(queryId);
 
-        const question = await Question.findById(quesId);
+        // const question = await Question.findById(quesId);
+        const question = await getQuestionById(quesId);
         question.noOfSubm += 1;
         await question.save();
 
@@ -68,12 +76,14 @@ const verdictController = async (req, res) => {
 }
 
 const statusController = async (req, res) => {
+    console.log('GET /api/explore/status/:queryId getStatusOfQuery');
     const queryId = req.params.queryId;
     if (!isValidObjectId(queryId))
         return res.status(404).json({ msg: 'not a valid object id' });
     let query = null;
     try {
-        query = await Query.findById(queryId);
+        // query = await Query.findById(queryId);
+        query = await getQueryById(queryId);
         if (!query) {
             return res.status(404).json({ msg: 'invalid queryId or this query has been deleted !' });
         }
@@ -84,9 +94,10 @@ const statusController = async (req, res) => {
 }
 
 const leaderboardController = async (req, res) => {
-    // console.log('leaderboard requested !');
+    console.log('GET /api/explore/leaderboard getLeaderboard');
     try {
-        const leaders = await Query.find({}).sort({ _id: -1 });
+        // const leaders = await Query.find({}).sort({ _id: -1 });
+        const leaders = await getAllQueriesReverseSorted();
         return res.status(200).json(leaders);
     } catch (error) {
         return res.status(400).json(error);
@@ -94,13 +105,12 @@ const leaderboardController = async (req, res) => {
 }
 
 const codesController = async (req, res) => {
-    // console.log('requested getcode !');
+    console.log('POST /api/explore/getcode getCodeOfAQuery');
     try {
         const { filepath } = req.body;
         const code = readFile(filepath);
         if (!code) return res.status(404).json({ error: 'filename does not exists or is deleted !' });
-        // console.log(code, code.toString());
-        res.status(200).json({code : code.toString()});
+        res.status(200).json({ code: code.toString() });
     } catch (error) {
         res.status(400).json({ error: JSON.stringify(error) });
     }

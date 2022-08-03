@@ -1,8 +1,12 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 
 import { SERVER_LINK } from '../../dev-server-link';
 import CodeEditorv3 from '../Question/Editor/CodeEditorv3';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ButtonCustom from '../../compenents/Button/Button';
+
+import classes from './Codes.module.css';
 
 const Codes = () => {
     const [response, setResponse] = useState('');
@@ -12,6 +16,9 @@ const Codes = () => {
         filepath = state.filepath;
         language = state.language;
     }
+
+    const navigator = useNavigate();
+    const backBtnHandler = () => navigator(-1);
 
     useEffect(() => {
         if (!filepath) return;
@@ -41,13 +48,26 @@ ${error}`
 
             {
                 filepath && !response.error && (
-                    <CodeEditorv3
-                        code={response.code}
-                        setCode={null}
-                        language={language}
-                        fontSize={16}
-                        isReadOnly={true}
-                    />
+                    <div className={classes.container}>
+                        <div style={{ width: '80%' }}>
+                            <div className={classes.back}>
+                                <div className={classes.codeSnippet}>
+                                    &#60; go back to leaderboard /&#62;
+                                </div>
+                                <ButtonCustom to='/' onClick={backBtnHandler} color='yellow'>
+                                    <ArrowBackIcon style={{ marginRight: '0.3em', transform: 'translateX(-12px)', fontSize: '1.2em' }} />
+                                    Back
+                                </ButtonCustom>
+                            </div>
+                            <CodeEditorv3
+                                code={response.code}
+                                setCode={null}
+                                language={language}
+                                fontSize={16}
+                                isReadOnly={true}
+                            />
+                        </div>
+                    </div>
                 )
             }
         </Fragment >
