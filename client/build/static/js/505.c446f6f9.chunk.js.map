@@ -1,0 +1,1 @@
+{"version":3,"file":"static/js/505.c446f6f9.chunk.js","mappings":"qIAQA,UANkB,WACd,OACI","sources":["pages/DashBoard/DashBoard.js"],"sourcesContent":["import React from 'react'\r\n\r\nconst DashBoard = () => {\r\n    return (\r\n        <div>DashBoard</div>\r\n    )\r\n}\r\n\r\nexport default DashBoard;"],"names":[],"sourceRoot":""}

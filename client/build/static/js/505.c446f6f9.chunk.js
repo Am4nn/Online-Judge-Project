@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkclient=self.webpackChunkclient||[]).push([[505],{63505:function(e,n,c){c.r(n);c(72791);var t=c(80184);n.default=function(){return(0,t.jsx)("div",{children:"DashBoard"})}}}]);
+//# sourceMappingURL=505.c446f6f9.chunk.js.map
