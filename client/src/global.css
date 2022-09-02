@@ -28,3 +28,53 @@
 .errorTemplate :last-child {
     border-bottom: unset;
 }
+
+.spin {
+    padding-left: 0.7em;
+    display: inline-block;
+}
+
+.spin::after {
+    content: ' ';
+    display: block;
+    width: 1.3em;
+    height: 1.3em;
+    position: relative;
+    z-index: 3;
+    border-radius: 50%;
+    border: 0.2rem solid hsl(180, 100%, 40%);
+    border-color: hsl(180, 100%, 40%) transparent hsl(180, 100%, 40%) transparent;
+    animation: spinner 900ms ease-in-out infinite;
+}
+
+.spin[color="black"]::after {
+    border-color: black transparent black transparent !important;
+}
+
+@keyframes spinner {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    50% {
+        transform: rotate(360deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+.dropdown-caret {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    vertical-align: middle;
+    content: "";
+    border-style: solid;
+    border-width: 4px 4px 0;
+    border-color: white;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+}

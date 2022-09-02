@@ -1,8 +1,6 @@
 const { exec, spawn } = require('child_process');
 const path = require('path');
 
-// use promisify
-
 // image => gcc, python
 const createContainer = image => {
     return new Promise((resolve, reject) => {

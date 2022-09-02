@@ -1,0 +1,8 @@
+.username {
+    margin: 0 0.3rem;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.user {
+    cursor: pointer;
+}

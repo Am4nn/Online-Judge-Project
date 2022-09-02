@@ -67,6 +67,8 @@ const createData = leaders => {
     submitTime = moment(submitTime).fromNow();
     status === 'pending' ? (status = 'Pending') : (status === 'success' ? (status = 'Accepted') : (status = 'Rejected'));
 
+    filepath = (filepath.split("\\").pop());
+
     return { quesName, status, language, time, submitTime, quesId, msg: ((!output || !output.msg) ? 'NA' : output.msg), filepath };
 }
 
@@ -128,7 +130,12 @@ const LeaderTable = props => {
                                                     className={classes[(column.id === 'quesName' ? 'quesRow' : '')]}
                                                 >
                                                     {column.id === 'code' ? (
-                                                        <Button variant="contained" onClick={() => NavigateFunction(`/codes/${row.quesId}`, { state: { filepath: row.filepath, language: row.language } })}>
+                                                        <Button
+                                                            variant="contained"
+                                                            onClick={() => (
+                                                                NavigateFunction(`/codes/${row.quesId}?filepath=${row.filepath}&language=${row.language}`)
+                                                            )}
+                                                        >
                                                             <CodeIcon />
                                                         </Button>
                                                     ) : (

@@ -56,15 +56,12 @@ const verdictController = async (req, res) => {
         if (language !== 'py' && language !== 'cpp')
             return res.status(400).json({ msg: 'Please select a language / valid language !' });
 
-        const filepath = createFile(language, code);
-        // const query = new Query({ language, filepath, testcase, quesId, quesName });
-        // await query.save();
-        const query = await createNewQuery({ language, filepath, testcase, quesId, quesName });
+        const { filepath, filename } = createFile(language, code);
+        const query = await createNewQuery({ language, filepath: filename, testcase, quesId, quesName });
 
         const queryId = query['_id'];
         addQueryToQueue(queryId);
 
-        // const question = await Question.findById(quesId);
         const question = await getQuestionById(quesId);
         question.noOfSubm += 1;
         await question.save();
@@ -107,7 +104,7 @@ const leaderboardController = async (req, res) => {
 const codesController = async (req, res) => {
     console.log('POST /api/explore/getcode getCodeOfAQuery');
     try {
-        const { filepath } = req.body;
+        let { filepath } = req.body;
         const code = readFile(filepath);
         if (!code) return res.status(404).json({ error: 'filename does not exists or is deleted !' });
         res.status(200).json({ code: code.toString() });

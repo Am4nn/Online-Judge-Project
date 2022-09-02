@@ -25,6 +25,10 @@
 
 .cards {
     width: 90%;
+    height: 88vh;
+    margin-right: 2px;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 @media (max-width:1000px) {

@@ -1,5 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
+import { useSearchParams } from 'react-router-dom';
 
 import { SERVER_LINK } from '../../dev-server-link';
 import CodeEditorv3 from '../Question/Editor/CodeEditorv3';
@@ -10,11 +11,13 @@ import classes from './Codes.module.css';
 
 const Codes = () => {
     const [response, setResponse] = useState('');
-    const { state } = useLocation();
+
+    const [searchParams] = useSearchParams();
+
     let filepath = null, language = null;
-    if (state) {
-        filepath = state.filepath;
-        language = state.language;
+    if (searchParams.get('filepath') && searchParams.get('language')) {
+        filepath = searchParams.get('filepath');
+        language = searchParams.get('language');
     }
 
     const navigator = useNavigate();

@@ -9,13 +9,18 @@ const user = require('./routes/user');
 const app = express();
 const { connectDB } = require('./DataBase/connectDB');
 const path = require('path');
+const cookieParser = require("cookie-parser");
 
 connectDB();
 
 // parse json request body
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({
+    origin: true,
+    credentials: true
+}));
 
 
 // set api route to get all questions
@@ -25,14 +30,14 @@ app.use('/api/explore', explore);
 app.use('/api/user', user);
 
 // Serve static assets in production
-// if (process.env.NODE_ENV === 'production') {
-// Set static folder
-app.use(express.static(path.join(__dirname, 'client/build')));
+if (process.env.NODE_ENV === 'production') {
+    // Set static folder
+    app.use(express.static(path.join(__dirname, 'client/build')));
 
-app.get('*', (req, res) =>
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
-);
-// }
+    app.get('*', (req, res) =>
+        res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
+    );
+}
 
 // set handle error
 

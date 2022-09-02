@@ -13,22 +13,6 @@ const questionsSlice = createSlice({
         },
         replaceQuestionsList(state, action) {
             state.questions = action.payload.questions;
-        },
-        addQuestionToList(state, action) {
-            const newItem = action.payload;
-            const existingItem = state.questions.find((item) => item.id === newItem.id);
-            state.changedQuestions = true;
-            if (!existingItem) {
-                state.questions.push({ ...newItem });
-            }
-        },
-        removeQuestionFromList(state, action) {
-            const id = action.payload;
-            const existingItem = state.questions.find((item) => item.id === id);
-            state.changedQuestions = true;
-            if (existingItem) {
-                state.questions = state.questions.filter((item) => item.id !== id);
-            }
         }
     }
 });

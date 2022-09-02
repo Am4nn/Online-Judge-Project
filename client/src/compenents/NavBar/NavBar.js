@@ -2,11 +2,21 @@ import React, { useState } from "react"
 import Container from "react-bootstrap/Container"
 import Navbar from "react-bootstrap/Navbar"
 import Nav from "react-bootstrap/Nav"
-import "./style.css"
 import { Link } from "react-router-dom"
+import { useDispatch, useSelector } from "react-redux"
+import { logout } from "../../store/auth-actions"
+import AccountMenu from "./AccountMenu/AccountMenu"
+import "./style.css"
 
 const NavBar = () => {
     const [expand, setExpand] = useState(false);
+    const loginState = useSelector(state => state.auth);
+    const dispatch = useDispatch();
+
+    const logoutHandler = () => {
+        if (loginState.isLoading) return;
+        dispatch(logout());
+    }
 
     return (
         <Navbar
@@ -61,6 +71,15 @@ const NavBar = () => {
                             >
                                 LeaderBoard
                             </Nav.Link>
+                        </Nav.Item>
+
+                        <Nav.Item>
+                            <AccountMenu
+                                expand={expand}
+                                setExpand={setExpand}
+                                loginState={loginState}
+                                logoutHandler={logoutHandler}
+                            />
                         </Nav.Item>
 
                     </Nav>
