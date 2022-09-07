@@ -96,7 +96,7 @@ const execPyCode = (filePath, testcase) => {
             const filename = await copyFiles(filePath, pythonContainerId);
 
             for (let index = 0; index < input.length; ++index) {
-                const exOut = await execPyFile(pythonContainerId, filename, input[index].replaceAll(' ', '\n'));
+                const exOut = await execPyFile(pythonContainerId, filename, input[index].split(' ').join('\n'));
                 // if socket connection established then send to client the index of passed test case
                 if (exOut !== output[index]) {
                     reject({

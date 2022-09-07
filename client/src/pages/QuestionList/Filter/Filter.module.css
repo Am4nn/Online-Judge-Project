@@ -1,13 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=PT+Serif:ital@1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=PT+Serif&display=swap');
+
 .heading {
     margin: 0.1em 0.1em 0.4em 0.1em;
-    letter-spacing: 0.1em;
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
+    letter-spacing: 0.1rem;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
     font-size: 2em;
-    padding: 0.3em 0;
+    padding: 0.3rem 0;
     font-weight: 600;
-    background-color: rgba(220, 174, 227, 0.1);
-    font-family: 'raleway';
+    /* background-color: rgba(220, 174, 227, 0.1); */
+    font-family: 'PT Serif', serif;
     border-bottom: 1px solid rgba(34, 36, 38, 0.15);
 }
 

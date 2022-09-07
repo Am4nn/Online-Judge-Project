@@ -16,6 +16,7 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: hsl(0, 0%, 98%) !important;
+    overflow-x: hidden;
 }
 
 code {

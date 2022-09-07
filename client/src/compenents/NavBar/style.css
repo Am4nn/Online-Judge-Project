@@ -22,9 +22,12 @@
     line-height: 2;
     height: 40px;
     z-index: 1000;
-    /* text-shadow: 0 0 2px #001716, 0 0 3px #03edf975, 0 0 5px #03edf975, 0 0 8px #03edf975; */
+    text-shadow:
+        0 0 2px hsla(177, 100%, 5%, 1),
+        0 0 3px hsla(183, 98%, 49%, 0.3),
+        0 0 5px hsla(183, 98%, 49%, 0.3),
+        0 0 8px hsla(183, 98%, 49%, 0.3);
 }
-
 
 .myNavLink {
     color: white;
@@ -74,7 +77,6 @@
     padding: 0.3rem 0rem 0.3rem 2rem !important;
     font-size: 1.2rem !important;
     backdrop-filter: blur(15px) !important;
-    /* box-shadow: 0px 3px 3px 0px rgba(9, 5, 29, 0.171) !important; */
 }
 
 .navbar-toggler {
@@ -115,11 +117,6 @@
 }
 
 @media (max-width: 767px) {
-    .navbar {
-        padding: 1rem 2rem !important;
-        font-size: 1.4rem !important;
-    }
-
     .nav-link {
         padding: 0.7rem 1rem !important;
     }

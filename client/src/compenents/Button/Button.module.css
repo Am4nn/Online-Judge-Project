@@ -1,5 +1,8 @@
+:root {
+    --transition-time: 1s;
+}
+
 .btn {
-    /* position: relative; */
     font-size: 1.5rem;
     height: 3.5rem;
     width: 12rem;
@@ -10,26 +13,28 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    /* border-top-left-radius: 0.6em; */
-    transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1);
 
     margin: 1.4em 0;
     transform: scale(0.9);
     color: black;
-    /* box-shadow: -1px -3px 2px 0px rgba(175, 157, 23, 0.463); */
+
+    transition: transform var(--transition-time) cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .btn::after {
     content: '';
-    position: absolute;
     width: 100%;
     height: 3.5rem;
+    position: absolute;
+    border-radius: 5px;
     clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+
+    transition: background-color var(--transition-time) cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .btn:hover {
     color: rgb(35, 35, 35);
-    transform: scale(1);
+    transform: scale(0.97);
 }
 
 .btn span {
@@ -39,12 +44,20 @@
     align-items: center;
 }
 
-.blue::after {
+.skyblue::after {
     background-color: hsl(180, 100%, 50%);
 }
 
-.blue:hover::after {
+.skyblue:hover::after {
     background-color: hsl(180, 100%, 40%);
+}
+
+.blue::after {
+    background-color: hsl(225, 55%, 76%);
+}
+
+.blue:hover::after {
+    background-color: hsl(226, 55%, 69%);
 }
 
 .green::after {
@@ -52,7 +65,7 @@
 }
 
 .green:hover::after {
-    background-color: hsl(161, 100%, 40%);
+    background-color: hsl(161, 100%, 43%);
 }
 
 .yellow::after {
@@ -60,5 +73,5 @@
 }
 
 .yellow:hover::after {
-    background-color: hsl(60, 80%, 40%);
+    background-color: hsl(60, 80%, 43%);
 }

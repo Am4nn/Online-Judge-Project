@@ -20,7 +20,7 @@ const Card = props => {
             <div className={classes.right}>
                 <Button to={`/questions/${question._id}`} color='blue'>
                     Solve
-                    <CodeIcon style={{ marginLeft: '0.5em' }} />
+                    <CodeIcon fontSize='large' style={{ marginLeft: '0.5em' }} />
                 </Button>
             </div>
         </div>

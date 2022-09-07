@@ -9,8 +9,11 @@ import ScrollToTop from './compenents/ScrollToTop/ScrollToTop';
 import LoadingSpinner from './compenents/LoadingSpinner/LoadingSpinner';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchQuestionListData, sendQuestionListData } from './store/questions-actions';
-import { getLoggedIn } from './store/auth-actions'
+import { fetchQuestionListData, sendQuestionListData } from './store/Questions/questions-actions';
+import { getLoggedIn } from './store/Auth/auth-actions'
+import Message from './compenents/Message/Message';
+
+import { messageActions } from './store/Message/message-slice'
 
 // const Home = React.lazy(() => import('./pages/Home/Home'));
 const QuestionList = React.lazy(() => import('./pages/QuestionList/QuestionList'));
@@ -32,7 +35,6 @@ const App = () => {
     const problems = useSelector(state => state.questions);
 
     const loginState = useSelector(state => state.auth);
-    // console.log(loggedIn.loggedIn)
 
     useEffect(() => {
         dispatch(getLoggedIn());
@@ -42,6 +44,13 @@ const App = () => {
         dispatch(fetchQuestionListData());
     }, [dispatch]);
 
+    useEffect(() => {
+        dispatch(messageActions.set({
+            type: 'info',
+            message: 'Welcome to website !',
+            description: 'This website is to solve coding questions and check against testcases'
+        }))
+    }, [dispatch]);
 
     useEffect(() => {
         if (isInitial) {
@@ -59,6 +68,7 @@ const App = () => {
         <BrowserRouter>
             <div className={classes.App}>
                 <NavBar />
+                <Message />
                 <ScrollToTop />
                 <div className={classes.routes}>
                     <Suspense
@@ -70,8 +80,8 @@ const App = () => {
                             <Route exact path='/questions/:id' element={<Question />} />
                             <Route exact path='/leaderboard' element={<LeaderBoard />} />
                             <Route exact path='/codes/:id' element={<Codes />} />
-                            <Route exact path='/login' element={loginState.loggedIn === false ? <Customform pageType="login" /> : <Navigate replace to='/questions' />} />
-                            <Route exact path='/register' element={loginState.loggedIn === false ? <Customform pageType="register" /> : <Navigate replace to='/questions' />} />
+                            <Route exact path='/login' element={!loginState.loggedIn ? <Customform pageType="login" /> : <Navigate replace to='/questions' />} />
+                            <Route exact path='/register' element={!loginState.loggedIn ? <Customform pageType="register" /> : <Navigate replace to='/questions' />} />
                             <Route exact path='/dashboard' element={<DashBoard />} />
                             <Route exact path='/account' element={<Account />} />
                             <Route exact path='*' element={<NotFound />} />

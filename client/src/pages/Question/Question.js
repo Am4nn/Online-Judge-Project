@@ -1,5 +1,5 @@
 import React, { Fragment, useRef, useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import classes from './Question.module.css';
 import useFetch from '../../hooks/useFetch';
@@ -9,23 +9,11 @@ import useLocalStorage from '../../hooks/useLocalStorage';
 import LoadingSpinner from '../../compenents/LoadingSpinner/LoadingSpinner';
 
 import SendIcon from '@mui/icons-material/Send';
-import Settings from '@mui/icons-material/Settings'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
-
-import {
-    Fab,
-    Select,
-    Drawer,
-    Button,
-    MenuItem,
-    TextField,
-    InputLabel,
-    FormControl
-} from '@mui/material';
 
 import { SERVER_LINK } from '../../dev-server-link';
 import { defaultCppCode, defaultPythonCode } from './defaultCodes/defaultCodes';
+import Options from './Options/Options';
 
 const Question = () => {
 
@@ -34,9 +22,6 @@ const Question = () => {
     }, []);
 
     const { id } = useParams();
-
-    const navigator = useNavigate();
-    const backBtnHandler = () => navigator(-1);
 
     const { loading, error, value: question } = useFetch(
         `${SERVER_LINK}/api/explore/problems/${id}`,
@@ -56,7 +41,6 @@ const Question = () => {
     const [codeFontSize, setcodeFontSize] = useState(15);
     const [selectedLang, setSelectedLang] = useLocalStorage('selectedlangoj', 'cpp');
     const [code, setCode] = useState(() => (selectedLang === 'cpp' ? defaultCppCode : defaultPythonCode));
-    const [drawerOpen, toggleDrawerOpen] = useState(false);
     const [response, setResponse] = useState([]);
 
     const endRef = useRef(null);
@@ -156,7 +140,7 @@ const Question = () => {
                         <div className={classes.codeSnippet}>
                             &#60; go back to questions /&#62;
                         </div>
-                        <ButtonCustom to='/' onClick={backBtnHandler} color='yellow'>
+                        <ButtonCustom to='/questions' color='yellow'>
                             <ArrowBackIcon style={{ marginRight: '0.3em', transform: 'translateX(-12px)', fontSize: '1.2em' }} />
                             Back
                         </ButtonCustom>
@@ -191,75 +175,20 @@ const Question = () => {
                                 &#60; write your code here in <span style={{ color: 'red', textTransform: 'uppercase' }}>{selectedLang}</span> /&#62;
                             </div>
 
-
-                            <Fab style={{
-                                zIndex: '899',
-                                position: 'absolute',
-                                top: '-2rem',
-                                right: '18%'
-                            }} onClick={() => toggleDrawerOpen(prev => !prev)} color="secondary" aria-label="add">
-                                <div className={classes.optionSnippet}
-                                    style={{
-                                        top: '-1.5rem',
-                                        whiteSpace: 'nowrap',
-                                        textTransform: 'lowercase'
-                                    }}
-                                >
-                                    &#60; change lang, font size, ... /&#62;
-                                </div>
-                                <Settings />
-                            </Fab>
-                            <Drawer
-                                anchor='right'
-                                open={drawerOpen}
-                                onClose={() => toggleDrawerOpen(prev => !prev)}
-                            >
-                                <div style={{ width: '15rem', margin: '1rem' }}>
-                                    <h1 className={classes.optionHeading} >Options</h1>
-
-
-                                    <div className={classes.fontSnippet}>
-                                        &#60; Font Size /&#62;
-                                    </div>
-                                    <div className={classes.changeFont}>
-                                        <TextField
-                                            type={'number'}
-                                            value={codeFontSize}
-                                            onChange={e => { if (e.target.value > 50 || e.target.value < 2) return; setcodeFontSize(e.target.value); }}
-                                            // variant="filled"
-                                            style={{ width: '100%' }}
-                                            variant='standard'
-                                        />
-                                    </div>
-
-                                    <div className={classes.changeLang}>
-                                        <FormControl>
-                                            <InputLabel id="changeLang-select-label">Language</InputLabel>
-                                            <Select
-                                                labelId="changeLang-select-label"
-                                                id="changeLang-select"
-                                                value={selectedLang}
-                                                label="Language"
-                                                style={{ width: '8em', height: '2.8em' }}
-                                                onChange={e => setSelectedLang(e.target.value)}
-                                            >
-                                                <MenuItem value={'cpp'}>CPP</MenuItem>
-                                                <MenuItem value={'py'}>PYTHON</MenuItem>
-                                                {/* <MenuItem value={'java'}>JAVA</MenuItem> */}
-                                                {/* <MenuItem value={'js'}>JS</MenuItem> */}
-                                            </Select>
-                                        </FormControl>
-                                    </div>
-
-                                    <div className={classes.resetCode}>
-                                        <Button color="error" onClick={resetCode} variant='contained' startIcon={
-                                            <RestartAltIcon fontSize='large' style={{ marginRight: '0.5em', fontSize: '2em' }} />
-                                        } style={{ textTransform: 'capitalize' }}>
-                                            ResetCode
-                                        </Button>
-                                    </div>
-                                </div>
-                            </Drawer>
+                            <Options
+                                favStyle={{
+                                    zIndex: '899',
+                                    position: 'absolute',
+                                    top: '-2rem',
+                                    right: '18%'
+                                }}
+                                resetCode={resetCode}
+                                selectedLang={selectedLang}
+                                codeFontSize={codeFontSize}
+                                setSelectedLang={setSelectedLang}
+                                setcodeFontSize={setcodeFontSize}
+                                codeEditable
+                            />
 
                             <div className={classes.editorText}>
                                 <CodeEditorv3

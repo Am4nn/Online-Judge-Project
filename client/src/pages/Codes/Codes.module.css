@@ -6,6 +6,20 @@
     margin-bottom: 3rem;
 }
 
+.contain {
+    width: 80%;
+}
+
+@media (max-width: 767px) {
+    .container {
+        padding-top: 2rem;
+    }
+
+    .contain {
+        width: 100%;
+    }
+}
+
 .back {
     display: flex;
     flex-direction: column;
@@ -26,10 +40,4 @@
     padding: 0 1rem;
     font-weight: 100;
     font-family: SFMono, "Fira Code", "Fira Mono", "Roboto Mono", monospace;
-}
-
-@media (max-width: 767px) {
-    .container {
-        padding-top: 2rem;
-    }
 }

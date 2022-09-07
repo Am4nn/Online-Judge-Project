@@ -8,7 +8,8 @@ import {
     ListItemIcon,
     Divider,
     IconButton,
-    Tooltip
+    Tooltip,
+    Zoom
 } from '@mui/material';
 
 import {
@@ -17,6 +18,9 @@ import {
     PersonAdd
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
 
 import classes from './AccountMenu.module.css';
 
@@ -63,7 +67,7 @@ const AccountMenu = ({ loginState, logoutHandler, setExpand, expand }) => {
                 justifyContent: 'center',
                 paddingRight: `${expand ? 3 : 0}rem`
             }}>
-                <Tooltip title="Account settings">
+                <Tooltip TransitionComponent={Zoom} title="Account settings">
                     <div
                         className={classes.user}
                         onClick={handleClick}
@@ -123,7 +127,18 @@ const AccountMenu = ({ loginState, logoutHandler, setExpand, expand }) => {
             >
                 {loginState.loggedIn === true &&
                     <MenuItem onClick={dashboardHandler}>
-                        <Avatar /> Dashboard
+                        <FontAwesomeIcon icon={faUserSecret}
+                            style={{
+                                backgroundColor: 'rgb(0,0,0,0.1)',
+                                borderRadius: '50%',
+                                width: '20px',
+                                height: '20px',
+                                padding: '6px',
+                                marginLeft: '-4px',
+                                marginRight: '8px'
+                            }}
+                        />
+                        <span>Dashboard</span>
                     </MenuItem>
                 }
                 {loginState.loggedIn === true &&

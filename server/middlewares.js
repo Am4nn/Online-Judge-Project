@@ -2,28 +2,35 @@ const jwt = require("jsonwebtoken");
 const User = require('./DataBase/Model/User');
 const bcrypt = require('bcryptjs');
 
+const loginValidatorHelper = async (req, res, next, credential, credentialName, password) => {
+
+    let existingUser = undefined;
+    credentialName === 'email' && (existingUser = await User.findOne({ email: credential }));
+    credentialName === 'username' && (existingUser = await User.findOne({ username: credential }));
+
+    if (!existingUser)
+        return res.status(401).json({ error: `Wrong ${credentialName} or password.` });
+
+    const passwordCorrect = await bcrypt.compare(
+        password,
+        existingUser.passwordHash
+    );
+    if (!passwordCorrect)
+        return res.status(401).json({ error: `Wrong ${credentialName} or password.` });
+
+    req.existingUser = existingUser;
+    next();
+}
+
 const loginValidator = async (req, res, next) => {
 
-    const { email, password } = req.body;
+    const { email, username, password } = req.body;
 
     try {
-        if (!email || !password)
-            return res.status(400).json({ error: `Please enter all required fields. Missing : ${!email ? 'email' : ''}${!password ? ' password' : ''}` });
+        if (!password || !(email || username))
+            return res.status(400).json({ error: `Please enter all required fields. Missing : (email or username)${!password ? ', password' : ''}` });
 
-        const existingUser = await User.findOne({ email });
-        if (!existingUser)
-            return res.status(401).json({ error: "Wrong email or password." });
-
-        const passwordCorrect = await bcrypt.compare(
-            password,
-            existingUser.passwordHash
-        );
-        if (!passwordCorrect)
-            return res.status(401).json({ error: "Wrong email or password." });
-
-        req.existingUser = existingUser;
-
-        next();
+        await loginValidatorHelper(req, res, next, (email ? email : username), (email ? 'email' : 'username'), password)
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Internal Error" });
@@ -32,17 +39,22 @@ const loginValidator = async (req, res, next) => {
 
 const registerValidator = async (req, res, next) => {
 
-    const { name, email, password, passwordVerify } = req.body;
+    const { name, username, email, password, passwordVerify } = req.body;
 
     try {
-        if (!name || !email || !password || !passwordVerify)
+        if (!name || !username || !email || !password || !passwordVerify)
             return res.status(400).json({
-                error: `Please enter all required fields.  Missing : ${!name ? 'name' : ''}${!email ? ' email' : ''}${!password ? ' password' : ''}${!passwordVerify ? ' passwordVerify' : ''}`
+                error: `Please enter all required fields.  Missing :${!name ? ' name' : ''}${!username ? ' username' : ''}${!email ? ' email' : ''}${!password ? ' password' : ''}${!passwordVerify ? ' passwordVerify' : ''}`
             });
 
         if (name.length >= 10)
             return res.status(400).json({
                 error: "Name should be less that 10 characters"
+            });
+
+        if (username.length >= 10 || username.length < 4)
+            return res.status(400).json({
+                error: "Username should be less that 10 characters and greater than or equal to 4 characters"
             });
 
         if (!(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)))
@@ -60,10 +72,16 @@ const registerValidator = async (req, res, next) => {
                 error: "Please enter the same password twice.",
             });
 
-        const existingUser = await User.findOne({ email });
-        if (existingUser)
+        const existingUserE = await User.findOne({ email });
+        if (existingUserE)
             return res.status(400).json({
                 error: "An account with this email already exists.",
+            });
+
+        const existingUserU = await User.findOne({ username });
+        if (existingUserU)
+            return res.status(400).json({
+                error: "An account with this username already exists.",
             });
 
         next();

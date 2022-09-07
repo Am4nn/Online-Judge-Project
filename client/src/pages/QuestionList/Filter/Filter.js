@@ -1,24 +1,36 @@
 import React, { Fragment } from 'react'
-import classes from './Filter.module.css'
+import { useDispatch } from 'react-redux'
 
-import Checkbox from '@mui/material/Checkbox'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import FormGroup from '@mui/material/FormGroup'
-import { Button } from '@mui/material'
-
+import {
+    Checkbox,
+    FormControlLabel,
+    FormGroup,
+    Button
+} from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete';
+
+import classes from './Filter.module.css'
+import { messageActions } from '../../../store/Message/message-slice'
 
 const Filter = props => {
 
     const { easy, medium, hard, setEasy, setMedium, setHard } = props;
 
+    const dispatch = useDispatch();
+
     const easyChecked = () => setEasy(prev => !prev);
     const mediumChecked = () => setMedium(prev => !prev);
     const hardChecked = () => setHard(prev => !prev);
+
     const clearFilter = () => {
+        if (!easy && !medium && !hard) return;
         setEasy(false);
         setMedium(false);
         setHard(false);
+        dispatch(messageActions.set({
+            type: 'warning',
+            message: 'All Filters Cleared !'
+        }))
     }
 
     return (
@@ -26,10 +38,10 @@ const Filter = props => {
             <div className={classes.heading}>Filter</div>
 
             <div className={classes.clearFilter}>
-                <Button color="error" onClick={clearFilter} variant="outlined" startIcon={
-                    <DeleteIcon fontSize='large' style={{ marginRight: '0.5em', fontSize: '2em' }} />
-                }>
-                    ClearFilter
+                <Button color="error" onClick={clearFilter} variant="outlined" endIcon={
+                    <DeleteIcon fontSize='large' style={{ fontSize: '2em' }} />
+                } style={{ fontFamily: 'PT Serif', fontWeight: '500', textTransform: 'capitalize' }}>
+                    <span style={{ fontSize: '1.1rem' }}>Clear-Filter</span>
                 </Button>
             </div>
 
@@ -78,7 +90,7 @@ const Filter = props => {
                     </FormGroup>
                 </div>
             </div>
-        </Fragment>
+        </Fragment >
     )
 }
 

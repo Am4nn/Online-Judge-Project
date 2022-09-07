@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=PT+Serif&display=swap');
+
+.optionHeading {
+    margin: 0.1em 0.1em 1.5rem 0.1em;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    font-size: 2em;
+    padding: 0.3em 0;
+    font-weight: 600;
+    font-family: 'PT Serif', serif !important;
+    border-bottom: 1px solid rgba(34, 36, 38, 0.16);
+    text-align: center;
+}
+
+.optionSnippet {
+    color: hsl(208, 100%, 15%);
+    letter-spacing: 0.01em;
+    font-size: 0.7em;
+    padding: 0 1rem;
+    font-weight: 100;
+    font-family: SFMono, "Fira Code", "Fira Mono", "Roboto Mono", monospace;
+    position: absolute;
+}
+
+.fontSnippet {
+    color: hsl(208, 100%, 15%);
+    letter-spacing: 0.02em;
+    font-size: 0.7em;
+    padding: 0 1rem;
+    font-weight: 100;
+    font-family: SFMono, "Fira Code", "Fira Mono", "Roboto Mono", monospace;
+}
+
+.changeFont {
+    margin-top: 0.3rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(34, 36, 38, 0.15);
+}
+
+.resetCode {
+    margin: 1.5rem 0 1.5rem 0;
+    padding-bottom: 1em;
+    padding-top: 1em;
+    /* border-bottom: 1px solid rgba(34, 36, 38, 0.15); */
+    border-top: 1px solid rgba(34, 36, 38, 0.15);
+}

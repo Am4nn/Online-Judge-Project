@@ -1,10 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import questionsSlice from './questions-slice';
-import authSlice from './auth-slice';
+import authSlice from './Auth/auth-slice';
+import messageSlice from './Message/message-slice';
+import questionsSlice from './Questions/questions-slice';
 
 const store = configureStore({
-    reducer: { questions: questionsSlice.reducer, auth: authSlice.reducer },
+    reducer: {
+        auth: authSlice.reducer,
+        message: messageSlice.reducer,
+        questions: questionsSlice.reducer
+    }
 });
 
 export default store;

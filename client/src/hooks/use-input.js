@@ -1,4 +1,4 @@
-import { useReducer } from 'react';
+import { useCallback, useReducer } from 'react';
 
 const initialInputState = {
     value: '',
@@ -35,9 +35,9 @@ const useInput = (validateValue) => {
         dispatch({ type: 'BLUR' });
     };
 
-    const reset = () => {
+    const reset = useCallback(() => {
         dispatch({ type: 'RESET' });
-    };
+    }, []);
 
     return {
         value: inputState.value,

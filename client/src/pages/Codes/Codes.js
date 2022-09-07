@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 
 import { SERVER_LINK } from '../../dev-server-link';
@@ -8,9 +7,11 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ButtonCustom from '../../compenents/Button/Button';
 
 import classes from './Codes.module.css';
+import Options from '../Question/Options/Options';
 
 const Codes = () => {
     const [response, setResponse] = useState('');
+    const [codeFontSize, setcodeFontSize] = useState(15);
 
     const [searchParams] = useSearchParams();
 
@@ -19,9 +20,6 @@ const Codes = () => {
         filepath = searchParams.get('filepath');
         language = searchParams.get('language');
     }
-
-    const navigator = useNavigate();
-    const backBtnHandler = () => navigator(-1);
 
     useEffect(() => {
         if (!filepath) return;
@@ -52,21 +50,31 @@ ${error}`
             {
                 filepath && !response.error && (
                     <div className={classes.container}>
-                        <div style={{ width: '80%' }}>
+                        <div className={classes.contain}>
                             <div className={classes.back}>
                                 <div className={classes.codeSnippet}>
                                     &#60; go back to leaderboard /&#62;
                                 </div>
-                                <ButtonCustom to='/' onClick={backBtnHandler} color='yellow'>
+                                <ButtonCustom to='/leaderboard' color='yellow'>
                                     <ArrowBackIcon style={{ marginRight: '0.3em', transform: 'translateX(-12px)', fontSize: '1.2em' }} />
                                     Back
                                 </ButtonCustom>
                             </div>
+                            <Options
+                                favStyle={{
+                                    zIndex: '899',
+                                    position: 'relative',
+                                    left: '33%',
+                                    bottom: '1rem'
+                                }}
+                                codeFontSize={codeFontSize}
+                                setcodeFontSize={setcodeFontSize}
+                            />
                             <CodeEditorv3
                                 code={response.code}
                                 setCode={null}
                                 language={language}
-                                fontSize={16}
+                                fontSize={codeFontSize}
                                 isReadOnly={true}
                             />
                         </div>

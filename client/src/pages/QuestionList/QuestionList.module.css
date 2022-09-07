@@ -4,23 +4,17 @@
 }
 
 .filter {
-    width: 15.66rem;
+    width: 15rem;
 }
 
 .filterabs {
     margin-top: 0.8rem;
-    width: 15.66rem;
+    width: 15rem;
     min-height: 85vh;
     position: fixed;
     z-index: 899;
-    backdrop-filter: blur(5px);
-    padding: 0, 0.08em;
-    margin-left: 0.5rem;
-    border-radius: 0.5rem;
-    box-shadow:
-        rgb(0 0 0 / 10%) 0px 0px 2px 0px,
-        rgb(0 0 0 / 10%) 0px 0px 5px 0px;
-
+    background-color: white;
+    border-right: 1px solid rgba(34, 36, 38, 0.15);
 }
 
 .cards {
@@ -29,6 +23,7 @@
     margin-right: 2px;
     overflow-y: scroll;
     overflow-x: hidden;
+    scroll-behavior: smooth !important;
 }
 
 @media (max-width:1000px) {
@@ -37,12 +32,13 @@
     }
 
     .filter {
-        /* display: none; */
         width: 0;
     }
 
     .filterabs {
-        width: 50%;
-        background-color: rgba(255, 255, 255, 0.7);
+        border-radius: 2px;
+        box-shadow:
+            rgb(0 0 0 / 10%) 0px 0px 2px 0px,
+            rgb(0 0 0 / 10%) 0px 0px 5px 0px;
     }
 }

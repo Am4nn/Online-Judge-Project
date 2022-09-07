@@ -7,7 +7,7 @@ const loginController = async (req, res) => {
         // sign the token
         const token = jwt.sign(
             {
-                user: req.existingUser._id,
+                user: req.existingUser._id
             },
             process.env.JWT_SECRET
         );
@@ -26,7 +26,7 @@ const loginController = async (req, res) => {
 
 const registerController = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, username, email, password } = req.body;
 
         // hash the password
         const salt = await bcrypt.genSalt();
@@ -35,6 +35,7 @@ const registerController = async (req, res) => {
         // save a new user account to the db
         const newUser = new User({
             name,
+            username,
             email,
             passwordHash
         });
@@ -44,7 +45,7 @@ const registerController = async (req, res) => {
         // sign the token
         const token = jwt.sign(
             {
-                user: savedUser._id,
+                user: savedUser._id
             },
             process.env.JWT_SECRET
         );

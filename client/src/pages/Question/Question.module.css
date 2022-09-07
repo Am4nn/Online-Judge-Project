@@ -230,54 +230,6 @@
     font-family: SFMono, "Fira Code", "Fira Mono", "Roboto Mono", monospace;
 }
 
-.changeFont {
-    background-color: white;
-    font-size: 1.5em;
-    font-weight: 600;
-    width: auto;
-    padding: 0em 0.2em;
-    border: 1px solid hsla(167, 44%, 76%, 0.5);
-    margin-top: 0.3rem;
-    margin-bottom: 1.5rem;
-}
-
-.changeLang {
-    background-color: white !important;
-}
-
-.fontSnippet {
-    color: hsl(208, 100%, 15%);
-    letter-spacing: 0.02em;
-    font-size: 0.7em;
-    padding: 0 1rem;
-    font-weight: 100;
-    font-family: SFMono, "Fira Code", "Fira Mono", "Roboto Mono", monospace;
-}
-
-.optionSnippet {
-    color: hsl(208, 100%, 15%);
-    letter-spacing: 0.01em;
-    font-size: 0.7em;
-    padding: 0 1rem;
-    font-weight: 100;
-    font-family: SFMono, "Fira Code", "Fira Mono", "Roboto Mono", monospace;
-    position: absolute;
-}
-
-.changeFont input,
-.changeFont input:focus,
-.changeFont input:active,
-.changeFont input:hover {
-    border: unset !important;
-    outline: unset !important;
-    box-shadow: unset !important;
-}
-
-.changeFont input {
-    text-align: center !important;
-    width: 3em;
-}
-
 @media (max-width:1000px) {
     .notHead {
         margin-left: 0.5rem;
@@ -305,27 +257,6 @@
     } */
 }
 
-.optionHeading {
-    margin: 0.1em 0.1em 1.5rem 0.1em;
-    letter-spacing: 0.1em;
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
-    font-size: 2em;
-    padding: 0.3em 0;
-    font-weight: 600;
-    background-color: rgba(220, 174, 227, 0.2);
-    font-family: 'raleway';
-    border-bottom: 1px solid rgba(34, 36, 38, 0.16);
-    text-align: center;
-}
-
-.resetCode {
-    margin: 1.5rem 0 1.5rem 0;
-    padding-bottom: 1em;
-    padding-top: 1em;
-    /* border-bottom: 1px solid rgba(34, 36, 38, 0.15); */
-    border-top: 1px solid rgba(34, 36, 38, 0.15);
-}
 
 .response {
     --col: 127;
