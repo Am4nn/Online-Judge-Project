@@ -10,6 +10,8 @@ import classes from './Codes.module.css';
 import { ArrowBack, Check, ContentCopy } from '@mui/icons-material';
 import { IconButton, Tooltip, Zoom } from '@mui/material';
 
+import { CopyToClipboard } from 'react-copy-to-clipboard'
+
 const Codes = () => {
     const [response, setResponse] = useState('');
     const [codeFontSize, setcodeFontSize] = useState(15);
@@ -66,19 +68,24 @@ ${error}`
                                     Back
                                 </ButtonCustom>
                             </div>
-                            <div style={{ position: 'absolute' }}>
-                                <Tooltip TransitionComponent={Zoom} title={copied ? 'Copied' : 'Copy'} placement='right'>
-                                    <IconButton
-                                        onClick={() => {
-                                            navigator.clipboard.writeText(response.code);
-                                            setCopied(true);
-                                        }}
-                                        aria-label={copied ? 'Copied' : 'Copy'}
-                                    >
-                                        {copied ? <Check /> : <ContentCopy />}
-                                    </IconButton>
-                                </Tooltip>
-                            </div>
+                            <CopyToClipboard
+                                text={response.code}
+                                onCopy={() => { }}
+                            >
+                                <div style={{ position: 'absolute' }}>
+                                    <Tooltip TransitionComponent={Zoom} title={copied ? 'Copied' : 'Copy'} placement='right'>
+                                        <IconButton
+                                            // onClick={() => {
+                                            //     navigator.clipboard.writeText(response.code);
+                                            //     setCopied(true);
+                                            // }}
+                                            aria-label={copied ? 'Copied' : 'Copy'}
+                                        >
+                                            {copied ? <Check /> : <ContentCopy />}
+                                        </IconButton>
+                                    </Tooltip>
+                                </div>
+                            </CopyToClipboard>
                             <Options
                                 favStyle={{
                                     zIndex: '899',
