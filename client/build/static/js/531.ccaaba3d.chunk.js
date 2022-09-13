@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkclient=self.webpackChunkclient||[]).push([[531],{58531:function(n,c,e){e.r(c);e(72791);var t=e(80184);c.default=function(){return(0,t.jsx)("div",{children:"Account"})}}}]);
-//# sourceMappingURL=531.ccaaba3d.chunk.js.map

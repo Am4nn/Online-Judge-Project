@@ -1,15 +1,13 @@
 import React, { Fragment, useState } from 'react';
+import { useNavigate } from 'react-router';
+import { useDispatch, useSelector } from "react-redux"
 
 import {
-    Box,
     Avatar,
     Menu,
     MenuItem,
     ListItemIcon,
     Divider,
-    IconButton,
-    Tooltip,
-    Zoom
 } from '@mui/material';
 
 import {
@@ -17,18 +15,21 @@ import {
     Logout,
     PersonAdd
 } from '@mui/icons-material';
-import { useNavigate } from 'react-router';
 
+import Nav from "react-bootstrap/Nav"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
 
-import classes from './AccountMenu.module.css';
+import { logout } from "../../../store/Auth/auth-actions"
 
-const AccountMenu = ({ loginState, logoutHandler, setExpand, expand }) => {
+const AccountMenu = ({ setExpand }) => {
 
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const navigator = useNavigate();
+
+    const loginState = useSelector(state => state.auth);
+    const dispatch = useDispatch();
 
     const handleClick = event => {
         setAnchorEl(event.currentTarget);
@@ -45,9 +46,10 @@ const AccountMenu = ({ loginState, logoutHandler, setExpand, expand }) => {
         setExpand(false);
         navigator('/register')
     }
-    const logoutBtnHandler = event => {
+    const logoutHandler = event => {
         event.stopPropagation();
-        logoutHandler();
+        if (loginState.isLoading) return;
+        dispatch(logout());
     }
     const accountHandler = () => {
         setExpand(false);
@@ -59,37 +61,14 @@ const AccountMenu = ({ loginState, logoutHandler, setExpand, expand }) => {
     }
 
     return (
-        <React.Fragment>
-            <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                textAlign: 'center',
-                justifyContent: 'center',
-                paddingRight: `${expand ? 3 : 0}rem`
-            }}>
-                <Tooltip TransitionComponent={Zoom} title="Account settings">
-                    <div
-                        className={classes.user}
-                        onClick={handleClick}
-                    >
-                        <IconButton
-                            size="small"
-                            sx={{ ml: 2 }}
-                            aria-controls={open ? 'account-menu' : undefined}
-                            aria-haspopup="true"
-                            aria-expanded={open ? 'true' : undefined}
-                        >
-                            {loginState.loggedIn === false ?
-                                <Avatar sx={{ width: 32, height: 32 }}>
-                                    <Login />
-                                </Avatar> : <Avatar sx={{ width: 32, height: 32 }} />
-                            }
-                        </IconButton>
-                        <span className={classes.username}>{loginState.loggedIn === true ? 'Aman Arya' : 'Sign-in/Sign-up'}</span>
-                        <span className="dropdown-caret"></span>
-                    </div>
-                </Tooltip>
-            </Box>
+        <Fragment>
+            <Nav.Link
+                className='myNavLink'
+                onClick={handleClick}
+            >
+                Account
+                <span className="dropdown-caret"></span>
+            </Nav.Link>
             <Menu
                 anchorEl={anchorEl}
                 id="account-menu"
@@ -126,6 +105,11 @@ const AccountMenu = ({ loginState, logoutHandler, setExpand, expand }) => {
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
                 {loginState.loggedIn === true &&
+                    <MenuItem onClick={accountHandler}>
+                        <Avatar /> {loginState.username}
+                    </MenuItem>
+                }
+                {loginState.loggedIn === true &&
                     <MenuItem onClick={dashboardHandler}>
                         <FontAwesomeIcon icon={faUserSecret}
                             style={{
@@ -139,11 +123,6 @@ const AccountMenu = ({ loginState, logoutHandler, setExpand, expand }) => {
                             }}
                         />
                         <span>Dashboard</span>
-                    </MenuItem>
-                }
-                {loginState.loggedIn === true &&
-                    <MenuItem onClick={accountHandler}>
-                        <Avatar /> My account
                     </MenuItem>
                 }
                 {loginState.loggedIn === true &&
@@ -166,7 +145,7 @@ const AccountMenu = ({ loginState, logoutHandler, setExpand, expand }) => {
                     </MenuItem>
                 }
                 {loginState.loggedIn === true &&
-                    <MenuItem onClick={logoutBtnHandler}>
+                    <MenuItem onClick={logoutHandler}>
                         <ListItemIcon>
                             <Logout fontSize="small" />
                         </ListItemIcon>
@@ -180,7 +159,7 @@ const AccountMenu = ({ loginState, logoutHandler, setExpand, expand }) => {
                     </MenuItem>
                 }
             </Menu>
-        </React.Fragment>
+        </Fragment>
     );
 }
 

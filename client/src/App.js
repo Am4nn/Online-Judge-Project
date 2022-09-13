@@ -14,6 +14,7 @@ import { getLoggedIn } from './store/Auth/auth-actions'
 import Message from './compenents/Message/Message';
 
 import { messageActions } from './store/Message/message-slice'
+import FooterFAB from './compenents/FooterFAB/FooterFAB';
 
 // const Home = React.lazy(() => import('./pages/Home/Home'));
 const QuestionList = React.lazy(() => import('./pages/QuestionList/QuestionList'));
@@ -23,6 +24,8 @@ const Codes = React.lazy(() => import('./pages/Codes/Codes'));
 const NotFound = React.lazy(() => import('./pages/NotFound/NotFound'));
 const DashBoard = React.lazy(() => import('./pages/DashBoard/DashBoard'));
 const Account = React.lazy(() => import('./pages/Account/Account'));
+const LinkShortner = React.lazy(() => import('./pages/LinkShortner/LinkShortner'));
+const Notes = React.lazy(() => import('./pages/Notes/Notes'));
 const Customform = React.lazy(() => import('./compenents/Customform/Customform'));
 
 
@@ -69,6 +72,7 @@ const App = () => {
             <div className={classes.App}>
                 <NavBar />
                 <Message />
+                <FooterFAB />
                 <ScrollToTop />
                 <div className={classes.routes}>
                     <Suspense
@@ -82,8 +86,10 @@ const App = () => {
                             <Route exact path='/codes/:id' element={<Codes />} />
                             <Route exact path='/login' element={!loginState.loggedIn ? <Customform pageType="login" /> : <Navigate replace to='/questions' />} />
                             <Route exact path='/register' element={!loginState.loggedIn ? <Customform pageType="register" /> : <Navigate replace to='/questions' />} />
-                            <Route exact path='/dashboard' element={<DashBoard />} />
+                            <Route exact path='/dashboard' element={loginState.loggedIn ? <DashBoard /> : <Navigate replace to='/questions' />} />
                             <Route exact path='/account' element={<Account />} />
+                            <Route exact path='/notes' element={<Notes />} />
+                            <Route exact path='/linkShortner' element={<LinkShortner />} />
                             <Route exact path='*' element={<NotFound />} />
                             {/* <Route exact path='*' element={<Navigate replace to='/questions' />} /> */}
                         </Routes>

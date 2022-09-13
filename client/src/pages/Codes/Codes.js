@@ -3,11 +3,12 @@ import { useSearchParams } from 'react-router-dom';
 
 import { SERVER_LINK } from '../../dev-server-link';
 import CodeEditorv3 from '../Question/Editor/CodeEditorv3';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ButtonCustom from '../../compenents/Button/Button';
-
-import classes from './Codes.module.css';
 import Options from '../Question/Options/Options';
+import classes from './Codes.module.css';
+
+import { ArrowBack, Check, ContentCopy } from '@mui/icons-material';
+import { IconButton, Tooltip, Zoom } from '@mui/material';
 
 const Codes = () => {
     const [response, setResponse] = useState('');
@@ -41,6 +42,11 @@ ${error}`
             }))
     }, [filepath])
 
+    const [copied, setCopied] = useState(false);
+
+    if (copied === true)
+        setTimeout(() => setCopied(false), 2000);
+
     return (
         <Fragment>
 
@@ -56,9 +62,22 @@ ${error}`
                                     &#60; go back to leaderboard /&#62;
                                 </div>
                                 <ButtonCustom to='/leaderboard' color='yellow'>
-                                    <ArrowBackIcon style={{ marginRight: '0.3em', transform: 'translateX(-12px)', fontSize: '1.2em' }} />
+                                    <ArrowBack style={{ marginRight: '0.3em', transform: 'translateX(-12px)', fontSize: '1.2em' }} />
                                     Back
                                 </ButtonCustom>
+                            </div>
+                            <div style={{ position: 'absolute' }}>
+                                <Tooltip TransitionComponent={Zoom} title={copied ? 'Copied' : 'Copy'} placement='right'>
+                                    <IconButton
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(response.code);
+                                            setCopied(true);
+                                        }}
+                                        aria-label={copied ? 'Copied' : 'Copy'}
+                                    >
+                                        {copied ? <Check /> : <ContentCopy />}
+                                    </IconButton>
+                                </Tooltip>
                             </div>
                             <Options
                                 favStyle={{

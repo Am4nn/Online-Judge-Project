@@ -16,8 +16,10 @@ export const getLoggedIn = () => {
                     credentials: 'include'
                 }
             ).then(data => data.json());
-            console.log("login : ", response);
-            dispatch(authActions.setLoggedIn({ loggedIn: response || false }));
+            dispatch(authActions.setLoggedIn({
+                loggedIn: response.status || false,
+                ...response
+            }));
         } catch (error) {
             console.error(error);
             dispatch(authActions.setError({ error: JSON.stringify(error) }));

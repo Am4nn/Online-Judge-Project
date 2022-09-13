@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const loginController = async (req, res) => {
+    console.log('POST /api/user/login');
     try {
         // sign the token
         const token = jwt.sign(
@@ -25,6 +26,7 @@ const loginController = async (req, res) => {
 }
 
 const registerController = async (req, res) => {
+    console.log('POST /api/user/register');
     try {
         const { name, username, email, password } = req.body;
 
@@ -63,6 +65,7 @@ const registerController = async (req, res) => {
 }
 
 const logoutController = (req, res) => {
+    console.log('GET /api/user/logout');
     return res.cookie("token", "", {
         httpOnly: true,
         expires: new Date(0),
@@ -71,16 +74,27 @@ const logoutController = (req, res) => {
     }).status(200).json({ msg: "Logged Out" });
 }
 
-const loggedInController = (req, res) => {
+const loggedInController = async (req, res) => {
+    console.log('GET /api/user/loggedIn');
+    // console.info('req', "body: ", req.body, "secret: ", req.secret, "cookies: ", req.cookies);
     try {
+        if (!req.cookies || !req.cookies.token) return res.json(false);
+
         const token = req.cookies.token;
-        if (!token) return res.json(false);
+        const verified = jwt.verify(token, process.env.JWT_SECRET);
 
-        jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(verified.user);
 
-        res.status(200).json(true);
+        res.status(200).json({
+            status: true,
+            name: user.name,
+            email: user.email,
+            username: user.username,
+            solvedQuestions: user.solvedQuestions
+        });
     } catch (err) {
-        res.json(false);
+        console.error(err);
+        res.json({ status: false });
     }
 }
 

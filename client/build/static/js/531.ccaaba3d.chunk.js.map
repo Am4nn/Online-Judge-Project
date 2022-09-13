@@ -1,1 +1,0 @@
-{"version":3,"file":"static/js/531.ccaaba3d.chunk.js","mappings":"qIAQA,UANgB,WACZ,OACI","sources":["pages/Account/Account.js"],"sourcesContent":["import React from 'react'\r\n\r\nconst Account = () => {\r\n    return (\r\n        <div>Account</div>\r\n    )\r\n}\r\n\r\nexport default Account;"],"names":[],"sourceRoot":""}

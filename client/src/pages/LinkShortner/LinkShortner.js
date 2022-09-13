@@ -1,12 +1,12 @@
 import React from 'react'
 
-const Home = () => {
+const LinkShortner = () => {
     return (
-        <div>Home
+        <div>LinkShortner
             <div>This site is still in development</div>
             <div>This page has not yet been developed</div>
         </div>
     )
 }
 
-export default Home;
+export default LinkShortner

@@ -10,7 +10,7 @@ const messageSlice = createSlice({
     },
     reducers: {
         set(state, action) {
-            state.type = action.payload.type;
+            state.type = action.payload.type || 'info';
             state.message = action.payload.message;
             action.payload.description ?
                 state.description = action.payload.description :
