@@ -19,27 +19,31 @@ const QuestionList = () => {
     const [easy, setEasy] = useState(false);
     const [medium, setMedium] = useState(false);
     const [hard, setHard] = useState(false);
+    const [solved, setSolved] = useState(false);
+    const [unsolved, setUnsolved] = useState(false);
     const cardsRef = useRef(null);
 
+    const { loggedIn, solvedQuestions } = useSelector(state => state.auth);
     const problems = useSelector(state => state.questions);
     const [questions, setQuestions] = useState([]);
 
     useEffect(() => {
-
         if (!easy && !medium && !hard) {
             setQuestions(problems.questions);
-            return;
         }
-        setQuestions(problems.questions.filter(element => {
-            if (
-                (easy && element.difficulty === 'easy') ||
-                (medium && element.difficulty === 'medium') ||
-                (hard && element.difficulty === 'hard')
-            ) return true;
-            return false;
-        }));
+        else setQuestions(problems.questions.filter(element => (
+            (easy && element.difficulty === 'easy') ||
+            (medium && element.difficulty === 'medium') ||
+            (hard && element.difficulty === 'hard')
+        )));
 
-    }, [easy, medium, hard, problems])
+        if (solved || unsolved)
+            setQuestions(questions => questions.filter(ele => (
+                (solved && solvedQuestions.includes(ele._id)) ||
+                (unsolved && !solvedQuestions.includes(ele._id))
+            )));
+
+    }, [easy, medium, hard, problems, solved, unsolved, solvedQuestions])
 
     const isMobile = useMediaQuery('(max-width:1000px)');
 
@@ -84,6 +88,11 @@ const QuestionList = () => {
                                                         easy={easy}
                                                         medium={medium}
                                                         hard={hard}
+                                                        loggedIn={loggedIn}
+                                                        solved={solved}
+                                                        setSolved={setSolved}
+                                                        unsolved={unsolved}
+                                                        setUnsolved={setUnsolved}
                                                     />
                                                 </div>
                                             </Slide>
@@ -99,13 +108,18 @@ const QuestionList = () => {
                                                 easy={easy}
                                                 medium={medium}
                                                 hard={hard}
+                                                loggedIn={loggedIn}
+                                                solved={solved}
+                                                setSolved={setSolved}
+                                                unsolved={unsolved}
+                                                setUnsolved={setUnsolved}
                                             />
                                         </div>
                                     </div>
                                 )}
 
                                 <div className={classes.cards} ref={cardsRef}>
-                                    {questions.map(problem => <Card key={problem._id} question={problem} />)}
+                                    {questions.map(problem => <Card solved={loggedIn && solvedQuestions.includes(problem._id)} key={problem._id} question={problem} />)}
                                 </div>
                             </Fragment>
                         ) : (

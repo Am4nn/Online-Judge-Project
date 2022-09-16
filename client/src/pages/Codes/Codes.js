@@ -54,9 +54,9 @@ ${error}`
         setTimeout(() => setCopied(false), 2500);
 
     const copyHandler = () => {
-        copy(response.code);
-        const type = 'success';
-        const message = 'Code copied successfully !';
+        const result = copy(response.code);
+        const type = result ? 'success' : 'error';
+        const message = result ? 'Code copied successfully !' : 'There are some errors copying the code !';
 
         dispatch(messageActions.set({ type, message }));
         setCopied(true);
@@ -80,16 +80,6 @@ ${error}`
                                 Back
                             </ButtonCustom>
                         </div>
-                        {/* <CopyToClipboard
-                            text={response.code}
-                            onCopy={(text, result) => {
-                                const type = result ? 'success' : 'error';
-                                const message = result ? 'Code copied successfully !' : 'There are some errors copying the code !';
-
-                                dispatch(messageActions.set({ type, message }));
-                                setCopied(true);
-                            }}
-                        > */}
                         <div style={{ position: 'absolute' }}>
                             <Tooltip TransitionComponent={Zoom} title={copied ? 'Copied' : 'Copy'} placement='right'>
                                 <IconButton
@@ -100,7 +90,6 @@ ${error}`
                                 </IconButton>
                             </Tooltip>
                         </div>
-                        {/* </CopyToClipboard> */}
                         <Options
                             favStyle={{
                                 zIndex: '899',

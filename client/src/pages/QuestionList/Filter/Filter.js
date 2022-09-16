@@ -14,7 +14,18 @@ import { messageActions } from '../../../store/Message/message-slice'
 
 const Filter = props => {
 
-    const { easy, medium, hard, setEasy, setMedium, setHard } = props;
+    const { easy,
+        medium,
+        hard,
+        setEasy,
+        setMedium,
+        setHard,
+        loggedIn,
+        solved,
+        setSolved,
+        unsolved,
+        setUnsolved
+    } = props;
 
     const dispatch = useDispatch();
 
@@ -23,10 +34,12 @@ const Filter = props => {
     const hardChecked = () => setHard(prev => !prev);
 
     const clearFilter = () => {
-        if (!easy && !medium && !hard) return;
+        if (!easy && !medium && !hard && !solved && !unsolved) return;
         setEasy(false);
         setMedium(false);
         setHard(false);
+        setSolved(false);
+        setUnsolved(false);
         dispatch(messageActions.set({
             type: 'warning',
             message: 'All Filters Cleared !'
@@ -90,6 +103,43 @@ const Filter = props => {
                     </FormGroup>
                 </div>
             </div>
+
+            {loggedIn &&
+                <div style={{ borderBottom: '1px solid rgba(34, 36, 38, 0.15)' }}>
+                    <div className={classes.checkboxes}>
+                        <FormGroup>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        onChange={() => setSolved(prev => !prev)}
+                                        checked={solved}
+                                        sx={{
+                                            color: '#0288d1',
+                                            '&.Mui-checked': {
+                                                color: '#0288d1'
+                                            }
+                                        }}
+                                    />}
+                                label="Solved"
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        onChange={() => setUnsolved(prev => !prev)}
+                                        checked={unsolved}
+                                        sx={{
+                                            color: '#0288d1',
+                                            '&.Mui-checked': {
+                                                color: '#0288d1'
+                                            }
+                                        }}
+                                    />}
+                                label="Unsolved"
+                            />
+                        </FormGroup>
+                    </div>
+                </div>
+            }
         </Fragment >
     )
 }

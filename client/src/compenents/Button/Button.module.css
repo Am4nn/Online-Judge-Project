@@ -60,6 +60,14 @@
     background-color: hsl(226, 55%, 69%);
 }
 
+.grey::after {
+    background-color: hsl(0, 0%, 83%);
+}
+
+.grey:hover::after {
+    background-color: hsl(0, 0%, 73%);
+}
+
 .green::after {
     background-color: hsl(161, 100%, 50%);
 }

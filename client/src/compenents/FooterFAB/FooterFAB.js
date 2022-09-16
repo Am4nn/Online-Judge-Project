@@ -39,6 +39,7 @@ const FooterFAB = () => {
                     anchorEl={fabRef.current}
                     placement={'right'}
                     transition
+                    style={{ zIndex: '999' }}
                 >
                     {({ TransitionProps }) => (
                         <Zoom {...TransitionProps} timeout={350}>

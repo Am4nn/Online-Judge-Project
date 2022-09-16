@@ -3,6 +3,7 @@
 const Queue = require('bull');
 const Query = require('../DataBase/Model/Query');
 const Question = require('../DataBase/Model/Question');
+const User = require('../DataBase/Model/User');
 
 const {
     execPyCode,
@@ -40,6 +41,17 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
         const question = await Question.findById(query.quesId);
         question.noOfSuccess += 1;
         await question.save();
+
+        if (query.username && query.username !== 'guest') {
+            const user = await User.findOne({ username: query.username });
+            if (!user.solvedQuestions) {
+                user.solvedQuestions = [];
+            }
+            if (!user.solvedQuestions.includes(query.quesId)) {
+                user.solvedQuestions.push(query.quesId);
+            }
+            await user.save();
+        }
 
     } catch (error) {
         if (!error.msg) {

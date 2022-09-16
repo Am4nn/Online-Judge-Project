@@ -16,6 +16,7 @@ export const getLoggedIn = () => {
                     credentials: 'include'
                 }
             ).then(data => data.json());
+            console.log(response);
             dispatch(authActions.setLoggedIn({
                 loggedIn: response.status || false,
                 ...response
@@ -56,7 +57,6 @@ export const login = (username, email, password) => {
             ).then(data => data.json());
 
             await dispatch(getLoggedIn());
-            console.log(response);
             if (response.error) {
                 dispatch(messageActions.set({
                     type: 'error',

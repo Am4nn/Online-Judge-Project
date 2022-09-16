@@ -30,11 +30,11 @@ const ExtraMenu = ({ setExpand }) => {
         setExpand(false);
     }
     const GSLHanlder = () => {
-        // setExpand(false);
         dispatch(messageActions.set({
             type: 'warning',
             message: 'This feature is not available yet !'
         }));
+        setExpand(false);
     }
     const LSHanlder = () => {
         navigate('/linkShortner');

@@ -24,6 +24,11 @@ const columns = [
         align: 'center',
     },
     {
+        id: 'username',
+        label: 'Username',
+        align: 'center'
+    },
+    {
         id: 'status',
         label: 'Status',
         align: 'center'
@@ -57,11 +62,12 @@ const columns = [
 ];
 
 const createData = leaders => {
-    let { quesName, status, language, submitTime, completeTime, startTime, quesId, output, filepath } = leaders;
+    let { quesName, status, language, submitTime, completeTime, startTime, quesId, output, filepath, username } = leaders;
 
     // if some of data is missing then fix them with some default values
     (quesName === undefined || quesName === null) && (quesName = 'Binary Search');
     (quesId === undefined || quesId === null) && (quesId = '62d2def98f76467879c21e29');
+    (username === undefined || username === null) && (username = 'guest');
 
     const time = Math.abs(new Date(completeTime) - new Date(startTime)) / 1000;
     submitTime = moment(submitTime).fromNow();
@@ -69,7 +75,7 @@ const createData = leaders => {
 
     filepath = (filepath.split("\\").pop());
 
-    return { quesName, status, language, time, submitTime, quesId, msg: ((!output || !output.msg) ? 'NA' : output.msg), filepath };
+    return { quesName, status, language, time, submitTime, quesId, msg: ((!output || !output.msg) ? 'NA' : output.msg), filepath, username };
 }
 
 const LeaderTable = props => {

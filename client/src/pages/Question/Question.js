@@ -61,6 +61,7 @@ const Question = () => {
                         'Content-Type': 'application/json'
                     },
                     method: 'POST',
+                    credentials: 'include',
                     body: JSON.stringify({ code, language: selectedLang, testcase: question.testcase, quesName: question.name })
                 }
             );

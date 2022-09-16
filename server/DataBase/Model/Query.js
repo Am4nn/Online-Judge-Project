@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const QuerySchema = new mongoose.Schema({
+    username: {
+        type: String,
+        required: true
+    },
     language: {
         type: String,
         required: true,

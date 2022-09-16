@@ -11,8 +11,8 @@ const getQuestionById = async id => {
     return question;
 }
 
-const createNewQuery = async ({ language, filepath, testcase, quesId, quesName }) => {
-    const query = new Query({ language, filepath, testcase, quesId, quesName });
+const createNewQuery = async ({ language, filepath, testcase, quesId, quesName, username }) => {
+    const query = new Query({ language, filepath, testcase, quesId, quesName, username });
     await query.save();
     return query;
 }

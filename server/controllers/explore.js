@@ -7,9 +7,11 @@ const {
     getAllQueriesReverseSorted
 } = require('../DataBase/database');
 
-// const Query = require('../DataBase/Model/Query');
-// const Question = require('../DataBase/Model/Question');
+const jwt = require('jsonwebtoken');
+
 const { addQueryToQueue } = require('../CodeExecuter/queryQueue');
+
+const User = require('../DataBase/Model/User');
 
 const {
     readFile,
@@ -56,8 +58,23 @@ const verdictController = async (req, res) => {
         if (language !== 'py' && language !== 'cpp')
             return res.status(400).json({ msg: 'Please select a language / valid language !' });
 
-        const { filepath, filename } = createFile(language, code);
-        const query = await createNewQuery({ language, filepath: filename, testcase, quesId, quesName });
+        let username = 'guest';
+        const token = req.cookies.token;
+        try {
+            if (token) {
+                const verified = jwt.verify(token, process.env.JWT_SECRET);
+                const userId = verified.user;
+                const user = await User.findById(userId);
+                username = user.username;
+                user.totalSubmissions += 1;
+                await user.save();
+            }
+        } catch {
+            username = 'guest';
+        }
+
+        const { filename } = createFile(language, code);
+        const query = await createNewQuery({ language, filepath: filename, testcase, quesId, quesName, username });
 
         const queryId = query['_id'];
         addQueryToQueue(queryId);
@@ -68,6 +85,7 @@ const verdictController = async (req, res) => {
 
         res.status(201).json({ status: 'pending', msg: "Request queued, wait for response !", queryId });
     } catch (err) {
+        console.error(err);
         return res.status(400).json({ status: 'error', msg: 'some error occured submitting the code !', error: JSON.stringify(err) });
     }
 }
@@ -79,7 +97,6 @@ const statusController = async (req, res) => {
         return res.status(404).json({ msg: 'not a valid object id' });
     let query = null;
     try {
-        // query = await Query.findById(queryId);
         query = await getQueryById(queryId);
         if (!query) {
             return res.status(404).json({ msg: 'invalid queryId or this query has been deleted !' });
@@ -93,7 +110,6 @@ const statusController = async (req, res) => {
 const leaderboardController = async (req, res) => {
     console.log('GET /api/explore/leaderboard getLeaderboard');
     try {
-        // const leaders = await Query.find({}).sort({ _id: -1 });
         const leaders = await getAllQueriesReverseSorted();
         return res.status(200).json(leaders);
     } catch (error) {
