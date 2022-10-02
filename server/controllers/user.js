@@ -16,8 +16,8 @@ const loginController = async (req, res) => {
         // send the token in a HTTP-only cookie
         res.cookie("token", token, {
             httpOnly: true,
-            secure: true,
-            sameSite: "none",
+            // secure: true,
+            // sameSite: "none",
         }).status(200).json({ msg: "Logged In" });
     } catch (err) {
         console.error(err);
@@ -55,8 +55,8 @@ const registerController = async (req, res) => {
         // send the token in a HTTP-only cookie
         res.cookie("token", token, {
             httpOnly: true,
-            secure: true,
-            sameSite: "none",
+            // secure: true,
+            // sameSite: "none",
         }).status(200).json({ msg: "Registered" });
     } catch (err) {
         console.error(err);
@@ -69,8 +69,8 @@ const logoutController = (req, res) => {
     return res.cookie("token", "", {
         httpOnly: true,
         expires: new Date(0),
-        secure: true,
-        sameSite: "none",
+        // secure: true,
+        // sameSite: "none",
     }).status(200).json({ msg: "Logged Out" });
 }
 

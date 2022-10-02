@@ -8,7 +8,7 @@ const authSlice = createSlice({
         error: undefined,
         name: undefined,
         email: undefined,
-        username: undefined,
+        username: 'guest',
         solvedQuestions: undefined
     },
     reducers: {
@@ -25,7 +25,7 @@ const authSlice = createSlice({
             } else {
                 state.name = undefined;
                 state.email = undefined;
-                state.username = undefined;
+                state.username = 'guest';
                 state.solvedQuestions = undefined;
             }
         },
