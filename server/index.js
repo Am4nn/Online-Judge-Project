@@ -3,13 +3,14 @@ if (process.env.NODE_ENV !== "production") { // if in development
 }
 
 const express = require('express');
+const app = express();
 const cors = require('cors');
+const cookieParser = require("cookie-parser");
 const explore = require('./routes/explore');
 const user = require('./routes/user');
-const app = express();
-const { connectDB } = require('./DataBase/connectDB');
+const notes = require('./routes/notes');
 const path = require('path');
-const cookieParser = require("cookie-parser");
+const { connectDB } = require('./DataBase/connectDB');
 
 connectDB();
 
@@ -23,8 +24,11 @@ app.use(cors({
 }));
 
 
-// set api route to get all questions
+// api route to get questions and verdicts
 app.use('/api/explore', explore);
+
+// api route to get and post notes
+app.use('/api/notes', notes);
 
 // user login and rgister
 app.use('/api/user', user);

@@ -106,4 +106,21 @@ const authValidator = (req, res, next) => {
     }
 }
 
-module.exports = { loginValidator, registerValidator, authValidator };
+const authProvider = (req, res, next) => {
+    try {
+        const token = req.cookies.token;
+        if (!token) new Error("Unauthorized");
+
+        const verified = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = verified.user;
+        req.username = verified.username;
+
+    } catch (err) {
+        req.user = undefined;
+        req.username = 'guest';
+    }
+
+    next();
+}
+
+module.exports = { loginValidator, registerValidator, authValidator, authProvider };

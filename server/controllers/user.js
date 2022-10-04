@@ -8,7 +8,8 @@ const loginController = async (req, res) => {
         // sign the token
         const token = jwt.sign(
             {
-                user: req.existingUser._id
+                user: req.existingUser._id,
+                username: req.existingUser.username
             },
             process.env.JWT_SECRET
         );
@@ -47,7 +48,8 @@ const registerController = async (req, res) => {
         // sign the token
         const token = jwt.sign(
             {
-                user: savedUser._id
+                user: savedUser._id,
+                username: savedUser.username
             },
             process.env.JWT_SECRET
         );

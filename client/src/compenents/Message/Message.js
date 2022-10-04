@@ -122,6 +122,7 @@ const Message = () => {
                 anchorEl={msgRef.current}
                 placement={'bottom'}
                 transition
+                style={{ zIndex: 1000 }}
             >
                 {({ TransitionProps }) => (
                     <Zoom {...TransitionProps} timeout={350}>

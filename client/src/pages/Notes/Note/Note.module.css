@@ -2,7 +2,7 @@
     border: 2px solid rgba(207, 106, 173, 0.3);
     display: flex;
     flex-direction: column;
-    width: 17rem;
+    width: 17.3rem;
     border-radius: 8px;
     padding: 5px 2px;
     margin: 0.5rem;
@@ -26,7 +26,7 @@
     text-transform: capitalize;
 }
 
-p {
+.desc {
     text-align: center;
     margin: 0.6rem 0;
     font-size: 0.9rem;

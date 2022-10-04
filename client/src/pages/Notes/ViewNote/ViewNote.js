@@ -12,15 +12,17 @@ import CodeEditorv3 from '../../Question/Editor/CodeEditorv3';
 import { Check, ContentCopy, Delete, Edit } from '@mui/icons-material';
 import copy from 'copy-to-clipboard';
 import { messageActions } from '../../../store/Message/message-slice';
+import { SERVER_LINK } from '../../../dev-server-link';
 
-const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditModal }) => {
+const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditModal, isMobile, markEditOrDelete, setReloadNeeded }) => {
 
-    const { username, title, desc, access, editable, codeid, language } = viewNote;
+    const { username, title, desc, access, editable, codeid, _id: noteid } = viewNote;
 
     const dispatch = useDispatch();
-    const { username: realUsername } = useSelector(state => state.auth);
+    const { username: auth_username, isAdmin } = useSelector(state => state.auth);
 
     const [code, setCode] = useState('');
+    const [language, setLanguage] = useState('c');
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [copied, setCopied] = useState(false);
     if (copied === true) setTimeout(() => setCopied(false), 2500);
@@ -38,6 +40,36 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
             }
         }
     }, [openModal]);
+
+
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!codeid) return;
+
+        // make request to server to fetch code with _id:codeid
+        fetch(
+            `${SERVER_LINK}/api/notes/${codeid}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                method: 'GET',
+                credentials: 'include'
+            }
+        )
+            .then(async response => {
+                const res = await response.json();
+                if (response.ok) return res;
+                return Promise.reject(res);
+            })
+            .then(response => {
+                setCode(response.code);
+                setLanguage(response.language);
+            })
+            .catch(error => { setCode(JSON.stringify(error)) })
+            .finally(() => setLoading(false))
+    }, [codeid]);
 
     const copyHandler = () => {
         const result = copy(code);
@@ -59,7 +91,34 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
         setOpenModal(false);
 
         // Make a request to server with credentials to delete perticular note
+        fetch(
+            `${SERVER_LINK}/api/notes/${noteid}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                method: 'DELETE',
+                credentials: 'include'
+            }
+        )
+            .then(async response => {
+                const res = await response.json();
+                if (response.ok) return res
+                return Promise.reject(res);
+            })
+            .then(response => {
+                dispatch(messageActions.set({ type: 'success', message: 'Deleted Note Successfully !', description: JSON.stringify(response) }));
+                markEditOrDelete(noteid, 'deleted');
+                setReloadNeeded(true);
+            })
+            .catch(err => {
+                console.error(err);
+                dispatch(messageActions.set({ type: 'error', message: 'Deleting Note Unsuccessful!', description: JSON.stringify(err) }));
+            })
     }
+
+    const isEditDisabled = (!editable && !isAdmin && (auth_username !== username));
+    const isDeleteDisabled = (!isAdmin && (auth_username !== username));
 
     return (
         <Fragment>
@@ -70,22 +129,27 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
                 scroll='paper'
                 aria-labelledby="View-Note"
                 fullWidth
-                maxWidth='md'
+                maxWidth={!isMobile && 'md'}
+                fullScreen={isMobile}
                 TransitionComponent={Zoom}
             >
                 <DialogTitle style={{ textTransform: 'capitalize' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span>View Note</span>
-                        <div>
-                            <Tooltip TransitionComponent={Zoom} title='Edit' placement='bottom'>
-                                <Fab onClick={handleEdit} size="small" color="info" aria-label="edit">
-                                    <Edit />
-                                </Fab>
+                        <div style={{ display: 'flex' }}>
+                            <Tooltip TransitionComponent={Zoom} title={isEditDisabled ? "Can't edit this note" : 'Edit'} placement='bottom'>
+                                <Box>
+                                    <Fab onClick={handleEdit} size="small" color="info" aria-label="edit" disabled={isEditDisabled}>
+                                        <Edit />
+                                    </Fab>
+                                </Box>
                             </Tooltip>
-                            <Tooltip TransitionComponent={Zoom} title='Delete' placement='bottom'>
-                                <Fab onClick={() => setOpenDeleteModal(true)} size="small" color="warning" aria-label="delete" sx={{ ml: 1 }}>
-                                    <Delete />
-                                </Fab>
+                            <Tooltip TransitionComponent={Zoom} title={isDeleteDisabled ? "Can't delete this note" : 'Delete'} placement='bottom'>
+                                <Box>
+                                    <Fab onClick={() => setOpenDeleteModal(true)} size="small" color="warning" aria-label="delete" sx={{ ml: 1 }} disabled={isDeleteDisabled}>
+                                        <Delete />
+                                    </Fab>
+                                </Box>
                             </Tooltip>
                         </div>
                     </div>
@@ -114,7 +178,7 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
                                     </IconButton>
                                 </Tooltip>
                             </div>
-                            <div style={{ fontWeight: 600, fontSize: '1.1rem', opacity: 0.7 }}>Language : {language}</div>
+                            <div style={{ fontWeight: 600, fontSize: '1.1rem', opacity: 0.7 }}>Language : {loading ? '...' : language}</div>
                         </div>
                         <CodeEditorv3
                             code={code}
@@ -122,7 +186,7 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
                             language={language}
                             fontSize={15}
                             isReadOnly
-                            isLoading
+                            isLoading={loading}
                         />
                     </Box>
 

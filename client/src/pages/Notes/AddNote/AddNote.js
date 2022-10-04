@@ -1,27 +1,33 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import { FormControl, FormControlLabel, InputLabel, MenuItem, Select, Switch, TextField } from '@mui/material';
+import { useSelector, useDispatch } from 'react-redux';
+
+import {
+    FormControl, FormControlLabel,
+    DialogContent, DialogTitle,
+    Button, styled, TextField,
+    Dialog, DialogActions,
+    InputLabel, MenuItem,
+    Select, Switch,
+} from '@mui/material';
 import { Box } from '@mui/system';
-import { styled } from '@mui/material/styles';
-import Note from '../Note/Note';
-import { useSelector } from 'react-redux';
+
 import CodeEditorv3 from '../../Question/Editor/CodeEditorv3';
+import Note from '../Note/Note';
+import { SERVER_LINK } from '../../../dev-server-link';
+import { messageActions } from '../../../store/Message/message-slice';
 
+const AddNote = ({ openModal, setOpenModal, isMobile, setReloadNeeded }) => {
 
-const AddNote = ({ openModal, setOpenModal }) => {
-
-    const { username } = useSelector(state => state.auth);
+    const { username, isAdmin } = useSelector(state => state.auth);
 
     const [title, setTitle] = useState('');
     const [desc, setDesc] = useState('');
     const [access, setAccess] = useState('public');
     const [editable, setEditable] = useState(false);
     const [code, setCode] = useState('');
-    const [language, setLanguage] = useState('cpp');
+    const [language, setLanguage] = useState('c');
+
+    const dispatch = useDispatch();
 
     const resetStates = () => {
         setTitle('');
@@ -37,8 +43,38 @@ const AddNote = ({ openModal, setOpenModal }) => {
     };
 
     const handleAdd = () => {
-        handleClose(false);
+        if (!title || !desc) {
+            dispatch(messageActions.set({ type: 'error', message: "title and description can't be empty", description: 'title and description are required so please fill both !!!' }));
+            return;
+        }
+
+        handleClose();
+        dispatch(messageActions.set({ type: 'info', message: 'Adding New Note...' }));
         // send request to server to add note with given info and credentials
+        fetch(
+            `${SERVER_LINK}/api/notes`,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                method: 'POST',
+                body: JSON.stringify({ title, desc, code, language, access, editable }),
+                credentials: 'include'
+            }
+        )
+            .then(async response => {
+                const res = await response.json();
+                if (response.ok) return res
+                return Promise.reject(res);
+            })
+            .then(response => {
+                dispatch(messageActions.set({ type: 'success', message: 'Added Note Successfully !', description: JSON.stringify(response) }));
+                setReloadNeeded(true);
+            })
+            .catch(err => {
+                console.error(err);
+                dispatch(messageActions.set({ type: 'error', message: 'Adding Note Unsuccessful!', description: JSON.stringify(err) }));
+            })
     }
 
     const descriptionElementRef = useRef(null);
@@ -58,7 +94,8 @@ const AddNote = ({ openModal, setOpenModal }) => {
             scroll='paper'
             aria-labelledby="Add-Note"
             fullWidth
-            maxWidth='sm'
+            maxWidth={!isMobile && 'sm'}
+            fullScreen={isMobile}
         >
             <DialogTitle style={{ textTransform: 'capitalize' }}>Add Note</DialogTitle>
             <DialogContent dividers ref={descriptionElementRef}>
@@ -99,18 +136,20 @@ const AddNote = ({ openModal, setOpenModal }) => {
                             value={access}
                             onChange={event => setAccess(event.target.value)}
                         >
-                            {username === 'aman' && <MenuItem value='global'>Global</MenuItem>}
+                            {isAdmin && <MenuItem value='global'>Global</MenuItem>}
                             <MenuItem value='public'>Public</MenuItem>
-                            <MenuItem value='private'>Private</MenuItem>
+                            {username !== 'guest' && <MenuItem value='private'>Private</MenuItem>}
                         </Select>
                     </FormControl>
 
-                    <FormControlLabel
-                        label="Editable (By Anyone)"
-                        control={<CustomSwitch checked={editable} onChange={event => setEditable(event.target.checked)} />}
-                        labelPlacement='start'
-                    />
-                    <span style={{ marginLeft: '0.9rem', fontWeight: 600, opacity: 0.6 }}>{editable ? "Yes" : "No"} </span>
+                    <div>
+                        <FormControlLabel
+                            label="Editable (By Anyone)"
+                            control={<CustomSwitch checked={editable} onChange={event => setEditable(event.target.checked)} />}
+                            labelPlacement='start'
+                        />
+                        <span style={{ marginLeft: '0.9rem', fontWeight: 600, opacity: 0.6 }}>{editable ? "Yes" : "No"} </span>
+                    </div>
 
                     <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                         <div style={{ fontWeight: 600, fontSize: '1.1rem', opacity: 0.7 }}>Enter Code : </div>

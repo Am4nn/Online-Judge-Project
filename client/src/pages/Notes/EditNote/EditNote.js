@@ -8,11 +8,12 @@ import { FormControl, FormControlLabel, InputLabel, MenuItem, Select, Switch, Te
 import { Box } from '@mui/system';
 import { styled } from '@mui/material/styles';
 import Note from '../Note/Note';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import CodeEditorv3 from '../../Question/Editor/CodeEditorv3';
+import { messageActions } from '../../../store/Message/message-slice';
 
 
-const EditNote = ({ openModal, setOpenModal, editNote }) => {
+const EditNote = ({ openModal, setOpenModal, editNote, isMobile, markEditOrDelete, setReloadNeeded }) => {
 
     const {
         username,
@@ -21,10 +22,12 @@ const EditNote = ({ openModal, setOpenModal, editNote }) => {
         access: access_,
         editable: editable_,
         code: code_,
-        language: language_
+        language: language_,
+        _id
     } = editNote;
 
-    const { username: realUsername } = useSelector(state => state.auth);
+    const dispatch = useDispatch();
+    const { username: realUsername, isAdmin } = useSelector(state => state.auth);
 
     const [title, setTitle] = useState('');
     const [desc, setDesc] = useState('');
@@ -34,13 +37,21 @@ const EditNote = ({ openModal, setOpenModal, editNote }) => {
     const [code, setCode] = useState('');
 
     useEffect(() => {
+        if (title_) {
+            dispatch(messageActions.set({
+                type: 'warning',
+                message: 'Edit feature is not available yet',
+                description: 'website is stil in development this feature will be available soon !'
+            }));
+        }
+
         title_ && setTitle(title_);
         desc_ && setDesc(desc_);
         access_ && setAccess(access_);
         editable_ && setEditable(editable_);
         language_ && setLanguage(language_);
         code_ && setCode(code_);
-    }, [title_, desc_, access_, editable_, language_, code_]);
+    }, [title_, desc_, access_, editable_, language_, code_, dispatch]);
 
     const handleClose = () => {
         setOpenModal(false);
@@ -49,6 +60,15 @@ const EditNote = ({ openModal, setOpenModal, editNote }) => {
     const handleSave = () => {
         handleClose(false);
         // send request to server to edit note with given info and credentials
+        dispatch(messageActions.set({
+            type: 'info',
+            message: 'Edit feature is not available yet',
+            description: 'website is stil in development this feature will be available soon !'
+        }));
+
+        // TODO
+        markEditOrDelete(_id, 'edited');
+        setReloadNeeded(true);
     }
 
     const descriptionElementRef = useRef(null);
@@ -68,7 +88,8 @@ const EditNote = ({ openModal, setOpenModal, editNote }) => {
             scroll='paper'
             aria-labelledby="Edit-Note"
             fullWidth
-            maxWidth='sm'
+            maxWidth={!isMobile && 'sm'}
+            fullScreen={isMobile}
         >
             <DialogTitle style={{ textTransform: 'capitalize' }}>Edit Note</DialogTitle>
             <DialogContent dividers ref={descriptionElementRef}>
@@ -100,20 +121,23 @@ const EditNote = ({ openModal, setOpenModal, editNote }) => {
                         value={desc}
                         onChange={event => setDesc(event.target.value)}
                     />
-                    <FormControl sx={{ width: '85%' }}>
-                        <InputLabel id="access-input-label">Access</InputLabel>
-                        <Select
-                            labelId="access-input-label"
-                            id="access-input"
-                            label="Access"
-                            value={access}
-                            onChange={event => setAccess(event.target.value)}
-                        >
-                            {realUsername === 'aman' && <MenuItem value='global'>Global</MenuItem>}
-                            <MenuItem value='public'>Public</MenuItem>
-                            <MenuItem value='private'>Private</MenuItem>
-                        </Select>
-                    </FormControl>
+
+                    {(isAdmin || realUsername === username) &&
+                        <FormControl sx={{ width: '85%' }}>
+                            <InputLabel id="access-input-label">Access</InputLabel>
+                            <Select
+                                labelId="access-input-label"
+                                id="access-input"
+                                label="Access"
+                                value={access}
+                                onChange={event => setAccess(event.target.value)}
+                            >
+                                {isAdmin && <MenuItem value='global'>Global</MenuItem>}
+                                <MenuItem value='public'>Public</MenuItem>
+                                {(realUsername !== 'guest') && <MenuItem value='private'>Private</MenuItem>}
+                            </Select>
+                        </FormControl>
+                    }
 
                     <FormControlLabel
                         label="Editable (By Anyone)"

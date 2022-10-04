@@ -20,12 +20,11 @@ const LeaderBoard = () => {
                 method: 'GET'
             }
         )
-            .then(data => data.json())
             .then(response => {
-                if (!response.ok) {
-                    setLeaders(response);
-                }
+                if (response.ok) return response.json();
+                return Promise.reject(response);
             })
+            .then(response => setLeaders(response))
             .catch(setError)
             .finally(() => setLoading(false))
     }, []);

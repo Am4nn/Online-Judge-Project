@@ -18,11 +18,11 @@
 }
 
 .addNoteFab {
-    z-index: 1;
-    position: absolute;
-    right: 5%;
-    text-transform: capitalize;
-    background-color: hsl(180, 100%, 50%);
+    position: fixed !important;
+    z-index: 1 !important;
+    right: 5% !important;
+    text-transform: capitalize !important;
+    background-color: hsl(180, 100%, 50%) !important;
 }
 
 .addNoteFab:hover {
@@ -36,6 +36,7 @@
     justify-content: flex-start;
     align-items: center;
     padding-bottom: 6rem;
+    width: 100%;
 
     /* Making container scrollable */
     overflow-y: scroll;

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-// Schema : _id, title, desc, codeid, username, access, editable, language
+// Schema : _id, title, desc, codeid, username, access, editable
 
 const NoteSchema = new mongoose.Schema({
     title: {
@@ -24,14 +24,14 @@ const NoteSchema = new mongoose.Schema({
         type: Boolean,
         require: true
     },
-    language: {
-        type: String,
-        required: true
-    },
     codeid: {
         type: String
     },
     createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    lastModifiedAt: {
         type: Date,
         default: Date.now
     }

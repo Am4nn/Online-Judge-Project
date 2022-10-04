@@ -27,7 +27,12 @@ const getAllQueriesReverseSorted = async () => {
     return leaders;
 }
 
+const isAdmin = username => {
+    return (username === 'aman');
+}
+
 module.exports = {
+    isAdmin,
     getQueryById,
     createNewQuery,
     getQuestionList,

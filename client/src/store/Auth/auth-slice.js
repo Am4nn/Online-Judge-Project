@@ -9,7 +9,8 @@ const authSlice = createSlice({
         name: undefined,
         email: undefined,
         username: 'guest',
-        solvedQuestions: undefined
+        solvedQuestions: undefined,
+        isAdmin: false
     },
     reducers: {
         setLoading(state, action) {
@@ -22,11 +23,13 @@ const authSlice = createSlice({
                 state.email = action.payload.email;
                 state.username = action.payload.username;
                 state.solvedQuestions = action.payload.solvedQuestions;
+                state.isAdmin = (action.payload.username === 'aman'); // update the logic 
             } else {
                 state.name = undefined;
                 state.email = undefined;
                 state.username = 'guest';
                 state.solvedQuestions = undefined;
+                state.isAdmin = false;
             }
         },
         setError(state, action) {
