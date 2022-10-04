@@ -14,7 +14,7 @@ import copy from 'copy-to-clipboard';
 import { messageActions } from '../../../store/Message/message-slice';
 import { SERVER_LINK } from '../../../dev-server-link';
 
-const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditModal, isMobile, markEditOrDelete, setReloadNeeded }) => {
+const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditModal, isMobile, markEditOrDelete, setReloadNeeded, SlideTransition }) => {
 
     const { username, title, desc, access, editable, codeid, _id: noteid } = viewNote;
 
@@ -118,7 +118,7 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
     }
 
     const isEditDisabled = (!editable && !isAdmin && (auth_username !== username));
-    const isDeleteDisabled = (!isAdmin && (auth_username !== username));
+    const isDeleteDisabled = (!isAdmin && (auth_username !== 'guest') && (auth_username !== username));
 
     return (
         <Fragment>
@@ -131,7 +131,7 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
                 fullWidth
                 maxWidth={!isMobile && 'md'}
                 fullScreen={isMobile}
-                TransitionComponent={Zoom}
+                TransitionComponent={SlideTransition}
             >
                 <DialogTitle style={{ textTransform: 'capitalize' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>

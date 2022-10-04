@@ -13,7 +13,7 @@ import CodeEditorv3 from '../../Question/Editor/CodeEditorv3';
 import { messageActions } from '../../../store/Message/message-slice';
 
 
-const EditNote = ({ openModal, setOpenModal, editNote, isMobile, markEditOrDelete, setReloadNeeded }) => {
+const EditNote = ({ openModal, setOpenModal, editNote, isMobile, markEditOrDelete, setReloadNeeded, SlideTransition }) => {
 
     const {
         username,
@@ -90,6 +90,7 @@ const EditNote = ({ openModal, setOpenModal, editNote, isMobile, markEditOrDelet
             fullWidth
             maxWidth={!isMobile && 'sm'}
             fullScreen={isMobile}
+            TransitionComponent={SlideTransition}
         >
             <DialogTitle style={{ textTransform: 'capitalize' }}>Edit Note</DialogTitle>
             <DialogContent dividers ref={descriptionElementRef}>

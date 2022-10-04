@@ -7,7 +7,7 @@ import {
     Button, styled, TextField,
     Dialog, DialogActions,
     InputLabel, MenuItem,
-    Select, Switch,
+    Select, Switch
 } from '@mui/material';
 import { Box } from '@mui/system';
 
@@ -16,7 +16,7 @@ import Note from '../Note/Note';
 import { SERVER_LINK } from '../../../dev-server-link';
 import { messageActions } from '../../../store/Message/message-slice';
 
-const AddNote = ({ openModal, setOpenModal, isMobile, setReloadNeeded }) => {
+const AddNote = ({ openModal, setOpenModal, isMobile, setReloadNeeded, SlideTransition }) => {
 
     const { username, isAdmin } = useSelector(state => state.auth);
 
@@ -96,6 +96,7 @@ const AddNote = ({ openModal, setOpenModal, isMobile, setReloadNeeded }) => {
             fullWidth
             maxWidth={!isMobile && 'sm'}
             fullScreen={isMobile}
+            TransitionComponent={SlideTransition}
         >
             <DialogTitle style={{ textTransform: 'capitalize' }}>Add Note</DialogTitle>
             <DialogContent dividers ref={descriptionElementRef}>

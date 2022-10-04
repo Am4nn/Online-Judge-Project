@@ -1,8 +1,8 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { forwardRef, Fragment, useEffect, useState } from 'react'
 import Note from './Note/Note';
 import classes from './Notes.module.css';
 import { useSelector } from 'react-redux';
-import { Fab, Tooltip, Zoom } from '@mui/material';
+import { Fab, Slide, Tooltip, Zoom } from '@mui/material';
 import { NoteAdd } from '@mui/icons-material'
 import AddNote from './AddNote/AddNote';
 import ViewNote from './ViewNote/ViewNote';
@@ -139,6 +139,11 @@ const notesData = [
         and admin can delete any note.
 */
 
+const SlideTransition = forwardRef((props, ref) => (
+    <Slide ref={ref} {...props} direction="up" />
+));
+
+
 const Notes = () => {
 
     const [allNotes, setAllNotes] = useState([]);
@@ -220,9 +225,9 @@ const Notes = () => {
             )}
             {!error && (
                 <div className={classes.container}>
-                    <AddNote setReloadNeeded={setReloadNeeded} isMobile={isMobile} openModal={openAddModal} setOpenModal={setOpenAddModal} />
-                    <ViewNote setReloadNeeded={setReloadNeeded} markEditOrDelete={markEditOrDelete} isMobile={isMobile} openModal={openViewModal} setOpenModal={setOpenViewModal} setEditNote={setEditNote} setOpenEditModal={setOpenEditModal} viewNote={viewNote} />
-                    <EditNote setReloadNeeded={setReloadNeeded} markEditOrDelete={markEditOrDelete} isMobile={isMobile} openModal={openEditModal} setOpenModal={setOpenEditModal} editNote={editNote} />
+                    <AddNote SlideTransition={SlideTransition} setReloadNeeded={setReloadNeeded} isMobile={isMobile} openModal={openAddModal} setOpenModal={setOpenAddModal} />
+                    <ViewNote SlideTransition={SlideTransition} setReloadNeeded={setReloadNeeded} markEditOrDelete={markEditOrDelete} isMobile={isMobile} openModal={openViewModal} setOpenModal={setOpenViewModal} setEditNote={setEditNote} setOpenEditModal={setOpenEditModal} viewNote={viewNote} />
+                    <EditNote SlideTransition={SlideTransition} setReloadNeeded={setReloadNeeded} markEditOrDelete={markEditOrDelete} isMobile={isMobile} openModal={openEditModal} setOpenModal={setOpenEditModal} editNote={editNote} />
 
                     <Tooltip TransitionComponent={Zoom} title='Add Note' placement='bottom'>
                         <Fab onClick={addNoteHandler} className={classes.addNoteFab} aria-label='add-note'>
