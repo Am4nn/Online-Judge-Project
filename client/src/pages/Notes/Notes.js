@@ -1,7 +1,7 @@
 import React, { forwardRef, Fragment, useEffect, useState } from 'react'
 import Note from './Note/Note';
 import classes from './Notes.module.css';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Fab, Slide, Tooltip, Zoom } from '@mui/material';
 import { NoteAdd } from '@mui/icons-material'
 import AddNote from './AddNote/AddNote';
@@ -10,106 +10,8 @@ import EditNote from './EditNote/EditNote';
 import { useMediaQuery } from '@mui/material'
 import { SERVER_LINK } from '../../dev-server-link';
 import LoadingSpinner from '../../compenents/LoadingSpinner/LoadingSpinner';
-
-// notesData is just for dev purpose
-const notesData = [
-    {
-        _id: '1',
-        title: 'FCFS Code OS',
-        desc: 'This code is written by me for OS assignment on FCFS',
-        codeid: '1dfg58-a153sd-asd4as-48asd',
-        username: 'aman',
-        access: 'global',
-        editable: false
-    }, {
-        _id: '2',
-        title: 'SJF Code OS',
-        desc: 'This code is written by me for OS assignment on SJF',
-        codeid: '1dfg58-a153sd-asd4as-48ase',
-        username: 'username2',
-        access: 'public',
-        editable: true
-    }, {
-        _id: '3',
-        title: 'SRTF Code OS',
-        desc: 'This code is written by me for OS assignment on SRTF',
-        codeid: '1dfg58-a153sd-asd4as-48asf',
-        username: 'username3',
-        access: 'public',
-        editable: false
-    }, {
-        _id: '4',
-        title: 'Round Robin Code OS',
-        desc: 'This code is written by me for OS assignment on Round Robin',
-        codeid: '1dfg58-a153sd-asd4as-48asg',
-        username: 'username4',
-        access: 'private'
-    }, {
-        _id: '5',
-        title: 'Priority First Code OS',
-        desc: 'This code is written by me for OS assignment on Priority First',
-        codeid: '1dfg58-a153sd-asd4as-48ash',
-        username: 'aman',
-        access: 'global',
-        editable: true
-    }, {
-        _id: '6',
-        title: 'Fork Code OS',
-        desc: 'This code is written by me for OS assignment on Fork This code is written by me for OS assignment on Fork ',
-        codeid: '1dfg58-a153sd-asd4as-48asi',
-        username: 'username6',
-        access: 'private',
-        editable: false
-    }, {
-        _id: '7',
-        title: 'Fork Code OS',
-        desc: 'This code is written by me for OS assignment on Fork This code is written by me for OS assignment on Fork ',
-        codeid: '1dfg58-a153sd-asd4as-48asi',
-        username: 'aman',
-        access: 'global',
-        editable: false
-    }, {
-        _id: '8',
-        title: 'Fork Code OS',
-        desc: 'This code is written by me for OS assignment on Fork This code is written by me for OS assignment on Fork ',
-        codeid: '1dfg58-a153sd-asd4as-48asi',
-        username: 'aman',
-        access: 'global',
-        editable: false
-    }, {
-        _id: '9',
-        title: 'Fork Code OS',
-        desc: 'This code is written by me for OS assignment on Fork This code is written by me for OS assignment on Fork ',
-        codeid: '1dfg58-a153sd-asd4as-48asi',
-        username: 'aman',
-        access: 'global',
-        editable: false
-    }, {
-        _id: '10',
-        title: 'Fork Code OS',
-        desc: 'This code is written by me for OS assignment on Fork This code is written by me for OS assignment on Fork ',
-        codeid: '1dfg58-a153sd-asd4as-48asi',
-        username: 'aman',
-        access: 'global',
-        editable: false
-    }, {
-        _id: '11',
-        title: 'Fork Code OS',
-        desc: 'This code is written by me for OS assignment on Fork This code is written by me for OS assignment on Fork ',
-        codeid: '1dfg58-a153sd-asd4as-48asi',
-        username: 'aman',
-        access: 'global',
-        editable: false
-    }, {
-        _id: '12',
-        title: 'Fork Code OS',
-        desc: 'This code is written by me for OS assignment on Fork This code is written by me for OS assignment on Fork ',
-        codeid: '1dfg58-a153sd-asd4as-48asi',
-        username: 'username6',
-        access: 'public',
-        editable: true
-    },
-];
+import { useSearchParams } from 'react-router-dom';
+import { messageActions } from '../../store/Message/message-slice';
 
 /*
     Schema : _id, title, desc, codeid, username, access, editable, language
@@ -143,6 +45,7 @@ const SlideTransition = forwardRef((props, ref) => (
     <Slide ref={ref} {...props} direction="up" />
 ));
 
+let isFirstRender = true;
 
 const Notes = () => {
 
@@ -161,9 +64,38 @@ const Notes = () => {
 
     const isMobile = useMediaQuery('(max-width:620px)');
     const { loggedIn, username } = useSelector(state => state.auth);
+    const dispatch = useDispatch();
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(undefined);
+
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    useEffect(() => {
+        if (!isFirstRender || loading) return;
+        isFirstRender = false;
+        const querynoteid = searchParams.get("view");
+        if (!querynoteid) return;
+        const foundNote = allNotes.find(ele => ele._id === querynoteid);
+        if (!foundNote) {
+            dispatch(messageActions.set({
+                type: 'error',
+                message: "The Note's Link you are accessing does not exists",
+                description: 'There is a query string in url, which does not belong to any note, this may be due to : the note you are tying to access has been deleted or may be link in incomplete !'
+            }));
+            return;
+        }
+
+        setOpenViewModal(true);
+        setViewNote(foundNote);
+    }, [loading, searchParams, allNotes, dispatch]);
+
+    useEffect(() => {
+        if (isFirstRender) return;
+        if (openViewModal) setSearchParams({ "view": viewNote._id });
+        else setSearchParams({});
+    }, [openViewModal, setSearchParams, viewNote]);
+
 
     const markEditOrDelete = (_id, property) => {
         setAllNotes(prev => {
@@ -207,7 +139,12 @@ const Notes = () => {
         }
 
         fetchNotesFromServer();
-    }, []);
+        dispatch(messageActions.set({
+            type: 'info',
+            message: 'Click on Notes to view their Code !',
+            description: 'If you click on a Note, you will be able to share, edit, or delete it. Alternatively, you can add a new note by clicking on the Add button !'
+        }));
+    }, [dispatch]);
 
     const addNoteHandler = () => setOpenAddModal(true);
 
@@ -225,9 +162,9 @@ const Notes = () => {
             )}
             {!error && (
                 <div className={classes.container}>
-                    <AddNote SlideTransition={SlideTransition} setReloadNeeded={setReloadNeeded} isMobile={isMobile} openModal={openAddModal} setOpenModal={setOpenAddModal} />
-                    <ViewNote SlideTransition={SlideTransition} setReloadNeeded={setReloadNeeded} markEditOrDelete={markEditOrDelete} isMobile={isMobile} openModal={openViewModal} setOpenModal={setOpenViewModal} setEditNote={setEditNote} setOpenEditModal={setOpenEditModal} viewNote={viewNote} />
-                    <EditNote SlideTransition={SlideTransition} setReloadNeeded={setReloadNeeded} markEditOrDelete={markEditOrDelete} isMobile={isMobile} openModal={openEditModal} setOpenModal={setOpenEditModal} editNote={editNote} />
+                    <AddNote setSearchParams={setSearchParams} SlideTransition={SlideTransition} setReloadNeeded={setReloadNeeded} isMobile={isMobile} openModal={openAddModal} setOpenModal={setOpenAddModal} />
+                    <ViewNote setSearchParams={setSearchParams} SlideTransition={SlideTransition} setReloadNeeded={setReloadNeeded} markEditOrDelete={markEditOrDelete} isMobile={isMobile} openModal={openViewModal} setOpenModal={setOpenViewModal} setEditNote={setEditNote} setOpenEditModal={setOpenEditModal} viewNote={viewNote} />
+                    <EditNote setSearchParams={setSearchParams} SlideTransition={SlideTransition} setReloadNeeded={setReloadNeeded} markEditOrDelete={markEditOrDelete} isMobile={isMobile} openModal={openEditModal} setOpenModal={setOpenEditModal} editNote={editNote} />
 
                     <Tooltip TransitionComponent={Zoom} title='Add Note' placement='bottom'>
                         <Fab onClick={addNoteHandler} className={classes.addNoteFab} aria-label='add-note'>

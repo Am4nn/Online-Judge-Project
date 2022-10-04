@@ -11,7 +11,7 @@ const Note = ({ note, setOpenViewModal, setViewNote }) => {
     username = username || "guest";
 
     const noteClickHandler = () => {
-        if (!codeid || edited || deleted) return;
+        if ((!codeid || edited || deleted)) return;
         setViewNote(note);
         setOpenViewModal(true);
     }

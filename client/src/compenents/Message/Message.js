@@ -122,13 +122,13 @@ const Message = () => {
                 anchorEl={msgRef.current}
                 placement={'bottom'}
                 transition
-                style={{ zIndex: 1000 }}
+                style={{ zIndex: 1400 }}
             >
                 {({ TransitionProps }) => (
                     <Zoom {...TransitionProps} timeout={350}>
                         <Paper
                             elevation={6}
-                            sx={{ margin: '0.5rem', zIndex: '5' }}
+                            sx={{ margin: '0.5rem' }}
                         >
                             <Typography sx={{ p: 2 }}>
                                 {(messageInfo && messageInfo.description) ? messageInfo.description : ''}

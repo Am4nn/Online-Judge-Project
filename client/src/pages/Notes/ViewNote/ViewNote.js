@@ -9,7 +9,7 @@ import { Box } from '@mui/system';
 import Note from '../Note/Note';
 import { useDispatch, useSelector } from 'react-redux';
 import CodeEditorv3 from '../../Question/Editor/CodeEditorv3';
-import { Check, ContentCopy, Delete, Edit } from '@mui/icons-material';
+import { Check, ContentCopy, Delete, Edit, Share } from '@mui/icons-material';
 import copy from 'copy-to-clipboard';
 import { messageActions } from '../../../store/Message/message-slice';
 import { SERVER_LINK } from '../../../dev-server-link';
@@ -26,6 +26,12 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [copied, setCopied] = useState(false);
     if (copied === true) setTimeout(() => setCopied(false), 2500);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setCode('');
+        setLoading(true);
+    }, [noteid]);
 
     const handleClose = () => {
         setOpenModal(false);
@@ -40,9 +46,6 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
             }
         }
     }, [openModal]);
-
-
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (!codeid) return;
@@ -117,6 +120,16 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
             })
     }
 
+    const handleShare = () => {
+        const link = window.location.href;
+        const result = copy(link);
+        const type = result ? 'success' : 'error';
+        const message = result ? 'Link to the Note copied successfully !' : "There are some errors copying the Note's Link !";
+        const description = `Link to Note : ${link}`;
+
+        dispatch(messageActions.set({ type, message, description }));
+    }
+
     const isEditDisabled = (!editable && !isAdmin && (auth_username !== username));
     const isDeleteDisabled = (!isAdmin && (auth_username !== 'guest') && (auth_username !== username));
 
@@ -137,9 +150,16 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span>View Note</span>
                         <div style={{ display: 'flex' }}>
+                            <Tooltip TransitionComponent={Zoom} title='Share' placement='bottom'>
+                                <Box>
+                                    <Fab onClick={handleShare} size="small" color="success" aria-label="share">
+                                        <Share />
+                                    </Fab>
+                                </Box>
+                            </Tooltip>
                             <Tooltip TransitionComponent={Zoom} title={isEditDisabled ? "Can't edit this note" : 'Edit'} placement='bottom'>
                                 <Box>
-                                    <Fab onClick={handleEdit} size="small" color="info" aria-label="edit" disabled={isEditDisabled}>
+                                    <Fab onClick={handleEdit} size="small" color="info" aria-label="edit" sx={{ ml: 1 }} disabled={isEditDisabled}>
                                         <Edit />
                                     </Fab>
                                 </Box>
@@ -169,10 +189,10 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
                     >
                         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                             <div>
-                                <Tooltip TransitionComponent={Zoom} title={copied ? 'Copied' : 'Copy'} placement='right'>
+                                <Tooltip TransitionComponent={Zoom} title={copied ? 'Code Copied' : 'Copy Code'} placement='right'>
                                     <IconButton
                                         onClick={copyHandler}
-                                        aria-label={copied ? 'Copied' : 'Copy'}
+                                        aria-label={copied ? 'Code Copied' : 'Copy Code'}
                                     >
                                         {copied ? <Check /> : <ContentCopy />}
                                     </IconButton>
