@@ -11,23 +11,20 @@ import Note from '../Note/Note';
 import { useDispatch, useSelector } from 'react-redux';
 import CodeEditorv3 from '../../Question/Editor/CodeEditorv3';
 import { messageActions } from '../../../store/Message/message-slice';
+import { SERVER_LINK } from '../../../dev-server-link';
 
 
 const EditNote = ({ openModal, setOpenModal, editNote, isMobile, markEditOrDelete, setReloadNeeded, SlideTransition }) => {
 
     const {
-        username,
-        title: title_,
-        desc: desc_,
-        access: access_,
-        editable: editable_,
-        code: code_,
-        language: language_,
-        _id
+        username, title: title_,
+        desc: desc_, access: access_,
+        editable: editable_, code: code_,
+        language: language_, _id
     } = editNote;
 
     const dispatch = useDispatch();
-    const { username: realUsername, isAdmin } = useSelector(state => state.auth);
+    const { username: realUsername, isAdmin, isGuest } = useSelector(state => state.auth);
 
     const [title, setTitle] = useState('');
     const [desc, setDesc] = useState('');
@@ -37,14 +34,6 @@ const EditNote = ({ openModal, setOpenModal, editNote, isMobile, markEditOrDelet
     const [code, setCode] = useState('');
 
     useEffect(() => {
-        if (title_) {
-            dispatch(messageActions.set({
-                type: 'warning',
-                message: 'Edit feature is not available yet',
-                description: 'website is stil in development this feature will be available soon !'
-            }));
-        }
-
         title_ && setTitle(title_);
         desc_ && setDesc(desc_);
         access_ && setAccess(access_);
@@ -55,20 +44,43 @@ const EditNote = ({ openModal, setOpenModal, editNote, isMobile, markEditOrDelet
 
     const handleClose = () => {
         setOpenModal(false);
-    };
+    }
 
     const handleSave = () => {
-        handleClose(false);
-        // send request to server to edit note with given info and credentials
-        dispatch(messageActions.set({
-            type: 'info',
-            message: 'Edit feature is not available yet',
-            description: 'website is stil in development this feature will be available soon !'
-        }));
+        if (!title || !desc) {
+            dispatch(messageActions.set({ type: 'error', message: "title and description can't be empty", description: 'title and description are required so please fill both !!!' }));
+            return;
+        }
 
-        // TODO
-        markEditOrDelete(_id, 'edited');
-        setReloadNeeded(true);
+        handleClose();
+        dispatch(messageActions.set({ type: 'info', message: 'Editing the Note...' }));
+
+        // send request to server to edit note with given info and credentials
+        fetch(
+            `${SERVER_LINK}/api/notes/${_id}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                method: 'PUT',
+                body: JSON.stringify({ title, desc, code, language, access, editable }),
+                credentials: 'include'
+            }
+        )
+            .then(async response => {
+                const res = await response.json();
+                if (response.ok) return res
+                return Promise.reject(res);
+            })
+            .then(response => {
+                dispatch(messageActions.set({ type: 'success', message: 'Edited Note Successfully !', description: JSON.stringify(response) }));
+                setReloadNeeded(true);
+                markEditOrDelete(_id, 'edited');
+            })
+            .catch(err => {
+                console.error(err);
+                dispatch(messageActions.set({ type: 'error', message: 'Editing Note Unsuccessful!', description: JSON.stringify(err) }));
+            })
     }
 
     const descriptionElementRef = useRef(null);
@@ -84,7 +96,7 @@ const EditNote = ({ openModal, setOpenModal, editNote, isMobile, markEditOrDelet
     return (
         <Dialog
             open={openModal}
-            onClose={() => setOpenModal(false)}
+            onClose={handleClose}
             scroll='paper'
             aria-labelledby="Edit-Note"
             fullWidth
@@ -135,17 +147,26 @@ const EditNote = ({ openModal, setOpenModal, editNote, isMobile, markEditOrDelet
                             >
                                 {isAdmin && <MenuItem value='global'>Global</MenuItem>}
                                 <MenuItem value='public'>Public</MenuItem>
-                                {(realUsername !== 'guest') && <MenuItem value='private'>Private</MenuItem>}
+                                {!isGuest && <MenuItem value='private'>Private</MenuItem>}
                             </Select>
                         </FormControl>
                     }
 
-                    <FormControlLabel
-                        label="Editable (By Anyone)"
-                        control={<CustomSwitch checked={editable} onChange={event => setEditable(event.target.checked)} />}
-                        labelPlacement='start'
-                    />
-                    <span style={{ marginLeft: '0.9rem', fontWeight: 600, opacity: 0.6 }}>{editable ? "Yes" : "No"} </span>
+                    {(access !== 'private') ?
+                        <div>
+                            <FormControlLabel
+                                label="Editable (By Anyone)"
+                                control={<CustomSwitch checked={editable} onChange={event => setEditable(event.target.checked)} />}
+                                labelPlacement='start'
+                            />
+                            <span style={{ marginLeft: '0.9rem', fontWeight: 600, opacity: 0.6 }}>{editable ? "Yes" : "No"} </span>
+                        </div>
+                        :
+                        <div style={{ fontSize: '0.85rem', fontWeight: 600, opacity: 0.6, margin: '0.6rem 0 0.6rem 0' }}>
+                            Private Note can't be made Editable by everyone (as only you can view/edit)
+                        </div>
+                    }
+
                     <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                         <div style={{ fontWeight: 600, fontSize: '1.1rem', opacity: 0.7 }}>Enter Code : </div>
                         <FormControl>

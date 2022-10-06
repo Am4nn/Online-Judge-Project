@@ -19,7 +19,7 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
     const { username, title, desc, access, editable, codeid, _id: noteid } = viewNote;
 
     const dispatch = useDispatch();
-    const { username: auth_username, isAdmin } = useSelector(state => state.auth);
+    const { username: auth_username, isAdmin, isGuest } = useSelector(state => state.auth);
 
     const [code, setCode] = useState('');
     const [language, setLanguage] = useState('c');
@@ -52,7 +52,7 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
 
         // make request to server to fetch code with _id:codeid
         fetch(
-            `${SERVER_LINK}/api/notes/${codeid}`,
+            `${SERVER_LINK}/api/notes/${codeid}?noteid=${noteid}`,
             {
                 headers: {
                     'Content-Type': 'application/json'
@@ -72,7 +72,7 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
             })
             .catch(error => { setCode(JSON.stringify(error)) })
             .finally(() => setLoading(false))
-    }, [codeid]);
+    }, [codeid, noteid]);
 
     const copyHandler = () => {
         const result = copy(code);
@@ -130,8 +130,8 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
         dispatch(messageActions.set({ type, message, description }));
     }
 
-    const isEditDisabled = (!editable && !isAdmin && (auth_username !== username));
-    const isDeleteDisabled = (!isAdmin && (auth_username !== 'guest') && (auth_username !== username));
+    const isEditable = (isAdmin || (access !== 'private' && editable) || (!isGuest && (auth_username === username)));
+    const isDeleteable = (isAdmin || (!isGuest && (auth_username === username)));
 
     return (
         <Fragment>
@@ -157,16 +157,16 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
                                     </Fab>
                                 </Box>
                             </Tooltip>
-                            <Tooltip TransitionComponent={Zoom} title={isEditDisabled ? "Can't edit this note" : 'Edit'} placement='bottom'>
+                            <Tooltip TransitionComponent={Zoom} title={(!isEditable) ? "Can't edit this note" : 'Edit'} placement='bottom'>
                                 <Box>
-                                    <Fab onClick={handleEdit} size="small" color="info" aria-label="edit" sx={{ ml: 1 }} disabled={isEditDisabled}>
+                                    <Fab onClick={handleEdit} size="small" color="info" aria-label="edit" sx={{ ml: 1 }} disabled={(!isEditable)}>
                                         <Edit />
                                     </Fab>
                                 </Box>
                             </Tooltip>
-                            <Tooltip TransitionComponent={Zoom} title={isDeleteDisabled ? "Can't delete this note" : 'Delete'} placement='bottom'>
+                            <Tooltip TransitionComponent={Zoom} title={(!isDeleteable) ? "Can't delete this note" : 'Delete'} placement='bottom'>
                                 <Box>
-                                    <Fab onClick={() => setOpenDeleteModal(true)} size="small" color="warning" aria-label="delete" sx={{ ml: 1 }} disabled={isDeleteDisabled}>
+                                    <Fab onClick={() => setOpenDeleteModal(true)} size="small" color="warning" aria-label="delete" sx={{ ml: 1 }} disabled={(!isDeleteable)}>
                                         <Delete />
                                     </Fab>
                                 </Box>

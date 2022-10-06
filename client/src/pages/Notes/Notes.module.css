@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Headland+One&display=swap');
 
 .head {
-    margin-bottom: 0.5rem;
     font-size: 2rem;
     font-weight: 900;
     font-family: 'Headland One';
@@ -21,7 +20,6 @@
     position: fixed !important;
     z-index: 1 !important;
     right: 5% !important;
-    text-transform: capitalize !important;
     background-color: hsl(180, 100%, 50%) !important;
 }
 
@@ -29,6 +27,20 @@
     background-color: hsl(180, 100%, 46%);
 }
 
+.adminModeFab {
+    position: fixed !important;
+    z-index: 1 !important;
+    right: 5% !important;
+    margin-top: 4.5rem !important;
+}
+
+.searchNoteFab {
+    position: fixed !important;
+    z-index: 1 !important;
+    right: 5% !important;
+    top: 9.3rem !important;
+    text-transform: capitalize !important;
+}
 
 .container {
     display: flex;
@@ -43,11 +55,13 @@
     position: absolute;
     top: 5rem;
     height: calc(100vh - 5rem);
+    max-height: calc(100vh - 5rem);
 }
 
 .ncLabel {
     width: 100%;
     padding-left: 1rem;
+    padding-right: 1rem;
     text-align: justify;
 }
 

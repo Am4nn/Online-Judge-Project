@@ -1,17 +1,19 @@
 import React, { forwardRef, Fragment, useEffect, useState } from 'react'
-import Note from './Note/Note';
-import classes from './Notes.module.css';
+import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Fab, Slide, Tooltip, Zoom } from '@mui/material';
-import { NoteAdd } from '@mui/icons-material'
+import { Box } from '@mui/system';
+import { Fab, InputBase, Slide, Tooltip, Zoom, useMediaQuery } from '@mui/material';
+import { Cancel, NoteAdd, Search, SupervisedUserCircle } from '@mui/icons-material'
+
 import AddNote from './AddNote/AddNote';
 import ViewNote from './ViewNote/ViewNote';
 import EditNote from './EditNote/EditNote';
-import { useMediaQuery } from '@mui/material'
 import { SERVER_LINK } from '../../dev-server-link';
-import LoadingSpinner from '../../compenents/LoadingSpinner/LoadingSpinner';
-import { useSearchParams } from 'react-router-dom';
 import { messageActions } from '../../store/Message/message-slice';
+import LoadingSpinner from '../../compenents/LoadingSpinner/LoadingSpinner';
+import Note from './Note/Note';
+import classes from './Notes.module.css';
+import useDebounce from '../../hooks/useDebounce';
 
 /*
     Schema : _id, title, desc, codeid, username, access, editable, language
@@ -50,8 +52,7 @@ let isFirstRender = true;
 const Notes = () => {
 
     const [allNotes, setAllNotes] = useState([]);
-
-    const [reloadNeeded, setReloadNeeded] = useState(false);
+    const [originalAllNotes, setOriginalAllNotes] = useState([]);
 
     const [openAddModal, setOpenAddModal] = useState(false);
 
@@ -61,22 +62,23 @@ const Notes = () => {
     const [openEditModal, setOpenEditModal] = useState(false);
     const [editNote, setEditNote] = useState({});
 
-
-    const isMobile = useMediaQuery('(max-width:620px)');
-    const { loggedIn, username } = useSelector(state => state.auth);
-    const dispatch = useDispatch();
-
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(undefined);
-
+    const [reloadNeeded, setReloadNeeded] = useState(false);
+    const [searchNoteQuery, setSearchNoteQuery] = useState('');
     const [searchParams, setSearchParams] = useSearchParams();
+    const [isAdminMode, setAdminMode] = useState(false);
+
+    const dispatch = useDispatch();
+    const { loggedIn, username, isAdmin } = useSelector(state => state.auth);
+    const isMobile = useMediaQuery('(max-width:620px)');
 
     useEffect(() => {
         if (!isFirstRender || loading) return;
         isFirstRender = false;
         const querynoteid = searchParams.get("view");
         if (!querynoteid) return;
-        const foundNote = allNotes.find(ele => ele._id === querynoteid);
+        const foundNote = originalAllNotes.find(ele => ele._id === querynoteid);
         if (!foundNote) {
             dispatch(messageActions.set({
                 type: 'error',
@@ -88,7 +90,7 @@ const Notes = () => {
 
         setOpenViewModal(true);
         setViewNote(foundNote);
-    }, [loading, searchParams, allNotes, dispatch]);
+    }, [loading, searchParams, originalAllNotes, dispatch]);
 
     useEffect(() => {
         if (isFirstRender) return;
@@ -117,10 +119,9 @@ const Notes = () => {
         containing all global and public notes but also with private notes specific
         to that credentials.
         */
-
         const fetchNotesFromServer = () => {
             fetch(
-                `${SERVER_LINK}/api/notes/allNotes`,
+                `${SERVER_LINK}/api/notes/allNotes${(isAdminMode) ? '?admin=true' : ''}`,
                 {
                     headers: {
                         'Content-Type': 'application/json'
@@ -129,16 +130,20 @@ const Notes = () => {
                     credentials: 'include'
                 }
             )
-                .then(response => {
-                    if (response.ok) return response.json();
-                    return Promise.reject(response);
+                .then(async response => {
+                    const res = await response.json();
+                    if (response.ok) return res
+                    return Promise.reject(res);
                 })
-                .then(response => setAllNotes(response))
+                .then(response => { setAllNotes(response); setOriginalAllNotes(response); })
                 .catch(setError)
                 .finally(() => setLoading(false))
         }
 
         fetchNotesFromServer();
+    }, [dispatch, isAdminMode]);
+
+    useEffect(() => {
         dispatch(messageActions.set({
             type: 'info',
             message: 'Click on Notes to view their Code !',
@@ -147,10 +152,21 @@ const Notes = () => {
     }, [dispatch]);
 
     const addNoteHandler = () => setOpenAddModal(true);
+    const adminModeHandler = () => isAdmin ? setAdminMode(prev => !prev) : setAdminMode(false);
+
+    useDebounce(() => {
+        console.log(searchNoteQuery);
+
+        if (!searchNoteQuery) setAllNotes(originalAllNotes);
+        else setAllNotes(originalAllNotes.filter(note => (
+            note.title.toLowerCase().includes(searchNoteQuery.toLowerCase()) ||
+            note.desc.toLowerCase().includes(searchNoteQuery.toLowerCase())
+        )));
+    }, 600, [searchNoteQuery]);
 
     return (
-        // show loading while notes are being fetched !
         <Fragment>
+            {/* show loading while notes are being fetched ! */}
             {loading && <LoadingSpinner />}
             {!loading && error && (
                 <div>
@@ -168,23 +184,34 @@ const Notes = () => {
 
                     <Tooltip TransitionComponent={Zoom} title='Add Note' placement='bottom'>
                         <Fab onClick={addNoteHandler} className={classes.addNoteFab} aria-label='add-note'>
-                            <NoteAdd sx={{ fontSize: '1.8rem' }} />
+                            <NoteAdd sx={{ fontSize: '1.7rem' }} />
                         </Fab>
                     </Tooltip>
 
-                    <div className={classes.head}>Notes</div>
+                    {isAdmin &&
+                        <Tooltip TransitionComponent={Zoom} title='Admin Mode' placement='bottom'>
+                            <Fab color='secondary' onClick={adminModeHandler} className={classes.adminModeFab} aria-label='admin-mode'>
+                                {isAdminMode ?
+                                    <Cancel sx={{ fontSize: '2.4rem' }} /> :
+                                    <SupervisedUserCircle sx={{ fontSize: '2.4rem' }} />
+                                }
+                            </Fab>
+                        </Tooltip>
+                    }
 
+                    <div className={classes.head}>Notes</div>
                     {reloadNeeded &&
                         <div style={{
-                            fontSize: '0.8rem', color: 'hsla(0, 40%, 50%,0.8)',
-                            margin: 'unset',
-                            position: 'absolute', top: '2.6rem'
+                            fontSize: '1rem', color: 'hsla(0, 40%, 50%,0.8)',
+                            margin: 'unset', position: 'relative', marginBottom: '0.5rem'
                         }}><span onClick={(() => window.location.reload())} style={{
                             zIndex: 100, position: 'relative',
                             color: 'blue', textDecoration: 'underline',
                             fontWeight: 500, cursor: 'pointer'
                         }}>Refresh</span> this page to see changes !</div>
                     }
+
+                    <SearchComponent searchNoteQuery={searchNoteQuery} setSearchNoteQuery={setSearchNoteQuery} />
 
                     {!loading && (
                         <Fragment>
@@ -225,6 +252,49 @@ const Notes = () => {
             }
         </Fragment >
     )
+};
+
+const SearchComponent = ({ searchNoteQuery, setSearchNoteQuery }) => {
+    return (
+        <Box sx={{
+            position: 'relative',
+            borderRadius: '5px',
+            backgroundColor: 'rgba(0,0,0,0.16)',
+            transition: 'all 300ms ease-in-out',
+            '&:hover': {
+                backgroundColor: 'rgba(0,0,0,0.13)',
+            },
+            width: '75%',
+            display: 'flex',
+            marginBottom: '1rem',
+            marginTop: '0.5rem'
+        }}>
+            <Box sx={{
+                padding: '0 1rem',
+                height: '100%',
+                position: 'absolute',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}>
+                <Search />
+            </Box>
+            <InputBase sx={{
+                color: 'inherit',
+                width: '100%',
+                '& .MuiInputBase-input': {
+                    padding: '0.7rem',
+                    paddingLeft: '3.5rem',
+                    width: '100%'
+                },
+            }}
+                placeholder="Search a note…"
+                inputProps={{ 'aria-label': 'search a note' }}
+                onChange={event => setSearchNoteQuery(event.target.value)}
+                value={searchNoteQuery}
+            />
+        </Box>
+    );
 }
 
 export default Notes;

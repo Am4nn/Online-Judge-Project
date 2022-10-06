@@ -31,7 +31,12 @@ const isAdmin = username => {
     return (username === 'aman');
 }
 
+const isGuest = username => {
+    return (!username || (username === 'guest'));
+}
+
 module.exports = {
+    isGuest,
     isAdmin,
     getQueryById,
     createNewQuery,

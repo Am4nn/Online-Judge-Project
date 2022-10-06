@@ -18,7 +18,7 @@ import { messageActions } from '../../../store/Message/message-slice';
 
 const AddNote = ({ openModal, setOpenModal, isMobile, setReloadNeeded, SlideTransition }) => {
 
-    const { username, isAdmin } = useSelector(state => state.auth);
+    const { username, isAdmin, isGuest } = useSelector(state => state.auth);
 
     const [title, setTitle] = useState('');
     const [desc, setDesc] = useState('');
@@ -87,6 +87,10 @@ const AddNote = ({ openModal, setOpenModal, isMobile, setReloadNeeded, SlideTran
         }
     }, [openModal]);
 
+    useEffect(() => {
+        if (access === 'private') setEditable(false);
+    }, [access]);
+
     return (
         <Dialog
             open={openModal}
@@ -139,18 +143,24 @@ const AddNote = ({ openModal, setOpenModal, isMobile, setReloadNeeded, SlideTran
                         >
                             {isAdmin && <MenuItem value='global'>Global</MenuItem>}
                             <MenuItem value='public'>Public</MenuItem>
-                            {username !== 'guest' && <MenuItem value='private'>Private</MenuItem>}
+                            {!isGuest && <MenuItem value='private'>Private</MenuItem>}
                         </Select>
                     </FormControl>
 
-                    <div>
-                        <FormControlLabel
-                            label="Editable (By Anyone)"
-                            control={<CustomSwitch checked={editable} onChange={event => setEditable(event.target.checked)} />}
-                            labelPlacement='start'
-                        />
-                        <span style={{ marginLeft: '0.9rem', fontWeight: 600, opacity: 0.6 }}>{editable ? "Yes" : "No"} </span>
-                    </div>
+                    {(access !== 'private') ?
+                        <div>
+                            <FormControlLabel
+                                label="Editable (By Anyone)"
+                                control={<CustomSwitch checked={editable} onChange={event => setEditable(event.target.checked)} />}
+                                labelPlacement='start'
+                            />
+                            <span style={{ marginLeft: '0.9rem', fontWeight: 600, opacity: 0.6 }}>{editable ? "Yes" : "No"} </span>
+                        </div>
+                        :
+                        <div style={{ fontSize: '0.85rem', fontWeight: 600, opacity: 0.6, margin: '0.6rem 0 0.6rem 0' }}>
+                            Private Note can't be made Editable by everyone (as only you can view/edit)
+                        </div>
+                    }
 
                     <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                         <div style={{ fontWeight: 600, fontSize: '1.1rem', opacity: 0.7 }}>Enter Code : </div>

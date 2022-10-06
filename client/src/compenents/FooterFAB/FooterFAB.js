@@ -47,9 +47,9 @@ const FooterFAB = () => {
                                 elevation={5}
                                 sx={{ margin: '0.5rem', zIndex: '5' }}
                             >
-                                <Typography sx={{ p: 2 }}>
+                                <Box sx={{ p: 2 }}>
                                     <Footer />
-                                </Typography>
+                                </Box>
                             </Paper>
                         </Zoom>
                     )}

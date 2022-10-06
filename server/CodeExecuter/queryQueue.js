@@ -4,6 +4,7 @@ const Queue = require('bull');
 const Query = require('../DataBase/Model/Query');
 const Question = require('../DataBase/Model/Question');
 const User = require('../DataBase/Model/User');
+const { isGuest } = require('../DataBase/database');
 
 const {
     execPyCode,
@@ -42,7 +43,7 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
         question.noOfSuccess += 1;
         await question.save();
 
-        if (query.username && query.username !== 'guest') {
+        if (query.username && !isGuest(query.username)) {
             const user = await User.findOne({ username: query.username });
             if (!user.solvedQuestions) {
                 user.solvedQuestions = [];

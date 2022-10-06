@@ -1,7 +1,7 @@
 const ObjectId = require('mongoose').Types.ObjectId;
 const Note = require('../DataBase/Model/Note');
 const Code = require('../DataBase/Model/Code');
-const { isAdmin } = require('../DataBase/database');
+const { isAdmin, isGuest } = require('../DataBase/database');
 
 // every req will have user (i.e. userID) and username due to authProvider middleware
 // if user is undefined that means user is not logged in and username will be guest
@@ -13,29 +13,16 @@ function isValidObjectId(id) {
 
 // gets all notes (global and public) but private notes only which belong to user
 const getAllNotes = async (req, res) => {
+    const isAdminMode = (isAdmin(req.username) && (req.query.admin === 'true'));
     try {
-        const notes = await Note.find({
+        const filter = isAdminMode ? {} : {
             "$or": [
                 { access: { "$in": ['global', 'public'] } },
                 { access: 'private', username: req.username }
             ]
-        });
+        };
+        const notes = await Note.find(filter);
         res.status(200).json(notes);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json(err);
-    }
-}
-
-// gets  all notes (all)
-const getAllNotesForAdmin = async (req, res) => {
-    try {
-        if (req.user && isAdmin(req.username)) {
-            const notes = await Note.find();
-            res.status(200).json(notes);
-        } else {
-            res.status(401).json("Unauthorized: Not an Admin, This route can only accessed by Admin");
-        }
     } catch (err) {
         console.error(err);
         res.status(500).json(err);
@@ -46,36 +33,17 @@ const getAllNotesForAdmin = async (req, res) => {
 const getNote = async (req, res) => {
     try {
         const codeid = req.params.codeid;
-        if (!isValidObjectId(codeid))
+        const noteid = req.query.noteid;
+        if (!isValidObjectId(codeid) || !isValidObjectId(noteid))
             return res.status(404).json('not a valid object id');
 
         const code = await Code.findById(codeid);
+        const note = await Note.findById(noteid);
         if (!code)
             return res.status(404).json('id does not exists');
 
-        if (req.body.access === 'private' && code.user !== req.user) // guest can't make private notes so no issues here
+        if ((note.access === 'private') && !isAdmin(req.username) && (code.user !== req.user)) // guest can't make private notes so no issues here
             return res.status(401).json("Unauthorized: private note can only be accessed by user who owns this note");
-
-        return res.status(200).json(code);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json(err);
-    }
-}
-
-// gets code and language for a codeid
-const getNoteForAdmin = async (req, res) => {
-    try {
-        if (!isAdmin(req.username))
-            return res.status(401).json("Unauthorized: Not an Admin, This route can only accessed by Admin");
-
-        const codeid = req.body.codeid;
-        if (!isValidObjectId(codeid))
-            return res.status(404).json('not a valid object id');
-
-        const code = await Code.findById(codeid);
-        if (!code)
-            return res.status(404).json('id does not exists');
 
         return res.status(200).json(code);
     } catch (err) {
@@ -95,7 +63,7 @@ const addNote = async (req, res) => {
             return res.status(400).json("title, description and access are required so please fill all !!!");
         }
 
-        if ((username === 'guest') || (!isAdmin(username) && access === 'global')) access = 'public';
+        if ((isGuest(username)) || (!isAdmin(username) && access === 'global')) access = 'public';
 
         const newcode = new Code({ code, language, user });
         await newcode.save();
@@ -114,7 +82,37 @@ const editNote = async (req, res) => {
     try {
         const username = req.username;
         const noteid = req.params.noteid;
-        // TODO
+
+        if (!isValidObjectId(noteid))
+            return res.status(404).json('not a valid object id');
+
+        let { title, desc, code, language, access, editable } = req.body;
+        if (!title || !desc || !language || !access) {
+            return res.status(400).json("title, description and access are required so please fill all !!!");
+        }
+
+        if ((isGuest(username)) || (!isAdmin(username) && access === 'global')) access = 'public';
+
+        const note = await Note.findById(noteid);
+
+        const isEditable = (isAdmin(username) || (note.access !== 'private' && note.editable) || (!isGuest(username) && (username === note.username)));
+        if (!isEditable) return res.status(400).json("Unauthorized: You can't edit this note !");
+
+        const codeDB = await Code.findById(note.codeid);
+
+        note.title = title;
+        note.desc = desc;
+        note.access = access;
+        note.editable = editable;
+        note.lastModifiedAt = Date.now();
+
+        codeDB.code = code;
+        codeDB.language = language;
+
+        await note.save();
+        await codeDB.save();
+
+        res.status(200).json(`Server : Note updated, Note_id = ${note._id} Code_id = ${codeDB._id}`);
     } catch (err) {
         console.error(err);
         res.status(500).json(err);
@@ -140,7 +138,7 @@ const deleteNote = async (req, res) => {
             if (note.access === 'global')
                 return res.status(401).json("Unauthorized: Not an Admin, Global Notes can only be deleted by Admin");
 
-            if (note.username === 'guest')
+            if (isGuest(username))
                 return res.status(401).json("Unauthorized: public notes by guest can only be deleted by admin !");
 
             if (note.username !== username)
@@ -159,8 +157,6 @@ const deleteNote = async (req, res) => {
 }
 
 module.exports = {
-    getAllNotesForAdmin,
-    getNoteForAdmin,
     getAllNotes,
     addNote,
     getNote,
