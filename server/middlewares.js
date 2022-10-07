@@ -24,7 +24,9 @@ const loginValidatorHelper = async (req, res, next, credential, credentialName, 
 
 const loginValidator = async (req, res, next) => {
 
-    const { email, username, password } = req.body;
+    let { email, username, password } = req.body;
+
+    username = username ? username.trim() : '';
 
     try {
         if (!password || !(email || username))
@@ -39,7 +41,10 @@ const loginValidator = async (req, res, next) => {
 
 const registerValidator = async (req, res, next) => {
 
-    const { name, username, email, password, passwordVerify } = req.body;
+    let { name, username, email, password, passwordVerify } = req.body;
+
+    name = name ? name.trim() : '';
+    username = username ? username.trim() : '';
 
     try {
         if (!name || !username || !email || !password || !passwordVerify)
@@ -98,6 +103,7 @@ const authValidator = (req, res, next) => {
 
         const verified = jwt.verify(token, process.env.JWT_SECRET);
         req.user = verified.user;
+        req.username = verified.username;
 
         next();
     } catch (err) {

@@ -59,11 +59,16 @@ const addNote = async (req, res) => {
         const username = req.username;
         let { title, desc, code, language, access, editable } = req.body;
 
+
         if (!title || !desc || !language || !access) {
             return res.status(400).json("title, description and access are required so please fill all !!!");
         }
 
         if ((isGuest(username)) || (!isAdmin(username) && access === 'global')) access = 'public';
+
+        title = title.trim();
+        desc = desc.trim();
+        code = code.trim();
 
         const newcode = new Code({ code, language, user });
         await newcode.save();
@@ -100,13 +105,13 @@ const editNote = async (req, res) => {
 
         const codeDB = await Code.findById(note.codeid);
 
-        note.title = title;
-        note.desc = desc;
+        note.title = title.trim();
+        note.desc = desc.trim();
         note.access = access;
         note.editable = editable;
         note.lastModifiedAt = Date.now();
 
-        codeDB.code = code;
+        codeDB.code = code.trim();
         codeDB.language = language;
 
         await note.save();

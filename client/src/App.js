@@ -29,8 +29,8 @@ const Notes = React.lazy(() => import('./pages/Notes/Notes'));
 const Customform = React.lazy(() => import('./compenents/Customform/Customform'));
 
 
+export const LOGIN = 'login', REGISTER = 'register', CHANGEPASSWORD = 'changePassword';
 let isInitial = true;
-
 
 const App = () => {
 
@@ -84,8 +84,9 @@ const App = () => {
                             <Route exact path='/questions/:id' element={<Question />} />
                             <Route exact path='/leaderboard' element={<LeaderBoard />} />
                             <Route exact path='/codes/:id' element={<Codes />} />
-                            <Route exact path='/login' element={!loginState.loggedIn ? <Customform pageType="login" /> : <Navigate replace to='/questions' />} />
-                            <Route exact path='/register' element={!loginState.loggedIn ? <Customform pageType="register" /> : <Navigate replace to='/questions' />} />
+                            <Route exact path='/login' element={!loginState.loggedIn ? <Customform pageType={LOGIN} /> : <Navigate replace to='/questions' />} />
+                            <Route exact path='/register' element={!loginState.loggedIn ? <Customform pageType={REGISTER} /> : <Navigate replace to='/questions' />} />
+                            <Route exact path='/changePassword' element={<Customform pageType={CHANGEPASSWORD} />} />
                             <Route exact path='/dashboard' element={loginState.loggedIn ? <DashBoard /> : <Navigate replace to='/questions' />} />
                             <Route exact path='/account' element={<Account />} />
                             <Route exact path='/notes' element={<Notes />} />

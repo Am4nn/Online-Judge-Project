@@ -9,10 +9,10 @@ const {
 let gccContainerId = null, pythonContainerId = null;
 createContainer('gcc')
     .then(data => { gccContainerId = data; console.log(`gcc container id : ${data}`) })
-    .catch(error => {/*console.error('GCC Docker Error : ', error)*/ });
+    .catch(error => { console.error('GCC Docker Error : ', error) });
 createContainer('python')
     .then(data => { pythonContainerId = data; console.log(`python container id : ${data}`) })
-    .catch(error => {/*console.error('PYTHON Docker Error : ', error)*/ });
+    .catch(error => { console.error('PYTHON Docker Error : ', error) });
 
 const fs = require("fs");
 const path = require("path");

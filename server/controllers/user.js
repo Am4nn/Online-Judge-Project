@@ -100,9 +100,39 @@ const loggedInController = async (req, res) => {
     }
 }
 
+const changePasswordController = async (req, res) => {
+    console.log('PUT /api/user/changePassword');
+    try {
+        let { username, email, password, newPassword } = req.body;
+        username = username ? username.trim() : '';
+        email = email ? email.trim() : '';
+
+        const existingUser = await User.findOne({ username, email });
+        if (!existingUser || (existingUser.username !== username) || (existingUser.email !== email))
+            return res.status(401).json({ error: 'Wrong email or username or password.' });
+        const passwordCorrect = await bcrypt.compare(
+            password,
+            existingUser.passwordHash
+        );
+        if (!passwordCorrect)
+            return res.status(401).json({ error: 'Wrong email or username or password.' });
+
+        // hash the password
+        const salt = await bcrypt.genSalt();
+        const passwordHash = await bcrypt.hash(newPassword, salt);
+        existingUser.passwordHash = passwordHash;
+        await existingUser.save();
+        res.status(200).json({ msg: "Password Changed" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
+}
+
 module.exports = {
     loginController,
     registerController,
     logoutController,
-    loggedInController
+    loggedInController,
+    changePasswordController
 };

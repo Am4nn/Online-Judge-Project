@@ -1,11 +1,11 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import { DialogContentText, Fab, Fade, IconButton, Tooltip, Zoom } from '@mui/material';
 import { Box } from '@mui/system';
+import {
+    Button, DialogContentText,
+    Fab, Fade, IconButton,
+    Tooltip, Zoom, Dialog,
+    DialogActions, DialogContent, DialogTitle
+} from '@mui/material';
 import Note from '../Note/Note';
 import { useDispatch, useSelector } from 'react-redux';
 import CodeEditorv3 from '../../Question/Editor/CodeEditorv3';
@@ -13,10 +13,11 @@ import { Check, ContentCopy, Delete, Edit, Share } from '@mui/icons-material';
 import copy from 'copy-to-clipboard';
 import { messageActions } from '../../../store/Message/message-slice';
 import { SERVER_LINK } from '../../../dev-server-link';
+import moment from 'moment';
 
 const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditModal, isMobile, markEditOrDelete, setReloadNeeded, SlideTransition }) => {
 
-    const { username, title, desc, access, editable, codeid, _id: noteid } = viewNote;
+    const { username, title, desc, access, editable, codeid, _id: noteid, lastModifiedAt } = viewNote;
 
     const dispatch = useDispatch();
     const { username: auth_username, isAdmin, isGuest } = useSelector(state => state.auth);
@@ -123,9 +124,20 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
     const handleShare = () => {
         const link = window.location.href;
         const result = copy(link);
-        const type = result ? 'success' : 'error';
-        const message = result ? 'Link to the Note copied successfully !' : "There are some errors copying the Note's Link !";
-        const description = `Link to Note : ${link}`;
+        let type = '';
+        let message = '';
+        let description = '';
+
+        if (!result) {
+            type = 'error'; message = "There are some errors copying the Note's Link !";
+            description = 'Try using another browser !';
+        } else if (access === 'private') {
+            type = 'warning'; message = "Link copied but someone else can't open it as its a Private Note";
+            description = 'Make this Note public to make it share-able !';
+        } else {
+            type = 'success'; message = 'Link to the Note copied successfully !';
+            description = `Link to Note : ${link}`;
+        }
 
         dispatch(messageActions.set({ type, message, description }));
     }
@@ -212,6 +224,11 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
 
                 </DialogContent>
                 <DialogActions>
+                    <div style={{ width: '100%', padding: '6px 8px', textTransform: 'capitalize' }}>
+                        <DialogContentText>
+                            Last Modified: {moment(lastModifiedAt).fromNow()}
+                        </DialogContentText>
+                    </div>
                     <Button onClick={handleClose}>Cancel</Button>
                 </DialogActions>
             </Dialog >

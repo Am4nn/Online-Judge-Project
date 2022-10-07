@@ -13,7 +13,8 @@ import {
 import {
     Login,
     Logout,
-    PersonAdd
+    PersonAdd,
+    LockOpen
 } from '@mui/icons-material';
 
 import Nav from "react-bootstrap/Nav"
@@ -58,6 +59,10 @@ const AccountMenu = ({ setExpand }) => {
     const dashboardHandler = () => {
         setExpand(false);
         navigator('/dashboard')
+    }
+    const changePassHandler = () => {
+        setExpand(false);
+        navigator('/changePassword')
     }
 
     return (
@@ -144,6 +149,12 @@ const AccountMenu = ({ setExpand }) => {
                         Login
                     </MenuItem>
                 }
+                <MenuItem onClick={changePassHandler}>
+                    <ListItemIcon>
+                        <LockOpen fontSize="small" />
+                    </ListItemIcon>
+                    Change Password
+                </MenuItem>
                 {loginState.loggedIn === true &&
                     <MenuItem onClick={logoutHandler}>
                         <ListItemIcon>

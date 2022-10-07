@@ -175,3 +175,50 @@ export const register = (name, username, email, password, passwordVerify) => {
         }
     }
 }
+
+export const changePassword = (username, email, password, newPassword) => {
+    return async dispatch => {
+        dispatch(messageActions.set({
+            type: 'info',
+            message: 'Changing Password...'
+        }))
+        try {
+            dispatch(authActions.setLoading({ isLoading: true }));
+            const response = await fetch(
+                `${SERVER_LINK}/api/user/changePassword`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    method: 'PUT',
+                    credentials: 'include',
+                    body: JSON.stringify({ username, email, password, newPassword })
+                }
+            ).then(data => data.json());
+
+            await dispatch(getLoggedIn());
+            if (response.error) {
+                dispatch(messageActions.set({
+                    type: 'error',
+                    message: 'Changing Password Failed !',
+                    description: response.error
+                }))
+                return dispatch(authActions.setError({ error: response.error }));
+            }
+            dispatch(messageActions.set({
+                type: 'success',
+                message: 'Changing Password Successful !'
+            }))
+        } catch (error) {
+            console.error(error);
+            dispatch(authActions.setError({ error: JSON.stringify(error) }));
+            dispatch(messageActions.set({
+                type: 'error',
+                message: 'Changing Password Failed !',
+                description: JSON.stringify(error)
+            }))
+        } finally {
+            dispatch(authActions.setLoading({ isLoading: false }));
+        }
+    }
+}

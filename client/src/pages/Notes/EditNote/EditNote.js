@@ -147,7 +147,7 @@ const EditNote = ({ openModal, setOpenModal, editNote, isMobile, markEditOrDelet
                             >
                                 {isAdmin && <MenuItem value='global'>Global</MenuItem>}
                                 <MenuItem value='public'>Public</MenuItem>
-                                {!isGuest && <MenuItem value='private'>Private</MenuItem>}
+                                {(isAdmin || access === 'private' || realUsername === username) && !isGuest && <MenuItem value='private'>Private</MenuItem>}
                             </Select>
                         </FormControl>
                     }

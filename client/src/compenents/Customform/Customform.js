@@ -5,10 +5,12 @@ import classes from './Customform.module.css'
 import useInput from '../../hooks/use-input'
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import { login, register } from '../../store/Auth/auth-actions'
+import { changePassword, login, register } from '../../store/Auth/auth-actions'
 import { authActions } from '../../store/Auth/auth-slice'
 import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Tooltip, Zoom } from '@mui/material'
 import { useMediaQuery } from '@mui/material'
+
+import { LOGIN, REGISTER, CHANGEPASSWORD } from '../../App';
 
 const Customform = props => {
 
@@ -23,13 +25,11 @@ const Customform = props => {
 
     if (loginState.loggedIn) {
         // this block never runs, as /login and /register routes get disabled
-        console.log(`${pageType === 'login' ? 'Logged In' : 'Registered'} Successfully`);
         dispatch(authActions.setError({ error: undefined }));
         navigator('/questions');
     }
 
     useEffect(() => {
-        // console.log(`${pageType} page`);
         return () => dispatch(authActions.setError({ error: undefined }));
     }, [dispatch, pageType]);
 
@@ -74,6 +74,16 @@ const Customform = props => {
     const passErrorMsg = 'Password is necessary and should be greater than or equal to 6 characters';
 
     const {
+        value: oldPassword,
+        isValid: isOldPassValid,
+        hasError: hasOldPassError,
+        valueChangeHandler: oldPassChangeHandler,
+        inputBlurHandler: oldPassBlurHandler,
+        reset: resetOldPass
+    } = useInput(value => (value.length >= 6));
+    const oldPassErrorMsg = 'Password is necessary and should be greater than or equal to 6 characters';
+
+    const {
         value: passwordVer,
         isValid: isPassVerValid,
         hasError: hasPassVerError,
@@ -92,7 +102,8 @@ const Customform = props => {
         resetEmail();
         resetPass();
         resetPassVer();
-    }, [pageType, resetName, resetUsername, resetEmail, resetPass, resetPassVer]);
+        resetOldPass();
+    }, [pageType, resetName, resetUsername, resetEmail, resetPass, resetPassVer, resetOldPass]);
 
     // final validations for form
     const isRegisterFormValid = isNameValid && isUserameValid &&
@@ -100,26 +111,39 @@ const Customform = props => {
     const isLoginFormValid = isPassValid && (
         emailUnameSelection === 'username' ? isUserameValid : isEmailValid
     );
-    const isFormValid = pageType === 'register' ? isRegisterFormValid : isLoginFormValid;
+    const isChangePassFormValid = isUserameValid && isEmailValid && isOldPassValid
+        && isPassValid && isPassVerValid;
+
+    let isFormValid;
+    switch (pageType) {
+        case REGISTER: isFormValid = isRegisterFormValid; break;
+        case LOGIN: isFormValid = isLoginFormValid; break;
+        case CHANGEPASSWORD: isFormValid = isChangePassFormValid; break;
+        default: break;
+    }
 
     // fix fogin with  email and username
     const loginHandler = () => {
         emailUnameSelection === 'username' && dispatch(login(username, undefined, password));
         emailUnameSelection === 'email' && dispatch(login(undefined, email, password));
     }
-    const registerHandler = () => {
-        dispatch(register(name, username, email, password, passwordVer));
-    }
+    const registerHandler = () => dispatch(register(name, username, email, password, passwordVer));
+    const changePassHandler = () => dispatch(changePassword(username, email, oldPassword, password));
 
     const formSubmitHandler = event => {
         event.preventDefault();
 
         if (!isFormValid) return;
-        if (pageType === 'login') loginHandler();
-        else if (pageType === 'register') registerHandler();
+        switch (pageType) {
+            case REGISTER: isFormValid = registerHandler(); break;
+            case LOGIN: isFormValid = loginHandler(); break;
+            case CHANGEPASSWORD: isFormValid = changePassHandler(); break;
+            default: break;
+        }
 
         resetPass();
         resetPassVer();
+        resetOldPass();
     }
 
     return (
@@ -129,17 +153,20 @@ const Customform = props => {
                 <form className={classes["Auth-form"]} onSubmit={formSubmitHandler}>
                     <div className={classes["Auth-form-content"]}>
                         <h3 className={classes["Auth-form-title"]}>
-                            {pageType === 'login' ? 'Sign In' : 'Sign Up'}
+                            {(pageType === LOGIN && 'Sign In') || (pageType === REGISTER && 'Sign Up') || (pageType === CHANGEPASSWORD && "Change Password")}
                         </h3>
-                        <div className="text-center">
-                            {pageType === 'login' ? "Don't have an account? " : 'Already have an account '}
 
-                            <Link to={pageType === 'login' ? '/register' : '/login'} className="link-primary">
-                                {pageType === 'login' ? 'Sign Up' : 'Sign In'}
-                            </Link>
-                        </div>
+                        {(pageType === LOGIN || pageType === REGISTER) &&
+                            <div className="text-center">
+                                {(pageType === LOGIN && "Don't have an account? ") || (pageType === REGISTER && 'Already have an account ')}
 
-                        {pageType === 'register' &&
+                                <Link to={(pageType === LOGIN && '/register') || (pageType === REGISTER && '/login')} className="link-primary">
+                                    {(pageType === LOGIN && 'Sign Up') || (pageType === REGISTER && 'Sign In')}
+                                </Link>
+                            </div>
+                        }
+
+                        {pageType === REGISTER &&
                             <div className='form-group mt-4'>
                                 <Tooltip
                                     arrow
@@ -170,7 +197,7 @@ const Customform = props => {
                             </div>
                         }
 
-                        {pageType === 'login' &&
+                        {pageType === LOGIN &&
                             <FormControl sx={{
                                 borderTop: '2px solid rgb(0,0,0,0.08)',
                                 borderBottom: '2px solid rgb(0,0,0,0.08)',
@@ -200,7 +227,7 @@ const Customform = props => {
                         }
 
 
-                        {(pageType === 'register' || emailUnameSelection === 'username') &&
+                        {(pageType === REGISTER || pageType === CHANGEPASSWORD || emailUnameSelection === 'username') &&
                             <div className='form-group mt-4'>
                                 <Tooltip
                                     arrow
@@ -231,7 +258,7 @@ const Customform = props => {
                             </div>
                         }
 
-                        {(pageType === 'register' || emailUnameSelection === 'email') &&
+                        {(pageType === REGISTER || pageType === CHANGEPASSWORD || emailUnameSelection === 'email') &&
                             <div className='form-group mt-4'>
                                 <Tooltip
                                     arrow
@@ -262,6 +289,37 @@ const Customform = props => {
                             </div>
                         }
 
+                        {pageType === CHANGEPASSWORD &&
+                            <div className='form-group mt-3'>
+                                <Tooltip
+                                    arrow
+                                    placement={tooltipPlacement}
+                                    TransitionComponent={Zoom}
+                                    title={oldPassErrorMsg}
+                                    open={!isMobile && hasOldPassError}
+                                >
+                                    <TextField
+                                        id='oldPassword'
+                                        type='password'
+                                        label="Old Password"
+                                        placeholder='Minimum Length 6'
+                                        variant="filled"
+                                        onBlur={oldPassBlurHandler}
+                                        onChange={oldPassChangeHandler}
+                                        value={oldPassword}
+                                        sx={hasOldPassError ? {
+                                            backgroundColor: '#fddddd',
+                                        } : {}}
+                                    />
+                                </Tooltip>
+                                {isMobile && hasOldPassError &&
+                                    <div className={classes.validError}>
+                                        {oldPassErrorMsg}
+                                    </div>
+                                }
+                            </div>
+                        }
+
                         <div className='form-group mt-3'>
                             <Tooltip
                                 arrow
@@ -273,7 +331,7 @@ const Customform = props => {
                                 <TextField
                                     id='password'
                                     type='password'
-                                    label="Password"
+                                    label={`${pageType === CHANGEPASSWORD ? 'New ' : ''}Password`}
                                     placeholder='Minimum Length 6'
                                     variant="filled"
                                     onBlur={passBlurHandler}
@@ -291,7 +349,7 @@ const Customform = props => {
                             }
                         </div>
 
-                        {pageType === 'register' &&
+                        {(pageType === REGISTER || pageType === CHANGEPASSWORD) &&
                             <div className='form-group mt-3'>
                                 <Tooltip
                                     arrow
@@ -303,8 +361,8 @@ const Customform = props => {
                                     <TextField
                                         id='passwordVerify'
                                         type='password'
-                                        label="Re-Enter Password"
-                                        placeholder='Same as password'
+                                        label={`Re-Enter ${pageType === CHANGEPASSWORD ? 'New ' : ''}Password`}
+                                        placeholder={`Same as ${pageType === CHANGEPASSWORD ? 'New ' : ''}Password`}
                                         variant="filled"
                                         onBlur={passVerBlurHandler}
                                         onChange={passVerChangeHandler}
@@ -334,7 +392,7 @@ const Customform = props => {
                                     fontSize: '1rem'
                                 }}
                             >
-                                {pageType === 'login' ? 'Login' : 'Register'}
+                                {pageType}
                                 {loginState && (loginState.isLoading || loginState.loggedIn) && <div className='spin' />}
                             </Button>
                         </div>

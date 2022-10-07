@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box } from '@mui/system';
 import { Fab, InputBase, Slide, Tooltip, Zoom, useMediaQuery } from '@mui/material';
-import { Cancel, NoteAdd, Search, SupervisedUserCircle } from '@mui/icons-material'
+import { Cancel, NoteAdd, Search, SupervisedUserCircle, KeyboardArrowRight } from '@mui/icons-material'
 
 import AddNote from './AddNote/AddNote';
 import ViewNote from './ViewNote/ViewNote';
@@ -140,6 +140,7 @@ const Notes = () => {
                 .finally(() => setLoading(false))
         }
 
+        setLoading(true);
         fetchNotesFromServer();
     }, [dispatch, isAdminMode]);
 
@@ -162,7 +163,7 @@ const Notes = () => {
             note.title.toLowerCase().includes(searchNoteQuery.toLowerCase()) ||
             note.desc.toLowerCase().includes(searchNoteQuery.toLowerCase())
         )));
-    }, 600, [searchNoteQuery]);
+    }, 500, [searchNoteQuery]);
 
     return (
         <Fragment>
@@ -215,7 +216,7 @@ const Notes = () => {
 
                     {!loading && (
                         <Fragment>
-                            <div className={classes.ncLabel}><span>Global Notes by Admin</span></div>
+                            <div className={classes.ncLabel}><span>Global Notes by Admin</span><KeyboardArrowRight fontSize='medium' /></div>
                             <div className={classes.noteList}>
                                 {allNotes.filter(note => (note.access === 'global')).map(note =>
                                     <Note key={note._id} note={note} setViewNote={setViewNote} setOpenViewModal={setOpenViewModal} />
