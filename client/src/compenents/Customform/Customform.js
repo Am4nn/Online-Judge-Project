@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import classes from './Customform.module.css'
 import useInput from '../../hooks/use-input'
@@ -20,14 +20,7 @@ const Customform = props => {
     const tooltipPlacement = 'right';
 
     const dispatch = useDispatch();
-    const navigator = useNavigate();
     const loginState = useSelector(state => state.auth);
-
-    if (loginState.loggedIn) {
-        // this block never runs, as /login and /register routes get disabled
-        dispatch(authActions.setError({ error: undefined }));
-        navigator('/questions');
-    }
 
     useEffect(() => {
         return () => dispatch(authActions.setError({ error: undefined }));
