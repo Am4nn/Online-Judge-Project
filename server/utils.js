@@ -1,7 +1,7 @@
 const logger = () => { }
 
 const dateTimeNowFormated = () => {
-    return ((new Date()).toLocaleString());
+    return ((new Date()).toLocaleString(undefined, { timeZone: 'Asia/Kolkata' }));
 }
 
 module.exports = {
