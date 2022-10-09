@@ -1,4 +1,4 @@
-import React, { forwardRef, Fragment, useEffect, useState } from 'react'
+import React, { forwardRef, Fragment, useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box } from '@mui/system';
@@ -113,36 +113,36 @@ const Notes = () => {
         });
     }
 
-    useEffect(() => {
-        /*
-        Make a request to server, with credentials and it will return an array 
-        containing all global and public notes but also with private notes specific
-        to that credentials.
-        */
-        const fetchNotesFromServer = () => {
-            fetch(
-                `${SERVER_LINK}/api/notes/allNotes${(isAdminMode) ? '?admin=true' : ''}`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    method: 'GET',
-                    credentials: 'include'
-                }
-            )
-                .then(async response => {
-                    const res = await response.json();
-                    if (response.ok) return res
-                    return Promise.reject(res);
-                })
-                .then(response => { setAllNotes(response); setOriginalAllNotes(response); })
-                .catch(setError)
-                .finally(() => setLoading(false))
-        }
-
+    /*
+    Make a request to server, with credentials and it will return an array 
+    containing all global and public notes but also with private notes specific
+    to that credentials.
+    */
+    const fetchNotesFromServer = useCallback(() => {
         setLoading(true);
+        fetch(
+            `${SERVER_LINK}/api/notes/allNotes${(isAdminMode) ? '?admin=true' : ''}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                method: 'GET',
+                credentials: 'include'
+            }
+        )
+            .then(async response => {
+                const res = await response.json();
+                if (response.ok) return res
+                return Promise.reject(res);
+            })
+            .then(response => { setAllNotes(response); setOriginalAllNotes(response); })
+            .catch(setError)
+            .finally(() => setLoading(false))
+    }, [isAdminMode]);
+
+    useEffect(() => {
         fetchNotesFromServer();
-    }, [dispatch, isAdminMode]);
+    }, [dispatch, fetchNotesFromServer]);
 
     useEffect(() => {
         dispatch(messageActions.set({
@@ -156,14 +156,19 @@ const Notes = () => {
     const adminModeHandler = () => isAdmin ? setAdminMode(prev => !prev) : setAdminMode(false);
 
     useDebounce(() => {
-        console.log(searchNoteQuery);
-
         if (!searchNoteQuery) setAllNotes(originalAllNotes);
         else setAllNotes(originalAllNotes.filter(note => (
             note.title.toLowerCase().includes(searchNoteQuery.toLowerCase()) ||
             note.desc.toLowerCase().includes(searchNoteQuery.toLowerCase())
         )));
     }, 500, [searchNoteQuery]);
+
+    const refreshNotesList = () => {
+        setEditNote({});
+        setViewNote({});
+        setReloadNeeded(false);
+        fetchNotesFromServer();
+    }
 
     return (
         <Fragment>
@@ -205,7 +210,7 @@ const Notes = () => {
                         <div style={{
                             fontSize: '1rem', color: 'hsla(0, 40%, 50%,0.8)',
                             margin: 'unset', position: 'relative', marginBottom: '0.5rem'
-                        }}><span onClick={(() => window.location.reload())} style={{
+                        }}><span onClick={refreshNotesList} style={{
                             zIndex: 100, position: 'relative',
                             color: 'blue', textDecoration: 'underline',
                             fontWeight: 500, cursor: 'pointer'
@@ -219,14 +224,14 @@ const Notes = () => {
                             <div className={classes.ncLabel}><span>Global Notes by Admin</span><KeyboardArrowRight fontSize='medium' /></div>
                             <div className={classes.noteList}>
                                 {allNotes.filter(note => (note.access === 'global')).map(note =>
-                                    <Note key={note._id} note={note} setViewNote={setViewNote} setOpenViewModal={setOpenViewModal} />
+                                    <Note refreshNotesList={refreshNotesList} key={note._id} note={note} setViewNote={setViewNote} setOpenViewModal={setOpenViewModal} />
                                 )}
                             </div>
 
                             <div className={classes.ncLabel}><span>Public Notes by Users/Guest</span></div>
                             <div className={classes.noteList}>
                                 {allNotes.filter(note => (note.access === 'public')).map(note =>
-                                    <Note key={note._id} note={note} setViewNote={setViewNote} setOpenViewModal={setOpenViewModal} />
+                                    <Note refreshNotesList={refreshNotesList} key={note._id} note={note} setViewNote={setViewNote} setOpenViewModal={setOpenViewModal} />
                                 )}
                             </div>
 
@@ -241,7 +246,7 @@ const Notes = () => {
                                     {allNotes.filter(note => (note.access === 'private')).length === 0 ?
                                         <span className={classes.red + ' ' + classes.noNote}>You have not created any Private Note, <button onClick={addNoteHandler}>Make One</button></span> :
                                         allNotes.filter(note => (note.access === 'private')).map(note =>
-                                            <Note key={note._id} note={note} setViewNote={setViewNote} setOpenViewModal={setOpenViewModal} />
+                                            <Note refreshNotesList={refreshNotesList} key={note._id} note={note} setViewNote={setViewNote} setOpenViewModal={setOpenViewModal} />
                                         )}
                                 </div>
                                 : ""

@@ -1,9 +1,10 @@
 const User = require('../DataBase/Model/User');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { dateTimeNowFormated } = require('../utils');
 
 const loginController = async (req, res) => {
-    console.log('POST /api/user/login');
+    console.log('POST /api/user/login', dateTimeNowFormated());
     try {
         // sign the token
         const token = jwt.sign(
@@ -21,13 +22,13 @@ const loginController = async (req, res) => {
             // sameSite: "none",
         }).status(200).json({ msg: "Logged In" });
     } catch (err) {
-        console.error(err);
+        console.error(err, dateTimeNowFormated());
         res.status(500).json({ error: "Internal Error" });
     }
 }
 
 const registerController = async (req, res) => {
-    console.log('POST /api/user/register');
+    console.log('POST /api/user/register', dateTimeNowFormated());
     try {
         const { name, username, email, password } = req.body;
 
@@ -61,13 +62,13 @@ const registerController = async (req, res) => {
             // sameSite: "none",
         }).status(200).json({ msg: "Registered" });
     } catch (err) {
-        console.error(err);
+        console.error(err, dateTimeNowFormated());
         res.status(500).json({ error: "Internal Error" });
     }
 }
 
 const logoutController = (req, res) => {
-    console.log('GET /api/user/logout');
+    console.log('GET /api/user/logout', dateTimeNowFormated());
     return res.cookie("token", "", {
         httpOnly: true,
         expires: new Date(0),
@@ -77,8 +78,7 @@ const logoutController = (req, res) => {
 }
 
 const loggedInController = async (req, res) => {
-    console.log('GET /api/user/loggedIn');
-    // console.info('req', "body: ", req.body, "secret: ", req.secret, "cookies: ", req.cookies);
+    console.log('GET /api/user/loggedIn', dateTimeNowFormated());
     try {
         if (!req.cookies || !req.cookies.token) return res.json(false);
 
@@ -95,13 +95,13 @@ const loggedInController = async (req, res) => {
             solvedQuestions: user.solvedQuestions
         });
     } catch (err) {
-        console.error(err);
+        console.error(err, dateTimeNowFormated());
         res.json({ status: false });
     }
 }
 
 const changePasswordController = async (req, res) => {
-    console.log('PUT /api/user/changePassword');
+    console.log('PUT /api/user/changePassword', dateTimeNowFormated());
     try {
         let { username, email, password, newPassword } = req.body;
         username = username ? username.trim() : '';
@@ -124,7 +124,7 @@ const changePasswordController = async (req, res) => {
         await existingUser.save();
         res.status(200).json({ msg: "Password Changed" });
     } catch (error) {
-        console.error(error);
+        console.error(error, dateTimeNowFormated());
         res.status(500).json({ error });
     }
 }

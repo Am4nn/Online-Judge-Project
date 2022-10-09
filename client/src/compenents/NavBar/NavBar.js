@@ -15,7 +15,6 @@ const NavBar = () => {
     const [expand, setExpand] = useState(false);
 
     const handleNavBarClickAway = () => {
-        console.log('handleNavBarClickAway');
         setExpand(false);
     }
 

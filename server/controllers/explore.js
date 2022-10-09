@@ -17,6 +17,7 @@ const {
     readFile,
     createFile
 } = require('../CodeExecuter/codeExecutor_dockerv');
+const { dateTimeNowFormated } = require('../utils');
 
 // ObjectID Validator function
 function isValidObjectId(id) {
@@ -24,7 +25,7 @@ function isValidObjectId(id) {
 }
 
 const problemsController = async (req, res) => {
-    console.log('GET /api/explore/problems getAllQuestions');
+    console.log('GET /api/explore/problems getAllQuestions', dateTimeNowFormated());
     try {
         const questions = await getQuestionList();
         return res.status(200).json(questions);
@@ -34,7 +35,7 @@ const problemsController = async (req, res) => {
 }
 
 const detailedProblemController = async (req, res) => {
-    console.log('GET /api/explore/problems/:id getDetailedQuestion');
+    console.log('GET /api/explore/problems/:id getDetailedQuestion', dateTimeNowFormated());
     try {
         const id = req.params.id;
         if (!isValidObjectId(id))
@@ -50,7 +51,7 @@ const detailedProblemController = async (req, res) => {
 }
 
 const verdictController = async (req, res) => {
-    console.log('POST /api/explore/problems/:id sentCodeForVerdict');
+    console.log('POST /api/explore/problems/:id sentCodeForVerdict', dateTimeNowFormated());
     try {
         const { language, code, testcase, quesName } = req.body;
         const quesId = req.params.id;
@@ -85,13 +86,13 @@ const verdictController = async (req, res) => {
 
         res.status(201).json({ status: 'pending', msg: "Request queued, wait for response !", queryId });
     } catch (err) {
-        console.error(err);
+        console.error(err, dateTimeNowFormated());
         return res.status(400).json({ status: 'error', msg: 'some error occured submitting the code !', error: JSON.stringify(err) });
     }
 }
 
 const statusController = async (req, res) => {
-    console.log('GET /api/explore/status/:queryId getStatusOfQuery');
+    console.log('GET /api/explore/status/:queryId getStatusOfQuery', dateTimeNowFormated());
     const queryId = req.params.queryId;
     if (!isValidObjectId(queryId))
         return res.status(404).json({ msg: 'not a valid object id' });
@@ -108,7 +109,7 @@ const statusController = async (req, res) => {
 }
 
 const leaderboardController = async (req, res) => {
-    console.log('GET /api/explore/leaderboard getLeaderboard');
+    console.log('GET /api/explore/leaderboard getLeaderboard', dateTimeNowFormated());
     try {
         const leaders = await getAllQueriesReverseSorted();
         return res.status(200).json(leaders);
@@ -118,7 +119,7 @@ const leaderboardController = async (req, res) => {
 }
 
 const codesController = async (req, res) => {
-    console.log('POST /api/explore/getcode getCodeOfAQuery');
+    console.log('POST /api/explore/getcode getCodeOfAQuery', dateTimeNowFormated());
     try {
         let { filepath } = req.body;
         const code = readFile(filepath);

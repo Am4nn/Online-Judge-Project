@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import classes from './Note.module.css';
 
-const Note = ({ note, setOpenViewModal, setViewNote }) => {
+const Note = ({ note, setOpenViewModal, setViewNote, refreshNotesList }) => {
 
     let { title, codeid, desc, username, access, editable, edited, deleted } = note;
     title = title || "Title";
@@ -28,7 +28,7 @@ const Note = ({ note, setOpenViewModal, setViewNote }) => {
                             color: 'blue', textDecoration: 'underline',
                             fontWeight: 500, cursor: 'pointer'
                         }}
-                            onClick={() => window.location.reload()} >
+                            onClick={refreshNotesList} >
                             Refresh
                         </span>
                         &nbsp;this page to see changes !

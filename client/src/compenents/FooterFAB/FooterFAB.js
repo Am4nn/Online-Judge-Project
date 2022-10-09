@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 
-import { ClickAwayListener, Fab, Paper, Popper, Tooltip, Typography, Zoom } from '@mui/material';
+import { ClickAwayListener, Fab, Paper, Popper, Tooltip, Zoom } from '@mui/material';
 import Coffee from '@mui/icons-material/Coffee';
 import { Box } from '@mui/system';
 import Footer from './Footer/Footer';

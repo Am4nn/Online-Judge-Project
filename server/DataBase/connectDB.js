@@ -10,7 +10,7 @@ const connectDB = () => {
         })
         .catch(error => {
             console.error("Oh no MONGOOSE Error !!!");
-            console.error(error);
+            console.error(error, dateTimeNowFormated());
         });
 }
 

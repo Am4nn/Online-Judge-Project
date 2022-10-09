@@ -7,10 +7,11 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { changePassword, login, register } from '../../store/Auth/auth-actions'
 import { authActions } from '../../store/Auth/auth-slice'
-import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Tooltip, Zoom } from '@mui/material'
+import { FilledInput, FormControl, FormControlLabel, FormLabel, IconButton, InputAdornment, InputLabel, Radio, RadioGroup, Tooltip, Zoom } from '@mui/material'
 import { useMediaQuery } from '@mui/material'
 
 import { LOGIN, REGISTER, CHANGEPASSWORD } from '../../App';
+import { Visibility, VisibilityOff } from '@mui/icons-material'
 
 const Customform = props => {
 
@@ -74,7 +75,7 @@ const Customform = props => {
         inputBlurHandler: oldPassBlurHandler,
         reset: resetOldPass
     } = useInput(value => (value.length >= 6));
-    const oldPassErrorMsg = 'Password is necessary and should be greater than or equal to 6 characters';
+    const oldPassErrorMsg = 'Old Password is necessary and should be greater than or equal to 6 characters';
 
     const {
         value: passwordVer,
@@ -252,7 +253,7 @@ const Customform = props => {
                         }
 
                         {(pageType === REGISTER || pageType === CHANGEPASSWORD || emailUnameSelection === 'email') &&
-                            <div className='form-group mt-4'>
+                            <div className='form-group mt-3'>
                                 <Tooltip
                                     arrow
                                     placement={tooltipPlacement}
@@ -283,94 +284,64 @@ const Customform = props => {
                         }
 
                         {pageType === CHANGEPASSWORD &&
-                            <div className='form-group mt-3'>
-                                <Tooltip
-                                    arrow
-                                    placement={tooltipPlacement}
-                                    TransitionComponent={Zoom}
-                                    title={oldPassErrorMsg}
-                                    open={!isMobile && hasOldPassError}
-                                >
-                                    <TextField
-                                        id='oldPassword'
-                                        type='password'
-                                        label="Old Password"
-                                        placeholder='Minimum Length 6'
-                                        variant="filled"
-                                        onBlur={oldPassBlurHandler}
-                                        onChange={oldPassChangeHandler}
-                                        value={oldPassword}
-                                        sx={hasOldPassError ? {
-                                            backgroundColor: '#fddddd',
-                                        } : {}}
-                                    />
-                                </Tooltip>
-                                {isMobile && hasOldPassError &&
-                                    <div className={classes.validError}>
-                                        {oldPassErrorMsg}
-                                    </div>
-                                }
-                            </div>
+                            <CustomPasswordInput
+                                emailUnameSelection={emailUnameSelection}
+                                pageType={pageType}
+                                isMobile={isMobile}
+                                tooltipPlacement={tooltipPlacement}
+                                errorMsg={oldPassErrorMsg}
+                                hasError={hasOldPassError}
+                                id='oldPassword'
+                                value={oldPassword}
+                                changeHandler={oldPassChangeHandler}
+                                blurHandler={oldPassBlurHandler}
+                                label="Old Password"
+                                placeholder='Minimum Length 6'
+                                sx={hasOldPassError ? {
+                                    backgroundColor: '#fddddd',
+                                } : {}}
+                                transitionComponent={Zoom}
+                            />
                         }
 
-                        <div className='form-group mt-3'>
-                            <Tooltip
-                                arrow
-                                placement={tooltipPlacement}
-                                TransitionComponent={Zoom}
-                                title={passErrorMsg}
-                                open={!isMobile && hasPassError}
-                            >
-                                <TextField
-                                    id='password'
-                                    type='password'
-                                    label={`${pageType === CHANGEPASSWORD ? 'New ' : ''}Password`}
-                                    placeholder='Minimum Length 6'
-                                    variant="filled"
-                                    onBlur={passBlurHandler}
-                                    onChange={passChangeHandler}
-                                    value={password}
-                                    sx={hasPassError ? {
-                                        backgroundColor: '#fddddd',
-                                    } : {}}
-                                />
-                            </Tooltip>
-                            {isMobile && hasPassError &&
-                                <div className={classes.validError}>
-                                    {passErrorMsg}
-                                </div>
-                            }
-                        </div>
+                        <CustomPasswordInput
+                            emailUnameSelection={emailUnameSelection}
+                            pageType={pageType}
+                            isMobile={isMobile}
+                            tooltipPlacement={tooltipPlacement}
+                            errorMsg={passErrorMsg}
+                            hasError={hasPassError}
+                            id='password'
+                            value={password}
+                            changeHandler={passChangeHandler}
+                            blurHandler={passBlurHandler}
+                            label={`${pageType === CHANGEPASSWORD ? 'New ' : ''}Password`}
+                            placeholder='Minimum Length 6'
+                            transitionComponent={Zoom}
+                            sx={hasPassError ? {
+                                backgroundColor: '#fddddd',
+                            } : {}}
+                        />
 
                         {(pageType === REGISTER || pageType === CHANGEPASSWORD) &&
-                            <div className='form-group mt-3'>
-                                <Tooltip
-                                    arrow
-                                    placement={tooltipPlacement}
-                                    TransitionComponent={Zoom}
-                                    title={passVerErrorMsg}
-                                    open={!isMobile && hasPassVerError}
-                                >
-                                    <TextField
-                                        id='passwordVerify'
-                                        type='password'
-                                        label={`Re-Enter ${pageType === CHANGEPASSWORD ? 'New ' : ''}Password`}
-                                        placeholder={`Same as ${pageType === CHANGEPASSWORD ? 'New ' : ''}Password`}
-                                        variant="filled"
-                                        onBlur={passVerBlurHandler}
-                                        onChange={passVerChangeHandler}
-                                        value={passwordVer}
-                                        sx={hasPassVerError ? {
-                                            backgroundColor: '#fddddd',
-                                        } : {}}
-                                    />
-                                </Tooltip>
-                                {isMobile && hasPassVerError &&
-                                    <div className={classes.validError}>
-                                        {passVerErrorMsg}
-                                    </div>
-                                }
-                            </div>
+                            <CustomPasswordInput
+                                emailUnameSelection={emailUnameSelection}
+                                pageType={pageType}
+                                isMobile={isMobile}
+                                tooltipPlacement={tooltipPlacement}
+                                errorMsg={passVerErrorMsg}
+                                hasError={hasPassVerError}
+                                id='passwordVerify'
+                                value={passwordVer}
+                                changeHandler={passVerChangeHandler}
+                                blurHandler={passVerBlurHandler}
+                                label='Re-Enter Password'
+                                placeholder={`Same as ${pageType === CHANGEPASSWORD ? 'New ' : ''}Password`}
+                                transitionComponent={Zoom}
+                                sx={hasPassVerError ? {
+                                    backgroundColor: '#fddddd',
+                                } : {}}
+                            />
                         }
 
                         <div className="d-grid gap-2 mt-4 mb-3">
@@ -405,6 +376,65 @@ const Customform = props => {
             </div >
         </Fragment>
     )
+}
+
+const CustomPasswordInput = ({ emailUnameSelection, pageType, isMobile, tooltipPlacement, errorMsg, hasError, id, value, changeHandler, label, placeholder, sx, transitionComponent, blurHandler }) => {
+
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleClickShowPassword = () => {
+        setShowPassword(prev => !prev);
+    };
+
+    const handleMouseDownPassword = (event) => {
+        event.preventDefault();
+    };
+
+    useEffect(() => {
+        setShowPassword(false);
+    }, [pageType, emailUnameSelection]);
+
+    return (
+        <div className='form-group mt-3'>
+            <Tooltip
+                arrow
+                placement={tooltipPlacement}
+                TransitionComponent={transitionComponent}
+                title={errorMsg}
+                open={!isMobile && hasError}
+            >
+                <FormControl sx={{ width: '25ch' }} variant="filled">
+                    <InputLabel htmlFor={id}>{label}</InputLabel>
+                    <FilledInput
+                        id={id}
+                        type={showPassword ? 'text' : 'password'}
+                        value={value}
+                        onChange={changeHandler}
+                        onBlur={blurHandler}
+                        placeholder={placeholder}
+                        sx={sx ? sx : {}}
+                        endAdornment={
+                            <InputAdornment position="end">
+                                <IconButton
+                                    aria-label="toggle password visibility"
+                                    onClick={handleClickShowPassword}
+                                    onMouseDown={handleMouseDownPassword}
+                                    edge="end"
+                                >
+                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                </IconButton>
+                            </InputAdornment>
+                        }
+                    />
+                </FormControl>
+            </Tooltip>
+            {isMobile && hasError &&
+                <div className={classes.validError}>
+                    {errorMsg}
+                </div>
+            }
+        </div>
+    );
 }
 
 export default Customform;
