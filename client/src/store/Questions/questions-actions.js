@@ -38,32 +38,3 @@ export const fetchQuestionListData = () => {
         }
     };
 };
-
-export const sendQuestionListData = (question) => {
-    return async dispatch => {
-        const sendRequest = async () => {
-            const response = await fetch(
-                `${SERVER_LINK}/api/explore/problems`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    method: 'PUT',
-                    body: JSON.stringify({
-                        items: question.items,
-                    }),
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error('Sending question data failed.');
-            }
-        };
-
-        try {
-            await sendRequest();
-        } catch (error) {
-            console.error(error);
-        }
-    };
-};

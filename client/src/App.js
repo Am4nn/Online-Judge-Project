@@ -9,7 +9,7 @@ import ScrollToTop from './compenents/ScrollToTop/ScrollToTop';
 import LoadingSpinner from './compenents/LoadingSpinner/LoadingSpinner';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchQuestionListData, sendQuestionListData } from './store/Questions/questions-actions';
+import { fetchQuestionListData } from './store/Questions/questions-actions';
 import { getLoggedIn } from './store/Auth/auth-actions'
 import Message from './compenents/Message/Message';
 
@@ -30,42 +30,21 @@ const Customform = React.lazy(() => import('./compenents/Customform/Customform')
 
 
 export const LOGIN = 'login', REGISTER = 'register', CHANGEPASSWORD = 'changePassword';
-let isInitial = true;
 
 const App = () => {
 
     const dispatch = useDispatch();
-    const problems = useSelector(state => state.questions);
-
     const loginState = useSelector(state => state.auth);
 
     useEffect(() => {
         dispatch(getLoggedIn());
-    }, [dispatch]);
-
-    useEffect(() => {
         dispatch(fetchQuestionListData());
-    }, [dispatch]);
-
-    useEffect(() => {
         dispatch(messageActions.set({
             type: 'info',
             message: 'Welcome to website !',
             description: 'This website is to solve coding questions and check against testcases'
         }))
     }, [dispatch]);
-
-    useEffect(() => {
-        if (isInitial) {
-            isInitial = false;
-            return;
-        }
-
-        if (problems.changedQuestions) {
-            dispatch(sendQuestionListData(problems));
-        }
-    }, [problems, dispatch]);
-
 
     return (
         <BrowserRouter>

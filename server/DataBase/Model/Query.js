@@ -14,6 +14,9 @@ const QuerySchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    codeId: {
+        type: String
+    },
     quesName: {
         type: String,
         required: true

@@ -4,7 +4,6 @@ const questionsSlice = createSlice({
     name: 'questions',
     initialState: {
         questions: [],
-        changedQuestions: false,
         isLoading: true,
     },
     reducers: {

@@ -4,11 +4,14 @@ const Queue = require('bull');
 const Query = require('../DataBase/Model/Query');
 const Question = require('../DataBase/Model/Question');
 const User = require('../DataBase/Model/User');
+const Code = require('../DataBase/Model/Code');
 const { isGuest } = require('../DataBase/database');
 
 const {
     execPyCode,
-    execCppCode
+    execCppCode,
+    deleteFile,
+    readFile
 } = require('./codeExecutor_dockerv');
 
 const queryQueue = new Queue('query-queue');
@@ -20,6 +23,11 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
     try {
         query = await Query.findById(queryId);
         if (!query) throw Error("Query not found");
+
+        // create an entry in code database
+        const code = new Code({ code: (readFile(query.filepath).toString()), language: query.language });
+        await code.save();
+        query.codeId = code._id;
 
         query.startTime = new Date();
         let response;
@@ -59,11 +67,14 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
             console.error('Error without msg in bull.process', error);
             error = { ...error, msg: 'some server side errors' };
         }
-
-        query.completeTime = new Date();
-        query.status = 'error';
-        query.output = error;
-        await query.save();
+        if (query) {
+            query.completeTime = new Date();
+            query.status = 'error';
+            query.output = error;
+            await query.save();
+        } else console.log('Error in queryQueue: ', error);
+    } finally {
+        if (query && query.filepath) deleteFile(query.filepath);
     }
     return true;
 })

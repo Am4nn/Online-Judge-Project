@@ -120,39 +120,27 @@ const data = [
     },
 ]
 
-const connectDB = () => {
-    mongoose.connect(
-        'mongodb://localhost:27017/oj-server'
-    )
-        .then(() => {
-            console.log("Database Connected !!!");
-        })
-        .catch(error => {
-            console.error("Oh no MONGOOSE Error !!!");
-            console.error(error);
-        });
+const connectDB = async () => {
+    return mongoose.connect(process.env.DB_URL || 'mongodb://localhost:27017/oj-server');
 }
 
-connectDB();
-
-async function seedDB() {
+const seedDB = async () => {
     await Question.deleteMany({});
-
     data.forEach(async question => {
         const newQuestion = new Question({ ...question });
         await newQuestion.save();
     })
-    // const allQuestions = await Question.find({});
-    // console.log(...allQuestions);
 }
 
-
-seedDB().then(() => {
-    console.log('Seeded successfully !!!');
-    setTimeout(() => {
-        mongoose.connection.close();
-        console.log('Disconnected !!!');
-    }, 1000);
+connectDB().then(() => {
+    console.log("Database Connected Successfully !");
+    seedDB().then(() => {
+        console.log('Seeded successfully !');
+        setTimeout(() => {
+            mongoose.connection.close();
+            console.log('Disconnected !');
+        }, 1000);
+    })
 }).catch(err => {
     console.error('Here comes error : \n', err);
 });

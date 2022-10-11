@@ -42,15 +42,14 @@ const readFile = filepath => {
     return fs.readFileSync(filepath);
 }
 
-// update it !
 const deleteFile = filepath => {
-
+    const filename = filepath;
     if (!filepath.includes("\\") && !filepath.includes("/"))
         filepath = path.join(codeDirectory, filepath);
 
     if (!fs.existsSync(filepath)) return;
     fs.unlinkSync(filepath);
-    console.log('unlinked : ', filepath);
+    console.log('Unlinked :', filename);
 }
 
 const execCppCode = (filePath, testcase) => {

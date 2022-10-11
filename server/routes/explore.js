@@ -15,6 +15,6 @@ router.get('/problems/:id', detailedProblemController);
 router.post('/problems/:id', verdictController);
 router.get('/status/:queryId', statusController);
 router.get('/leaderboard', leaderboardController);
-router.post('/getcode', codesController);
+router.get('/getcode/:codeId', codesController);
 
 module.exports = router;

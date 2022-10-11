@@ -22,22 +22,20 @@ const Codes = () => {
     const [searchParams] = useSearchParams();
     const dispatch = useDispatch();
 
-    let filepath = null, language = null;
-    if (searchParams.get('filepath') && searchParams.get('language')) {
-        filepath = searchParams.get('filepath');
-        language = searchParams.get('language');
+    let codeId = null;
+    if (searchParams.get('codeId')) {
+        codeId = searchParams.get('codeId');
     }
 
     useEffect(() => {
-        if (!filepath) return;
+        if (!codeId) return;
         fetch(
-            `${SERVER_LINK}/api/explore/getcode`,
+            `${SERVER_LINK}/api/explore/getcode/${codeId}`,
             {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                method: 'POST',
-                body: JSON.stringify({ filepath })
+                method: 'GET'
             }
         )
             .then(res => res.json())
@@ -46,7 +44,7 @@ const Codes = () => {
                 error: `server side error, check your network
 ${error}`
             }))
-    }, [filepath])
+    }, [codeId]);
 
     const [copied, setCopied] = useState(false);
 
@@ -64,11 +62,10 @@ ${error}`
 
     return (
         <Fragment>
-
-            {!filepath && <div className='errorTemplate'><span>Error : </span>You should come to this page by clicking button on leader board / or might be possible that code for this query was never written/saved.</div>}
+            {!codeId && <div className='errorTemplate'><span>Error : </span>Might be possible that code for this query was never written/saved.</div>}
             {response.error && <div className='errorTemplate'><span>Error : </span>{response.error}</div>}
 
-            {filepath && !response.error && (
+            {codeId && !response.error && (
                 <div className={classes.container}>
                     <div className={classes.contain}>
                         <div className={classes.back}>
@@ -103,7 +100,7 @@ ${error}`
                         <CodeEditorv3
                             code={response.code}
                             setCode={null}
-                            language={language}
+                            language={response.language}
                             fontSize={codeFontSize}
                             isReadOnly={true}
                         />

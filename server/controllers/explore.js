@@ -14,10 +14,10 @@ const { addQueryToQueue } = require('../CodeExecuter/queryQueue');
 const User = require('../DataBase/Model/User');
 
 const {
-    readFile,
     createFile
 } = require('../CodeExecuter/codeExecutor_dockerv');
 const { dateTimeNowFormated } = require('../utils');
+const Code = require('../DataBase/Model/Code');
 
 // ObjectID Validator function
 function isValidObjectId(id) {
@@ -119,12 +119,12 @@ const leaderboardController = async (req, res) => {
 }
 
 const codesController = async (req, res) => {
-    console.log('POST /api/explore/getcode getCodeOfAQuery', dateTimeNowFormated());
+    console.log('GET /api/explore/getcode/:codeId getCodeOfAQuery', dateTimeNowFormated());
     try {
-        let { filepath } = req.body;
-        const code = readFile(filepath);
-        if (!code) return res.status(404).json({ error: 'filename does not exists or is deleted !' });
-        res.status(200).json({ code: code.toString() });
+        const codeId = req.params.codeId;
+        const code = await Code.findById(codeId);
+        if (!code) return res.status(404).json({ error: 'filename does not exists / yet exists or is deleted !' });
+        res.status(200).json({ code: code.code, language: code.language });
     } catch (error) {
         res.status(400).json({ error: JSON.stringify(error) });
     }

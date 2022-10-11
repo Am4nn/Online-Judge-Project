@@ -62,7 +62,7 @@ const columns = [
 ];
 
 const createData = leaders => {
-    let { quesName, status, language, submitTime, completeTime, startTime, quesId, output, filepath, username } = leaders;
+    let { quesName, status, language, submitTime, completeTime, startTime, quesId, output, username, codeId } = leaders;
 
     // if some of data is missing then fix them with some default values
     (quesName === undefined || quesName === null) && (quesName = 'Binary Search');
@@ -73,9 +73,7 @@ const createData = leaders => {
     submitTime = moment(submitTime).fromNow();
     status === 'pending' ? (status = 'Pending') : (status === 'success' ? (status = 'Accepted') : (status = 'Rejected'));
 
-    filepath = (filepath.split("\\").pop());
-
-    return { quesName, status, language, time, submitTime, quesId, msg: ((!output || !output.msg) ? 'NA' : output.msg), filepath, username };
+    return { quesName, status, language, time, submitTime, quesId, msg: ((!output || !output.msg) ? 'NA' : output.msg), username, codeId };
 }
 
 const LeaderTable = props => {
@@ -138,9 +136,7 @@ const LeaderTable = props => {
                                                     {column.id === 'code' ? (
                                                         <Button
                                                             variant="contained"
-                                                            onClick={() => (
-                                                                NavigateFunction(`/codes/${row.quesId}?filepath=${row.filepath}&language=${row.language}`)
-                                                            )}
+                                                            onClick={() => NavigateFunction(`/codes/${row.quesId}${row.codeId ? ('?codeId=' + row.codeId) : ''}`)}
                                                         >
                                                             <CodeIcon />
                                                         </Button>
