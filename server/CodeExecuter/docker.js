@@ -23,6 +23,33 @@ const copyFiles = (filePath, containerId) => {
     });
 }
 
+/**
+ * @param {Array | String} filenames
+ * @param {String} containerId 
+ * @return {Promise}
+ */
+const deleteFilesDocker = (filenames, containerId) => {
+    const filesToBeDeleted = (Array.isArray(filenames) ? filenames.join(' ') : filenames);
+    return new Promise((resolve, reject) => {
+        exec(`docker exec ${containerId} rm ${filesToBeDeleted}`, (error, stdout, stderr) => {
+            error && reject({ msg: 'on error', error, stderr });
+            stderr && reject({ msg: 'on stderr', stderr });
+            resolve(filesToBeDeleted);
+        });
+    });
+}
+
+const compileCCode = (containerId, filename) => {
+    const id = filename.split(".")[0];
+    return new Promise((resolve, reject) => {
+        exec(`docker exec ${containerId} gcc ${id}.c -o ${id}.out -lpthread -lrt`, (error, stdout, stderr) => {
+            error && reject({ msg: 'on error', error, stderr });
+            stderr && reject({ msg: 'on stderr', stderr });
+            resolve(id);
+        });
+    });
+}
+
 const compileCppCode = (containerId, filename) => {
     const id = filename.split(".")[0];
     return new Promise((resolve, reject) => {
@@ -79,7 +106,9 @@ const execPyFile = (containerId, filename, testInput) => {
 module.exports = {
     createContainer,
     copyFiles,
+    compileCCode,
     compileCppCode,
     execOutFile,
-    execPyFile
+    execPyFile,
+    deleteFilesDocker
 };

@@ -6,7 +6,8 @@ const {
     problemsController,
     leaderboardController,
     detailedProblemController,
-    codesController
+    codesController,
+    codeExecutor
 } = require('../controllers/explore');
 
 // api/explore/
@@ -16,5 +17,6 @@ router.post('/problems/:id', verdictController);
 router.get('/status/:queryId', statusController);
 router.get('/leaderboard', leaderboardController);
 router.get('/getcode/:codeId', codesController);
+router.post('/codeExecutor', codeExecutor);
 
 module.exports = router;

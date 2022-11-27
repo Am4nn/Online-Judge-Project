@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 
 import classes from './App.module.css';
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -47,36 +47,33 @@ const App = () => {
     }, [dispatch]);
 
     return (
-        <BrowserRouter>
-            <div className={classes.App}>
-                <NavBar />
-                <Message />
-                <FooterFAB />
-                <ScrollToTop />
-                <div className={classes.routes}>
-                    <Suspense
-                        fallback={<div className='centered'><LoadingSpinner /></div>}>
-                        <Routes>
-                            {/* <Route exact path='/' element={<Home />} /> */}
-                            <Route exact path='/' element={<Navigate replace to='/questions' />} />
-                            <Route exact path='/questions' element={<QuestionList />} />
-                            <Route exact path='/questions/:id' element={<Question />} />
-                            <Route exact path='/leaderboard' element={<LeaderBoard />} />
-                            <Route exact path='/codes/:id' element={<Codes />} />
-                            <Route exact path='/login' element={!loginState.loggedIn ? <Customform pageType={LOGIN} /> : <Navigate replace to='/questions' />} />
-                            <Route exact path='/register' element={!loginState.loggedIn ? <Customform pageType={REGISTER} /> : <Navigate replace to='/questions' />} />
-                            <Route exact path='/changePassword' element={<Customform pageType={CHANGEPASSWORD} />} />
-                            <Route exact path='/dashboard' element={loginState.loggedIn ? <DashBoard /> : <Navigate replace to='/questions' />} />
-                            <Route exact path='/account' element={<Account />} />
-                            <Route exact path='/notes' element={<Notes />} />
-                            <Route exact path='/linkShortner' element={<LinkShortner />} />
-                            <Route exact path='*' element={<NotFound />} />
-                            {/* <Route exact path='*' element={<Navigate replace to='/questions' />} /> */}
-                        </Routes>
-                    </Suspense>
-                </div>
+        <div className={classes.App}>
+            <NavBar />
+            <Message />
+            <FooterFAB />
+            <ScrollToTop />
+            <div className={classes.routes}>
+                <Suspense
+                    fallback={<div className='centered'><LoadingSpinner /></div>}>
+                    <Routes>
+                        {/* <Route exact path='/' element={<Home />} /> */}
+                        <Route exact path='/' element={<Navigate replace to='/questions' />} />
+                        <Route exact path='/questions' element={<QuestionList />} />
+                        <Route exact path='/questions/:id' element={<Question />} />
+                        <Route exact path='/leaderboard' element={<LeaderBoard />} />
+                        <Route exact path='/codes/:id' element={<Codes />} />
+                        <Route exact path='/login' element={!loginState.loggedIn ? <Customform pageType={LOGIN} /> : <Navigate replace to='/questions' />} />
+                        <Route exact path='/register' element={!loginState.loggedIn ? <Customform pageType={REGISTER} /> : <Navigate replace to='/questions' />} />
+                        <Route exact path='/changePassword' element={<Customform pageType={CHANGEPASSWORD} />} />
+                        <Route exact path='/dashboard' element={loginState.loggedIn ? <DashBoard /> : <Navigate replace to='/questions' />} />
+                        <Route exact path='/account' element={<Account />} />
+                        <Route exact path='/notes' element={<Notes />} />
+                        <Route exact path='/linkShortner' element={<LinkShortner />} />
+                        <Route exact path='*' element={<NotFound />} />
+                    </Routes>
+                </Suspense>
             </div>
-        </BrowserRouter>
+        </div>
     );
 }
 

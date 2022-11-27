@@ -1,6 +1,7 @@
-if (process.env.NODE_ENV !== "production") { // if in development
+// if in development
+if (process.env.NODE_ENV !== "production") {
     require('dotenv').config(); // .env file var -> process.env
-}
+} else console.log("In Production !");
 
 const express = require('express');
 const app = express();
@@ -23,7 +24,6 @@ app.use(cors({
     credentials: true
 }));
 
-
 // api route to get questions and verdicts
 app.use('/api/explore', explore);
 
@@ -37,14 +37,10 @@ app.use('/api/user', user);
 // if (process.env.NODE_ENV === 'production') {
 // Set static folder
 app.use(express.static(path.join(__dirname, 'client/build')));
-
 app.get('*', (req, res) =>
     res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
 );
 // }
-
-// set handle error
-
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {

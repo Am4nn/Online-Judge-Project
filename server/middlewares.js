@@ -39,6 +39,11 @@ const loginValidator = async (req, res, next) => {
     }
 }
 
+/**
+* @param {Object} req
+* @param {Object} req.body
+* @param {String} req.body.username
+*/
 const registerValidator = async (req, res, next) => {
 
     let { name, username, email, password, passwordVerify } = req.body;
@@ -76,6 +81,12 @@ const registerValidator = async (req, res, next) => {
             return res.status(400).json({
                 error: "Please enter the same password twice.",
             });
+
+        if (username.toLowerCase().includes('aman')) {
+            return res.status(400).json({
+                error: "These Usernames (including 'aman') are reserved for Admin Only !"
+            });
+        }
 
         const existingUserE = await User.findOne({ email });
         if (existingUserE)

@@ -12,7 +12,7 @@ import SendIcon from '@mui/icons-material/Send';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { SERVER_LINK } from '../../dev-server-link';
-import { defaultCppCode, defaultPythonCode } from './defaultCodes/defaultCodes';
+import { defaultCCode, defaultCppCode, defaultPythonCode } from './defaultCodes/defaultCodes';
 import Options from './Options/Options';
 
 const Question = () => {
@@ -110,6 +110,9 @@ const Question = () => {
 
     const resetCode = () => {
         switch (selectedLang) {
+            case 'c':
+                setCode(defaultCCode);
+                break;
             case 'cpp':
                 setCode(defaultCppCode);
                 break;
@@ -217,12 +220,41 @@ const Question = () => {
                         {codeSubmittingState !== 'not-initialized' && (
                             <div className={classes.body}>
                                 <div style={{ "--col": (response.status === 'success' ? 127 : 0) }} className={classes.response}>
-                                    {response.msg && <div><span>Msg : </span>{response.msg}</div>}
-                                    {response.stdout && <div><span>STDOUT : </span>{response.stdout}</div>}
-                                    {response.stderr && <div><span>STDERR : </span>{response.stderr}</div>}
-                                    {response.error && <div><span>Error : </span>{JSON.stringify(response.error)}</div>}
-                                    {response.serverError && <div><span>serverError : </span>{response.serverError.toString()}</div>}
-                                    {response.status === 'pending' && <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}> <LoadingSpinner /> </div>}
+                                    {response.msg &&
+                                        <div className={classes.resTextHead}>
+                                            <div className={classes.resHead}>Msg: </div>
+                                            <div>{response.msg}</div>
+                                        </div>
+                                    }
+                                    {response.stdout &&
+                                        <div className={classes.resTextHead}>
+                                            <div className={classes.resHead}>STDOUT: </div>
+                                            <div>{response.stdout}</div>
+                                        </div>
+                                    }
+                                    {response.stderr &&
+                                        <div className={classes.resTextHead}>
+                                            <div className={classes.resHead}>STDERR: </div>
+                                            <div>{response.stderr}</div>
+                                        </div>
+                                    }
+                                    {response.error &&
+                                        <div className={classes.resTextHead}>
+                                            <div className={classes.resHead}>Error: </div>
+                                            <div>{JSON.stringify(response.error)}</div>
+                                        </div>
+                                    }
+                                    {response.serverError &&
+                                        <div className={classes.resTextHead}>
+                                            <div className={classes.resHead}>ServerError: </div>
+                                            <div>{response.serverError.toString()}</div>
+                                        </div>
+                                    }
+                                    {response.status === 'pending' &&
+                                        <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <LoadingSpinner />
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         )}

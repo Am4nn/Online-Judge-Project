@@ -197,8 +197,8 @@ const EditNote = ({ openModal, setOpenModal, editNote, isMobile, markEditOrDelet
 
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleSave}>Save</Button>
-                <Button onClick={handleClose}>Cancel</Button>
+                <Button style={{ textTransform: 'capitalize' }} variant='outlined' color='secondary' onClick={handleSave}>Save</Button>
+                <Button style={{ textTransform: 'capitalize' }} variant='outlined' onClick={handleClose}>Cancel</Button>
             </DialogActions>
         </Dialog >
     );

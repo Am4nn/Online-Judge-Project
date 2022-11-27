@@ -1,19 +1,24 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react';
-import { Box } from '@mui/system';
+import { useDispatch, useSelector } from 'react-redux';
 import {
     Button, DialogContentText,
-    Fab, Fade, IconButton,
-    Tooltip, Zoom, Dialog,
-    DialogActions, DialogContent, DialogTitle
+    Fab, Fade, IconButton, Tooltip,
+    Zoom, Dialog, DialogActions,
+    DialogContent, DialogTitle, TextField
 } from '@mui/material';
-import Note from '../Note/Note';
-import { useDispatch, useSelector } from 'react-redux';
-import CodeEditorv3 from '../../Question/Editor/CodeEditorv3';
-import { Check, ContentCopy, Delete, Edit, Share } from '@mui/icons-material';
-import copy from 'copy-to-clipboard';
-import { messageActions } from '../../../store/Message/message-slice';
-import { SERVER_LINK } from '../../../dev-server-link';
+import {
+    Check, ContentCopy,
+    Delete, Edit, Share
+} from '@mui/icons-material';
+import { Box } from '@mui/system';
 import moment from 'moment';
+import copy from 'copy-to-clipboard';
+import Note from '../Note/Note';
+import classes from './ViewNote.module.css';
+import { SERVER_LINK } from '../../../dev-server-link';
+import CodeEditorv3 from '../../Question/Editor/CodeEditorv3';
+import { messageActions } from '../../../store/Message/message-slice';
+import LoadingSpinner from './../../../compenents/LoadingSpinner/LoadingSpinner';
 
 const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditModal, isMobile, markEditOrDelete, setReloadNeeded, SlideTransition }) => {
 
@@ -85,7 +90,7 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
     }
 
     const handleEdit = () => {
-        setEditNote({ ...viewNote, code });
+        setEditNote({ ...viewNote, code, language });
         setOpenEditModal(true);
         setOpenModal(false);
     }
@@ -140,6 +145,82 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
         }
 
         dispatch(messageActions.set({ type, message, description }));
+    }
+
+    const [codeSubmittingState, setCodeSubmittingState] = useState('not-initialized');
+    const [response, setResponse] = useState({ status: 'pending' });
+    const [input, setInput] = useState('');
+    const endRef = useRef(null);
+
+    useEffect(() => {
+        setInput('');
+        setCodeSubmittingState('not-initialized');
+    }, [noteid]);
+
+    const handleCompile = async event => {
+
+        event.preventDefault();
+
+        if (codeSubmittingState === 'submitting') return;
+
+        console.log('submitting code');
+        setCodeSubmittingState('submitting');
+
+        try {
+            const query = await fetch(
+                `${SERVER_LINK}/api/explore/codeExecutor`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    method: 'POST',
+                    credentials: 'include',
+                    body: JSON.stringify({ code, language, input })
+                }
+            );
+            const queryData = await query.json();
+            setResponse(queryData);
+
+            if (query.ok) {
+                // console.info("response-ok", queryData);
+                const intervalID = setInterval(async () => {
+                    const response = await fetch(
+                        `${SERVER_LINK}/api/explore/status/${queryData.queryId}`,
+                        {
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            method: 'GET'
+                        }
+                    );
+                    const data = await response.json();
+                    if (!response.ok) {
+                        clearInterval(intervalID);
+                        setCodeSubmittingState('submitted');
+                        setResponse(data);
+                        // console.log("response-not-ok ", data);
+                    }
+                    else if (data.status !== 'pending') {
+                        clearInterval(intervalID);
+                        setCodeSubmittingState('submitted');
+                        setResponse({ ...data.output, status: data.status });
+                        // console.log(`status -> ${data.status}`, data);
+                    }
+                    // else console.log('status -> pending', data);
+                }, 1000);
+            }
+            else {
+                // console.log('response not ok ', queryData);
+                setCodeSubmittingState('submitted');
+            }
+
+            if (endRef.current)
+                endRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+        } catch (error) {
+            setResponse({ msg: 'caught errors while sending code to server for getting verdict', serverError: JSON.stringify(error) });
+            setCodeSubmittingState('submitted');
+        }
     }
 
     const isEditable = (isAdmin || (access !== 'private' && editable) || (!isGuest && (auth_username === username)));
@@ -222,6 +303,64 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
                         />
                     </Box>
 
+                    <TextField
+                        id="input-textarea"
+                        placeholder="Put Multiline Input here"
+                        label='Any Input ?'
+                        color='secondary'
+                        fullWidth
+                        multiline
+                        maxRows='3'
+                        variant='outlined'
+                        sx={{ marginTop: '2rem' }}
+                        value={input}
+                        onChange={event => setInput(event.target.value)}
+                    />
+                    {codeSubmittingState !== 'not-initialized' && (
+                        <Box>
+                            <div className={classes.body}>
+                                <div style={{ "--col": (response.status === 'success' ? 127 : 0) }} className={classes.response}>
+                                    {response.msg &&
+                                        <div className={classes.resTextHead}>
+                                            <div className={classes.resHead}>Msg: </div>
+                                            <div>{response.msg}</div>
+                                        </div>
+                                    }
+                                    {response.stdout &&
+                                        <div className={classes.resTextHead}>
+                                            <div className={classes.resHead}>STDOUT: </div>
+                                            <div>{response.stdout}</div>
+                                        </div>
+                                    }
+                                    {response.stderr &&
+                                        <div className={classes.resTextHead}>
+                                            <div className={classes.resHead}>STDERR: </div>
+                                            <div>{response.stderr}</div>
+                                        </div>
+                                    }
+                                    {response.error &&
+                                        <div className={classes.resTextHead}>
+                                            <div className={classes.resHead}>Error: </div>
+                                            <div>{JSON.stringify(response.error)}</div>
+                                        </div>
+                                    }
+                                    {response.serverError &&
+                                        <div className={classes.resTextHead}>
+                                            <div className={classes.resHead}>ServerError: </div>
+                                            <div>{response.serverError.toString()}</div>
+                                        </div>
+                                    }
+                                    {response.status === 'pending' &&
+                                        <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <LoadingSpinner />
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '12rem' }} ref={endRef} />
+                        </Box>
+                    )}
+
                 </DialogContent>
                 <DialogActions>
                     <div style={{ width: '100%', padding: '6px 8px', textTransform: 'capitalize' }}>
@@ -229,7 +368,8 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
                             Last Modified: {moment(lastModifiedAt).fromNow()}
                         </DialogContentText>
                     </div>
-                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button style={{ textTransform: 'capitalize' }} variant='outlined' color='secondary' onClick={handleCompile}>Compile</Button>
+                    <Button style={{ textTransform: 'capitalize' }} variant='outlined' onClick={handleClose}>Cancel</Button>
                 </DialogActions>
             </Dialog >
         </Fragment>

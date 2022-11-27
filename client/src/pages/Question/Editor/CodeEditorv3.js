@@ -18,6 +18,9 @@ const CodeEditorv3 = props => {
 
     let mode = 'c_cpp';
     switch (language) {
+        case 'c':
+            mode = 'c_cpp';
+            break;
         case 'cpp':
             mode = 'c_cpp';
             break;

@@ -2,32 +2,26 @@ const mongoose = require('mongoose');
 
 const QuerySchema = new mongoose.Schema({
     username: {
-        type: String,
-        required: true
+        type: String
     },
     language: {
         type: String,
-        required: true,
-        enum: ['cpp', 'py']
+        enum: ['c', 'cpp', 'py', 'java', 'js']
     },
     quesId: {
-        type: String,
-        required: true
+        type: String
     },
     codeId: {
         type: String
     },
     quesName: {
-        type: String,
-        required: true
+        type: String
     },
     filepath: {
-        type: String,
-        required: true
+        type: String
     },
     testcase: {
-        type: String,
-        required: true
+        type: String
     },
     submitTime: {
         type: Date,
@@ -58,6 +52,9 @@ const QuerySchema = new mongoose.Schema({
         type: String,
         default: 'pending',
         enum: ['pending', 'success', 'error']
+    },
+    type: {
+        type: String
     }
 });
 

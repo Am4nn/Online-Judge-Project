@@ -1,0 +1,46 @@
+.body {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 2rem;
+    white-space: pre-line;
+}
+
+.response {
+    --col: 127;
+
+    padding: 2em;
+    width: 100%;
+    /* background-color: hsla(var(--col), 44%, 76%, 0.09); */
+    border: 1px solid hsla(var(--col), 44%, 76%, 0.5);
+    letter-spacing: 0.03em;
+    position: relative;
+    text-align: justify;
+}
+
+.response::before {
+    background-color: white;
+    border: 1px solid hsla(var(--col), 44%, 76%, 0.5);
+    font-size: 1.5em;
+    content: "Verdict";
+    position: absolute;
+    top: -1em;
+    left: 1em;
+    padding: 0 1rem;
+    font-weight: 600;
+}
+
+.response .resHead {
+    font-weight: 600;
+    margin-right: 1em;
+}
+
+.response .resTextHead {
+    display: flex;
+    padding: 0.4em;
+    border-bottom: 1px solid rgba(70, 70, 70, 0.1);
+}
+
+.response :last-child {
+    border-bottom: unset;
+}

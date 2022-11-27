@@ -9,15 +9,16 @@ const {
 
 const jwt = require('jsonwebtoken');
 
-const { addQueryToQueue } = require('../CodeExecuter/queryQueue');
+const { addQueryToQueue, addQueryToQueue_Exec } = require('../CodeExecuter/queryQueue');
 
 const User = require('../DataBase/Model/User');
 
 const {
-    createFile
+    createFile, execCode
 } = require('../CodeExecuter/codeExecutor_dockerv');
 const { dateTimeNowFormated } = require('../utils');
 const Code = require('../DataBase/Model/Code');
+const Query = require('../DataBase/Model/Query');
 
 // ObjectID Validator function
 function isValidObjectId(id) {
@@ -50,13 +51,15 @@ const detailedProblemController = async (req, res) => {
     }
 }
 
+const validLanguages = ['c', 'cpp', 'py'];
+
 const verdictController = async (req, res) => {
     console.log('POST /api/explore/problems/:id sentCodeForVerdict', dateTimeNowFormated());
     try {
         const { language, code, testcase, quesName } = req.body;
         const quesId = req.params.id;
 
-        if (language !== 'py' && language !== 'cpp')
+        if (!validLanguages.includes(language))
             return res.status(400).json({ msg: 'Please select a language / valid language !' });
 
         let username = 'guest';
@@ -103,6 +106,8 @@ const statusController = async (req, res) => {
             return res.status(404).json({ msg: 'invalid queryId or this query has been deleted !' });
         }
         res.status(200).json(query);
+        if (query.type === 'exec' && (query.status === 'success' || query.status === 'error'))
+            await Query.findByIdAndDelete(queryId);
     } catch (err) {
         res.status(400).json({ msg: 'on error', error: JSON.stringify(err) });
     }
@@ -130,11 +135,33 @@ const codesController = async (req, res) => {
     }
 }
 
+const codeExecutor = async (req, res) => {
+    try {
+        const { language, code, input } = req.body;
+
+        if (!validLanguages.includes(language))
+            return res.status(400).json({ msg: 'Please select a language / valid language !' });
+
+        const { filename, filepath } = createFile(language, code);
+        const query = new Query({ type: 'exec' });
+        await query.save();
+
+        const queryId = query['_id'];
+        addQueryToQueue_Exec(filepath, language, input, queryId);
+
+        res.status(201).json({ status: 'pending', msg: "Request queued, wait for response !", queryId });
+    } catch (error) {
+        console.error(err, dateTimeNowFormated());
+        return res.status(400).json({ status: 'error', msg: 'some error occured submitting the code !', error: JSON.stringify(err) });
+    }
+}
+
 module.exports = {
     codesController,
     statusController,
     verdictController,
     problemsController,
     leaderboardController,
-    detailedProblemController
+    detailedProblemController,
+    codeExecutor
 };

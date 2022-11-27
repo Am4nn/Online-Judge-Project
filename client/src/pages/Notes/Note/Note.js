@@ -26,12 +26,12 @@ const Note = ({ note, setOpenViewModal, setViewNote, refreshNotesList }) => {
                         <span style={{
                             zIndex: 100, position: 'relative',
                             color: 'blue', textDecoration: 'underline',
-                            fontWeight: 500, cursor: 'pointer'
+                            fontWeight: 500, cursor: 'pointer', marginRight: '3px'
                         }}
                             onClick={refreshNotesList} >
                             Refresh
                         </span>
-                        &nbsp;this page to see changes !
+                        this page to see changes !
                     </div>
                 </Fragment>
                 :

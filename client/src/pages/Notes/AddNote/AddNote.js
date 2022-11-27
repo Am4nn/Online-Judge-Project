@@ -192,8 +192,8 @@ const AddNote = ({ openModal, setOpenModal, isMobile, setReloadNeeded, SlideTran
 
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleAdd}>Add</Button>
-                <Button onClick={handleClose}>Cancel</Button>
+                <Button style={{ textTransform: 'capitalize' }} variant='outlined' color='secondary' onClick={handleAdd}>Add</Button>
+                <Button style={{ textTransform: 'capitalize' }} variant='outlined' onClick={handleClose}>Cancel</Button>
             </DialogActions>
         </Dialog >
     );
