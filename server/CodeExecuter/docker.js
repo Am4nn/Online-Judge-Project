@@ -6,8 +6,19 @@ const createContainer = image => {
     return new Promise((resolve, reject) => {
         exec(`docker run -i -d ${image}`, (error, stdout, stderr) => {
             (error || stderr) && reject({ msg: 'on docker error', error, stderr });
-            const containerId = stdout;
-            resolve(containerId.trim());
+            const containerId = stdout.trim();
+            console.log(`${image} container id : ${containerId}`)
+            resolve(containerId);
+        });
+    });
+}
+
+const stopContainer = containerId => {
+    return new Promise((resolve, reject) => {
+        exec(`docker stop ${containerId}`, (error, stdout, stderr) => {
+            (error || stderr) && reject({ msg: 'on docker error', error, stderr });
+            console.log(`Deleted container ${containerId}`);
+            resolve(stdout.trim());
         });
     });
 }
@@ -105,6 +116,7 @@ const execPyFile = (containerId, filename, testInput) => {
 
 module.exports = {
     createContainer,
+    stopContainer,
     copyFiles,
     compileCCode,
     compileCppCode,

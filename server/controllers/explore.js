@@ -31,6 +31,7 @@ const problemsController = async (req, res) => {
         const questions = await getQuestionList();
         return res.status(200).json(questions);
     } catch (error) {
+        console.error(error, dateTimeNowFormated());
         return res.status(400).json(error);
     }
 }
@@ -47,6 +48,7 @@ const detailedProblemController = async (req, res) => {
             return res.status(404).json('id does not exists');
         return res.status(200).json(question);
     } catch (error) {
+        console.error(error, dateTimeNowFormated());
         return res.status(400).json(error);
     }
 }
@@ -88,9 +90,9 @@ const verdictController = async (req, res) => {
         await question.save();
 
         res.status(201).json({ status: 'pending', msg: "Request queued, wait for response !", queryId });
-    } catch (err) {
-        console.error(err, dateTimeNowFormated());
-        return res.status(400).json({ status: 'error', msg: 'some error occured submitting the code !', error: JSON.stringify(err) });
+    } catch (error) {
+        console.error(error, dateTimeNowFormated());
+        return res.status(400).json({ status: 'error', msg: 'some error occured submitting the code !', error: JSON.stringify(error) });
     }
 }
 
@@ -108,8 +110,9 @@ const statusController = async (req, res) => {
         res.status(200).json(query);
         if (query.type === 'exec' && (query.status === 'success' || query.status === 'error'))
             await Query.findByIdAndDelete(queryId);
-    } catch (err) {
-        res.status(400).json({ msg: 'on error', error: JSON.stringify(err) });
+    } catch (error) {
+        console.error(error, dateTimeNowFormated());
+        res.status(400).json({ msg: 'on error', error: JSON.stringify(error) });
     }
 }
 
@@ -119,6 +122,7 @@ const leaderboardController = async (req, res) => {
         const leaders = await getAllQueriesReverseSorted();
         return res.status(200).json(leaders);
     } catch (error) {
+        console.error(error, dateTimeNowFormated());
         return res.status(400).json(error);
     }
 }
@@ -131,11 +135,13 @@ const codesController = async (req, res) => {
         if (!code) return res.status(404).json({ error: 'filename does not exists / yet exists or is deleted !' });
         res.status(200).json({ code: code.code, language: code.language });
     } catch (error) {
+        console.error(error, dateTimeNowFormated());
         res.status(400).json({ error: JSON.stringify(error) });
     }
 }
 
 const codeExecutor = async (req, res) => {
+    console.log('POST /api/explore/codeExecutor', dateTimeNowFormated());
     try {
         const { language, code, input } = req.body;
 
@@ -151,7 +157,7 @@ const codeExecutor = async (req, res) => {
 
         res.status(201).json({ status: 'pending', msg: "Request queued, wait for response !", queryId });
     } catch (error) {
-        console.error(err, dateTimeNowFormated());
+        console.error(error, dateTimeNowFormated());
         return res.status(400).json({ status: 'error', msg: 'some error occured submitting the code !', error: JSON.stringify(err) });
     }
 }

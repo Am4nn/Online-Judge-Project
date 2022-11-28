@@ -80,6 +80,8 @@ const addNote = async (req, res) => {
         const note = new Note({ title, desc, username, access, editable, codeid: newcode._id });
         await note.save();
 
+        console.log('Add Note :', title);
+
         res.status(200).json(`Server : Note added to database, Note_id = ${note._id}`);
     } catch (err) {
         console.error(err, dateTimeNowFormated());
@@ -105,7 +107,7 @@ const editNote = async (req, res) => {
         if ((isGuest(username)) || (!isAdmin(username) && access === 'global')) access = 'public';
 
         const note = await Note.findById(noteid);
-        console.log("note: ", note.title);
+        console.log("Edit Note :", note.title);
 
         const isEditable = (isAdmin(username) || (note.access !== 'private' && note.editable) || (!isGuest(username) && (username === note.username)));
         if (!isEditable) return res.status(400).json("Unauthorized: You can't edit this note !");
@@ -158,7 +160,7 @@ const deleteNote = async (req, res) => {
                 return res.status(401).json("Unauthorized: private note can only be accessed by user who owns this note");
         }
 
-        console.log("note: ", note.title);
+        console.log("Delete Note :", note.title);
 
         await Note.deleteOne({ _id: noteid });
         await Code.deleteOne({ _id: codeid });
@@ -173,7 +175,7 @@ const deleteNote = async (req, res) => {
 
 const logFromClient = (req, res) => {
     try {
-        console.log("GET /api/notes/log", dateTimeNowFormated());
+        console.log("POST /api/notes/log", dateTimeNowFormated());
         console.log("Username:", req.username);
         console.log("LOG:", req.body.msg);
         res.status(200).json('logged');

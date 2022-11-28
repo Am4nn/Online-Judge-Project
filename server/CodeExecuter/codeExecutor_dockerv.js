@@ -9,12 +9,16 @@ const {
 } = require('./docker');
 
 let gccContainerId = null, pythonContainerId = null;
-createContainer('gcc')
-    .then(data => { gccContainerId = data; console.log(`gcc container id : ${data}`) })
-    .catch(error => { console.error('GCC Docker Error : ', error) });
-createContainer('python')
-    .then(data => { pythonContainerId = data; console.log(`python container id : ${data}`) })
-    .catch(error => { console.error('PYTHON Docker Error : ', error) });
+const initDockerGcc = () => {
+    createContainer('gcc')
+        .then(data => (gccContainerId = data))
+        .catch(error => { console.error('GCC Docker Error : ', error) });
+}
+const initDockerPython = () => {
+    createContainer('python')
+        .then(data => (pythonContainerId = data))
+        .catch(error => { console.error('PYTHON Docker Error : ', error) });
+}
 
 const fs = require("fs");
 const path = require("path");
@@ -45,13 +49,12 @@ const readFile = filepath => {
 }
 
 const deleteFile = filepath => {
-    const filename = filepath;
     if (!filepath.includes("\\") && !filepath.includes("/"))
         filepath = path.join(codeDirectory, filepath);
 
     if (!fs.existsSync(filepath)) return;
     fs.unlinkSync(filepath);
-    console.log('Unlinked :', filename);
+    console.log('Unlinked :', path.basename(filepath));
 }
 
 const details = {
@@ -241,6 +244,6 @@ module.exports = {
     deleteFile,
     execCode,
     execCodeAgainstTestcases,
-    // execPyCode,
-    // execCppCode
+    initDockerGcc,
+    initDockerPython
 };

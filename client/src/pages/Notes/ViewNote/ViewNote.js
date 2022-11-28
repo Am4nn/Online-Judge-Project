@@ -163,8 +163,13 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
 
         if (codeSubmittingState === 'submitting') return;
 
-        console.log('submitting code');
         setCodeSubmittingState('submitting');
+        setResponse({ msg: 'Queueing...', status: 'pending' });
+
+        if (endRef.current) {
+            // console.log('endRef', endRef);
+            endRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
 
         try {
             const query = await fetch(
@@ -182,8 +187,7 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
             setResponse(queryData);
 
             if (query.ok) {
-                // console.info("response-ok", queryData);
-                const intervalID = setInterval(async () => {
+                let intervalID = setInterval(async () => {
                     const response = await fetch(
                         `${SERVER_LINK}/api/explore/status/${queryData.queryId}`,
                         {
@@ -194,29 +198,24 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
                         }
                     );
                     const data = await response.json();
-                    if (!response.ok) {
+                    if (!response.ok && intervalID) {
                         clearInterval(intervalID);
+                        intervalID = null;
                         setCodeSubmittingState('submitted');
                         setResponse(data);
-                        // console.log("response-not-ok ", data);
                     }
-                    else if (data.status !== 'pending') {
+                    else if (data.status !== 'pending' && intervalID) {
                         clearInterval(intervalID);
+                        intervalID = null;
                         setCodeSubmittingState('submitted');
                         setResponse({ ...data.output, status: data.status });
-                        // console.log(`status -> ${data.status}`, data);
                     }
-                    // else console.log('status -> pending', data);
+                    // else console.log('status -> pending');
                 }, 1000);
             }
             else {
-                // console.log('response not ok ', queryData);
                 setCodeSubmittingState('submitted');
             }
-
-            if (endRef.current)
-                endRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-
         } catch (error) {
             setResponse({ msg: 'caught errors while sending code to server for getting verdict', serverError: JSON.stringify(error) });
             setCodeSubmittingState('submitted');
@@ -317,49 +316,47 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
                         onChange={event => setInput(event.target.value)}
                     />
                     {codeSubmittingState !== 'not-initialized' && (
-                        <Box>
-                            <div className={classes.body}>
-                                <div style={{ "--col": (response.status === 'success' ? 127 : 0) }} className={classes.response}>
-                                    {response.msg &&
-                                        <div className={classes.resTextHead}>
-                                            <div className={classes.resHead}>Msg: </div>
-                                            <div>{response.msg}</div>
-                                        </div>
-                                    }
-                                    {response.stdout &&
-                                        <div className={classes.resTextHead}>
-                                            <div className={classes.resHead}>STDOUT: </div>
-                                            <div>{response.stdout}</div>
-                                        </div>
-                                    }
-                                    {response.stderr &&
-                                        <div className={classes.resTextHead}>
-                                            <div className={classes.resHead}>STDERR: </div>
-                                            <div>{response.stderr}</div>
-                                        </div>
-                                    }
-                                    {response.error &&
-                                        <div className={classes.resTextHead}>
-                                            <div className={classes.resHead}>Error: </div>
-                                            <div>{JSON.stringify(response.error)}</div>
-                                        </div>
-                                    }
-                                    {response.serverError &&
-                                        <div className={classes.resTextHead}>
-                                            <div className={classes.resHead}>ServerError: </div>
-                                            <div>{response.serverError.toString()}</div>
-                                        </div>
-                                    }
-                                    {response.status === 'pending' &&
-                                        <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                            <LoadingSpinner />
-                                        </div>
-                                    }
-                                </div>
+                        <Box className={classes.body}>
+                            <div style={{ "--col": (response.status === 'success' ? 127 : 0) }} className={classes.response}>
+                                {response.msg &&
+                                    <div className={classes.resTextHead}>
+                                        <div className={classes.resHead}>Msg: </div>
+                                        <div>{response.msg}</div>
+                                    </div>
+                                }
+                                {response.stdout &&
+                                    <div className={classes.resTextHead}>
+                                        <div className={classes.resHead}>STDOUT: </div>
+                                        <div>{response.stdout}</div>
+                                    </div>
+                                }
+                                {response.stderr &&
+                                    <div className={classes.resTextHead}>
+                                        <div className={classes.resHead}>STDERR: </div>
+                                        <div>{response.stderr}</div>
+                                    </div>
+                                }
+                                {response.error &&
+                                    <div className={classes.resTextHead}>
+                                        <div className={classes.resHead}>Error: </div>
+                                        <div>{JSON.stringify(response.error)}</div>
+                                    </div>
+                                }
+                                {response.serverError &&
+                                    <div className={classes.resTextHead}>
+                                        <div className={classes.resHead}>ServerError: </div>
+                                        <div>{response.serverError.toString()}</div>
+                                    </div>
+                                }
+                                {response.status === 'pending' &&
+                                    <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <LoadingSpinner />
+                                    </div>
+                                }
                             </div>
-                            <div style={{ marginTop: '12rem' }} ref={endRef} />
                         </Box>
                     )}
+                    <div ref={endRef} style={{ marginTop: '18rem' }} />
 
                 </DialogContent>
                 <DialogActions>
