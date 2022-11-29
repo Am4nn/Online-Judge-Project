@@ -1,24 +1,15 @@
 const ObjectId = require('mongoose').Types.ObjectId;
-const {
-    getQueryById,
-    createNewQuery,
-    getQuestionList,
-    getQuestionById,
-    getAllQueriesReverseSorted
-} = require('../DataBase/database');
-
 const jwt = require('jsonwebtoken');
 
-const { addQueryToQueue, addQueryToQueue_Exec } = require('../CodeExecuter/queryQueue');
-
-const User = require('../DataBase/Model/User');
-
 const {
-    createFile, execCode
-} = require('../CodeExecuter/codeExecutor_dockerv');
+    getQueryById, createNewQuery,
+    getQuestionList, getQuestionById,
+    getAllQueriesReverseSorted,
+    deleteQueryById, getUserById, getCodeById
+} = require('../DataBase/database');
+const { addQueryToQueue, addQueryToQueue_Exec } = require('../CodeExecuter/queryQueue');
+const { createFile } = require('../CodeExecuter/codeExecutor_dockerv');
 const { dateTimeNowFormated } = require('../utils');
-const Code = require('../DataBase/Model/Code');
-const Query = require('../DataBase/Model/Query');
 
 // ObjectID Validator function
 function isValidObjectId(id) {
@@ -53,7 +44,7 @@ const detailedProblemController = async (req, res) => {
     }
 }
 
-const validLanguages = ['c', 'cpp', 'py'];
+const validLanguages = ['c', 'cpp', 'py', 'js', 'java'];
 
 const verdictController = async (req, res) => {
     console.log('POST /api/explore/problems/:id sentCodeForVerdict', dateTimeNowFormated());
@@ -70,7 +61,7 @@ const verdictController = async (req, res) => {
             if (token) {
                 const verified = jwt.verify(token, process.env.JWT_SECRET);
                 const userId = verified.user;
-                const user = await User.findById(userId);
+                const user = await getUserById(userId);
                 username = user.username;
                 user.totalSubmissions += 1;
                 await user.save();
@@ -109,7 +100,7 @@ const statusController = async (req, res) => {
         }
         res.status(200).json(query);
         if (query.type === 'exec' && (query.status === 'success' || query.status === 'error'))
-            await Query.findByIdAndDelete(queryId);
+            await deleteQueryById(queryId);
     } catch (error) {
         console.error(error, dateTimeNowFormated());
         res.status(400).json({ msg: 'on error', error: JSON.stringify(error) });
@@ -131,7 +122,7 @@ const codesController = async (req, res) => {
     console.log('GET /api/explore/getcode/:codeId getCodeOfAQuery', dateTimeNowFormated());
     try {
         const codeId = req.params.codeId;
-        const code = await Code.findById(codeId);
+        const code = await getCodeById(codeId);
         if (!code) return res.status(404).json({ error: 'filename does not exists / yet exists or is deleted !' });
         res.status(200).json({ code: code.code, language: code.language });
     } catch (error) {
@@ -146,19 +137,21 @@ const codeExecutor = async (req, res) => {
         const { language, code, input } = req.body;
 
         if (!validLanguages.includes(language))
-            return res.status(400).json({ msg: 'Please select a language / valid language !' });
+            return res.status(400).json({
+                msg: `Please select a language / valid language.
+Or may be this language is not yet supported !`
+            });
 
-        const { filename, filepath } = createFile(language, code);
-        const query = new Query({ type: 'exec' });
-        await query.save();
+        const { filepath } = createFile(language, code);
+        const query = await createNewQuery({ type: 'exec', filepath, language, input });
 
         const queryId = query['_id'];
-        addQueryToQueue_Exec(filepath, language, input, queryId);
+        addQueryToQueue_Exec(queryId);
 
         res.status(201).json({ status: 'pending', msg: "Request queued, wait for response !", queryId });
     } catch (error) {
         console.error(error, dateTimeNowFormated());
-        return res.status(400).json({ status: 'error', msg: 'some error occured submitting the code !', error: JSON.stringify(err) });
+        return res.status(400).json({ status: 'error', msg: 'some error occured submitting the code !', error: JSON.stringify(error) });
     }
 }
 

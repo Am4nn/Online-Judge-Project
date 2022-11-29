@@ -11,11 +11,13 @@ const Options = props => {
     const {
         favStyle,
         resetCode,
+        showCorrectCode,
         codeFontSize,
         selectedLang,
         codeEditable,
         setcodeFontSize,
-        setSelectedLang
+        setSelectedLang,
+        correctCodeAvailable
     } = props;
 
     const [drawerOpen, toggleDrawerOpen] = useState(false);
@@ -37,7 +39,7 @@ const Options = props => {
             <Drawer
                 anchor='right'
                 open={drawerOpen}
-                onClose={() => toggleDrawerOpen(prev => !prev)}
+                onClose={() => toggleDrawerOpen(false)}
             >
                 <div style={{ width: '15rem', margin: '1rem' }}>
                     <h1 className={classes.optionHeading} >Options</h1>
@@ -65,19 +67,26 @@ const Options = props => {
                                         <MenuItem value={'c'}>C</MenuItem>
                                         <MenuItem value={'cpp'}>Cpp</MenuItem>
                                         <MenuItem value={'py'}>Python</MenuItem>
-                                        {/* <MenuItem value={'java'}>JAVA</MenuItem> */}
-                                        {/* <MenuItem value={'js'}>JS</MenuItem> */}
+                                        <MenuItem value={'java'}>Java</MenuItem>
+                                        <MenuItem value={'js'}>Js</MenuItem>
                                     </Select>
                                 </FormControl>
                             </div>
 
                             <div className={classes.resetCode}>
-                                <Button color="error" onClick={resetCode} variant='contained' startIcon={
+                                <Button color="error" onClick={() => { resetCode(); toggleDrawerOpen(false); }} variant='contained' startIcon={
                                     <RestartAltIcon fontSize='large' style={{ marginRight: '0.5em', fontSize: '2em' }} />
                                 } style={{ textTransform: 'capitalize' }}>
                                     ResetCode
                                 </Button>
                             </div>
+                            {correctCodeAvailable &&
+                                <Button color="info" onClick={() => { showCorrectCode(); toggleDrawerOpen(false); }} variant='contained' startIcon={
+                                    <RestartAltIcon fontSize='large' style={{ marginRight: '0.5em', fontSize: '2em' }} />
+                                } style={{ textTransform: 'capitalize' }}>
+                                    ShowCorrectCode.<span style={{ textTransform: 'lowercase' }}>{selectedLang}</span>
+                                </Button>
+                            }
                         </Fragment>
                     }
                 </div>

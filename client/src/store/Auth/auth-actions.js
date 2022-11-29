@@ -16,7 +16,7 @@ export const getLoggedIn = () => {
                     credentials: 'include'
                 }
             ).then(data => data.json());
-            console.log(response);
+            // console.log(response);
             dispatch(authActions.setLoggedIn({
                 loggedIn: response.status || false,
                 ...response

@@ -1,16 +1,20 @@
-const ObjectId = require('mongoose').Types.ObjectId;
-const Note = require('../DataBase/Model/Note');
-const Code = require('../DataBase/Model/Code');
-const { isAdmin, isGuest } = require('../DataBase/database');
+const {
+    isAdmin, isGuest,
+    createNewCode, getCodeById,
+    deleteCodeById, getNoteByFilter,
+    getNoteById, createNewNote,
+    deleteNoteById
+} = require('../DataBase/database');
 const { dateTimeNowFormated } = require('../utils');
 
-// every req will have user (i.e. userID) and username due to authProvider middleware
-// if user is undefined that means user is not logged in and username will be guest
-
+const ObjectId = require('mongoose').Types.ObjectId;
 // ObjectID Validator function
 function isValidObjectId(id) {
     return (ObjectId.isValid(id) && ((String)(new ObjectId(id)) === id))
 }
+
+// every req will have user (i.e. userID) and username due to authProvider middleware
+// if user is undefined that means user is not logged in and username will be guest
 
 // gets all notes (global and public) but private notes only which belong to user
 const getAllNotes = async (req, res) => {
@@ -23,7 +27,7 @@ const getAllNotes = async (req, res) => {
                 { access: 'private', username: req.username }
             ]
         };
-        const notes = await Note.find(filter);
+        const notes = await getNoteByFilter(filter);
         res.status(200).json(notes);
     } catch (err) {
         console.error(err, dateTimeNowFormated());
@@ -40,8 +44,8 @@ const getNote = async (req, res) => {
         if (!isValidObjectId(codeid) || !isValidObjectId(noteid))
             return res.status(404).json('not a valid object id');
 
-        const code = await Code.findById(codeid);
-        const note = await Note.findById(noteid);
+        const code = await getCodeById(codeid);
+        const note = await getNoteById(noteid);
         console.log("note: ", note.title);
         if (!code)
             return res.status(404).json('id does not exists');
@@ -69,18 +73,16 @@ const addNote = async (req, res) => {
             return res.status(400).json("title, description and access are required so please fill all !!!");
         }
 
+        console.log('Add Note :', title);
+
         if ((isGuest(username)) || (!isAdmin(username) && access === 'global')) access = 'public';
 
         title = title.trim();
         desc = desc.trim();
         code = code.trim();
 
-        const newcode = new Code({ code, language, user });
-        await newcode.save();
-        const note = new Note({ title, desc, username, access, editable, codeid: newcode._id });
-        await note.save();
-
-        console.log('Add Note :', title);
+        const newcode = await createNewCode({ code, language, user });
+        const note = await createNewNote({ title, desc, username, access, editable, codeid: newcode._id });
 
         res.status(200).json(`Server : Note added to database, Note_id = ${note._id}`);
     } catch (err) {
@@ -104,15 +106,17 @@ const editNote = async (req, res) => {
             return res.status(400).json("title, description and access are required so please fill all !!!");
         }
 
-        if ((isGuest(username)) || (!isAdmin(username) && access === 'global')) access = 'public';
+        if ((isGuest(username)) || (!isAdmin(username) && access === 'global'))
+            access = 'public';
 
-        const note = await Note.findById(noteid);
+        const note = await getNoteById(noteid);
+
         console.log("Edit Note :", note.title);
 
         const isEditable = (isAdmin(username) || (note.access !== 'private' && note.editable) || (!isGuest(username) && (username === note.username)));
         if (!isEditable) return res.status(400).json("Unauthorized: You can't edit this note !");
 
-        const codeDB = await Code.findById(note.codeid);
+        const codeDB = await getCodeById(note.codeid);
 
         note.title = title.trim();
         note.desc = desc.trim();
@@ -143,7 +147,7 @@ const deleteNote = async (req, res) => {
         if (!isValidObjectId(noteid))
             return res.status(404).json('not a valid object id');
 
-        const note = await Note.findById(noteid);
+        const note = await getNoteById(noteid);
         if (!note)
             return res.status(404).json("This note is already deleted or D.N.E. !");
 
@@ -162,8 +166,8 @@ const deleteNote = async (req, res) => {
 
         console.log("Delete Note :", note.title);
 
-        await Note.deleteOne({ _id: noteid });
-        await Code.deleteOne({ _id: codeid });
+        await deleteNoteById(noteid);
+        await deleteCodeById(codeid);
 
         res.status(200).json(`Server : Note delete successfully from database permanently !, Note_id = ${noteid}`);
 

@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Button, DialogContentText,
@@ -155,7 +155,22 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
     useEffect(() => {
         setInput('');
         setCodeSubmittingState('not-initialized');
+        setResponse({ status: 'pending' });
     }, [noteid]);
+
+    const intervalID = useRef(null);
+    const stopInterval = useCallback(() => {
+        if (intervalID.current) {
+            clearInterval(intervalID.current);
+            intervalID.current = null;
+        }
+    }, []);
+
+    useEffect(() => {
+        if (intervalID.current)
+            setCodeSubmittingState('not-initialized');
+        stopInterval();
+    }, [openModal, stopInterval]);
 
     const handleCompile = async event => {
 
@@ -166,10 +181,8 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
         setCodeSubmittingState('submitting');
         setResponse({ msg: 'Queueing...', status: 'pending' });
 
-        if (endRef.current) {
-            // console.log('endRef', endRef);
+        if (endRef.current)
             endRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
 
         try {
             const query = await fetch(
@@ -187,7 +200,7 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
             setResponse(queryData);
 
             if (query.ok) {
-                let intervalID = setInterval(async () => {
+                intervalID.current = setInterval(async () => {
                     const response = await fetch(
                         `${SERVER_LINK}/api/explore/status/${queryData.queryId}`,
                         {
@@ -198,15 +211,13 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
                         }
                     );
                     const data = await response.json();
-                    if (!response.ok && intervalID) {
-                        clearInterval(intervalID);
-                        intervalID = null;
+                    if (intervalID.current && !response.ok) {
+                        stopInterval();
                         setCodeSubmittingState('submitted');
                         setResponse(data);
                     }
-                    else if (data.status !== 'pending' && intervalID) {
-                        clearInterval(intervalID);
-                        intervalID = null;
+                    else if (intervalID.current && data.status !== 'pending') {
+                        stopInterval();
                         setCodeSubmittingState('submitted');
                         setResponse({ ...data.output, status: data.status });
                     }

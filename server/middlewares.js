@@ -1,12 +1,12 @@
 const jwt = require("jsonwebtoken");
-const User = require('./DataBase/Model/User');
 const bcrypt = require('bcryptjs');
+const { findOneUser } = require('./DataBase/database');
 
 const loginValidatorHelper = async (req, res, next, credential, credentialName, password) => {
 
     let existingUser = undefined;
-    credentialName === 'email' && (existingUser = await User.findOne({ email: credential }));
-    credentialName === 'username' && (existingUser = await User.findOne({ username: credential }));
+    credentialName === 'email' && (existingUser = await findOneUser({ email: credential }));
+    credentialName === 'username' && (existingUser = await findOneUser({ username: credential }));
 
     if (!existingUser)
         return res.status(401).json({ error: `Wrong ${credentialName} or password.` });
@@ -88,13 +88,13 @@ const registerValidator = async (req, res, next) => {
             });
         }
 
-        const existingUserE = await User.findOne({ email });
+        const existingUserE = await findOneUser({ email });
         if (existingUserE)
             return res.status(400).json({
                 error: "An account with this email already exists.",
             });
 
-        const existingUserU = await User.findOne({ username });
+        const existingUserU = await findOneUser({ username });
         if (existingUserU)
             return res.status(400).json({
                 error: "An account with this username already exists.",

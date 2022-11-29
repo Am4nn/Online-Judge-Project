@@ -1,28 +1,48 @@
-const {
-    compileCCode,
-    compileCppCode,
-    copyFiles,
-    createContainer,
-    execOutFile,
-    execPyFile,
-    deleteFilesDocker
-} = require('./docker');
-
-let gccContainerId = null, pythonContainerId = null;
-const initDockerGcc = () => {
-    createContainer('gcc')
-        .then(data => (gccContainerId = data))
-        .catch(error => { console.error('GCC Docker Error : ', error) });
+// ####################################################################################
+const imageNames = ['gcc', 'python', 'node', 'openjdk'];
+const containerIds = {
+    'gcc': '',
+    'python': '',
+    'node': '',
+    'openjdk': ''
 }
-const initDockerPython = () => {
-    createContainer('python')
-        .then(data => (pythonContainerId = data))
-        .catch(error => { console.error('PYTHON Docker Error : ', error) });
+const containerNamePostfix = '-oj-container';
+const containerName = image => image + containerNamePostfix;
+const initDockerContainer = image => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // check and kill already running container
+            await killContainer(containerName(image));
+            // now create new container of image
+            const data = await createContainer({ name: containerName(image), image });
+            containerIds[image] = data;
+            resolve(`${image} Container Id : ${data}`);
+        } catch (error) {
+            reject(`${image} Docker Error : ${error}`)
+        }
+    });
 }
+const initAllDockerContainers = async () => {
+    try {
+        const res = await Promise.all(imageNames.map(image => initDockerContainer(image)));
+        console.log(res.join('\n'));
+        console.log("\nAll Containers Initialized");
+    } catch (error) {
+        console.error("Docker Error: ", error);
+    }
+}
+// ####################################################################################
 
 const fs = require("fs");
 const path = require("path");
 const { v4: uuid } = require("uuid");
+const {
+    compileCCode, compileCppCode,
+    copyFiles, createContainer,
+    execOutFile, execPyFile,
+    deleteFilesDocker, execJsFile,
+    compileJavaCode, execJavaClassFile, killContainer
+} = require('./docker');
 
 const codeDirectory = path.join(__dirname, "codeFiles");
 
@@ -60,29 +80,60 @@ const deleteFile = filepath => {
 const details = {
     'c': {
         compiler: compileCCode,
+        compiledExtension: 'out',
         executor: execOutFile,
-        inputFunction: null
+        inputFunction: null,
+        containerId: () => containerIds['gcc']
     },
     'cpp': {
         compiler: compileCppCode,
+        compiledExtension: 'out',
         executor: execOutFile,
-        inputFunction: null
+        inputFunction: null,
+        containerId: () => containerIds['gcc']
     },
     'py': {
         compiler: null,
+        compiledExtension: '',
         executor: execPyFile,
-        inputFunction: data => (data ? data.split(' ').join('\n') : '')
+        inputFunction: data => (data ? data.split(' ').join('\n') : ''),
+        containerId: () => containerIds['python']
+    },
+    'js': {
+        compiler: null,
+        compiledExtension: '',
+        executor: execJsFile,
+        inputFunction: null,
+        containerId: () => containerIds['node']
+    },
+    'java': {
+        compiler: compileJavaCode,
+        compiledExtension: 'class',
+        executor: execJavaClassFile,
+        inputFunction: null,
+        containerId: () => containerIds['openjdk']
     }
 };
 
+
+const stderrMsgFn = ({ index, input, output, exOut }) => `Testcase ${index} Failed 
+Testcase: 
+${input} 
+Expected Output: 
+${output} 
+Your Output: 
+${exOut}`;
+
+const languageErrMsg = `Please select a language / valid language.
+Or may be this language is not yet supported !`
+
 const execCodeAgainstTestcases = (filePath, testcase, language) => {
 
-    let containerId = null;
-    switch (language) {
-        case 'c': containerId = gccContainerId; break;
-        case 'cpp': containerId = gccContainerId; break;
-        case 'py': containerId = pythonContainerId; break;
-    }
+    // check if language is supported or not
+    if (!details[language]) return { msg: languageErrMsg };
+
+    let containerId = details[language].containerId();
+    if (!containerId) return reject({ msg: languageErrMsg });
 
     if (!filePath.includes("\\") && !filePath.includes("/"))
         filePath = path.join(codeDirectory, filePath);
@@ -90,8 +141,6 @@ const execCodeAgainstTestcases = (filePath, testcase, language) => {
     const { input, output } = require(`./testcases/${testcase}`)
 
     return new Promise(async (resolve, reject) => {
-        if (!containerId) return reject({ msg: 'Please select a language / valid language !' });
-
         let filename = null, isCompiled = false;
         try {
             filename = await copyFiles(filePath, containerId);
@@ -111,14 +160,7 @@ const execCodeAgainstTestcases = (filePath, testcase, language) => {
                 if (exOut !== output[index]) {
                     reject({
                         msg: 'on wrong answer',
-                        stderr:
-                            `Testcase ${index} Failed 
-Testcase: 
-${input[index]} 
-Expected Output: 
-${output[index]} 
-Your Output: 
-${exOut}`
+                        stderr: stderrMsgFn({ index, input: input[index], output: output[index], exOut })
                     });
                     break;
                 }
@@ -128,25 +170,32 @@ ${exOut}`
         } catch (error) {
             reject(error);
         } finally {
-            let filesToBeDeleted = filename;
-            if (isCompiled)
-                filesToBeDeleted += (' ' + (filename.split('.')[0]) + '.out');
-            deleteFilesDocker(filesToBeDeleted, containerId);
+            if (!filename) return;
+            try {
+                let filesToBeDeleted = filename;
+                if (isCompiled) {
+                    if (language === 'java')
+                        filesToBeDeleted += ' Solution.class';
+                    else
+                        filesToBeDeleted += (' ' + (filename.split('.')[0]) + '.' + details[language].compiledExtension);
+                }
+                deleteFilesDocker(filesToBeDeleted, containerId);
+            } catch (error) {
+                console.error('Caught some errors while deleting files from Docker Container', error, containerId);
+            }
         }
     });
 }
 
 const execCode = async (filePath, language, inputString) => {
+
     if (!inputString) inputString = '';
 
-    let containerId = null;
-    switch (language) {
-        case 'c': containerId = gccContainerId; break;
-        case 'cpp': containerId = gccContainerId; break;
-        case 'py': containerId = pythonContainerId; break;
-    }
+    // check if language is supported or not
+    if (!details[language]) return { msg: languageErrMsg };
 
-    if (!containerId) return { msg: 'Please select a language / valid language !' };
+    let containerId = details[language].containerId();
+    if (!containerId) return { msg: languageErrMsg };
 
     if (!filePath.includes("\\") && !filePath.includes("/"))
         filePath = path.join(codeDirectory, filePath);
@@ -168,75 +217,23 @@ const execCode = async (filePath, language, inputString) => {
 
         return ({ msg: "Compiled Successfully", stdout: exOut });
     } catch (error) {
-        return (error);
+        return error;
     } finally {
-        let filesToBeDeleted = filename;
-        if (isCompiled)
-            filesToBeDeleted += (' ' + (filename.split('.')[0]) + '.out');
-        deleteFilesDocker(filesToBeDeleted, containerId);
+        if (!filename) return;
+        try {
+            let filesToBeDeleted = filename;
+            if (isCompiled) {
+                if (language === 'java')
+                    filesToBeDeleted += ' Solution.class';
+                else
+                    filesToBeDeleted += (' ' + (filename.split('.')[0]) + '.' + details[language].compiledExtension);
+            }
+            deleteFilesDocker(filesToBeDeleted, containerId);
+        } catch (error) {
+            console.error('Caught some errors while deleting files from Docker Container', error, containerId);
+        }
     }
 }
-
-
-// const execCppCode = (filePath, testcase) => {
-
-//     if (!filePath.includes("\\") && !filePath.includes("/"))
-//         filePath = path.join(codeDirectory, filePath);
-
-//     const { input, output } = require(`./testcases/${testcase}`)
-
-//     return new Promise(async (resolve, reject) => {
-//         try {
-//             const filename = await copyFiles(filePath, gccContainerId);
-//             const id = await compileCppCode(gccContainerId, filename);
-
-//             for (let index = 0; index < input.length; ++index) {
-//                 const exOut = await execOutFile(gccContainerId, id, input[index]);
-//                 // if socket connection established then send to client the index of passed test case
-//                 if (exOut !== output[index]) {
-//                     reject({
-//                         msg: 'on wrong answer',
-//                         stderr: `testcase ${index} failed => testcase : (${input[index]}) => expected : ${output[index]} => your output : ${exOut}`
-//                     });
-//                     break;
-//                 }
-//             }
-
-//             resolve({ msg: 'All Test Cases Passed' });
-//         } catch (error) {
-//             reject(error);
-//         }
-//     });
-// }
-
-// const execPyCode = (filePath, testcase) => {
-
-//     if (!filePath.includes("\\") && !filePath.includes("/"))
-//         filePath = path.join(codeDirectory, filePath);
-
-//     let { input, output } = require(`./testcases/${testcase}`)
-//     return new Promise(async (resolve, reject) => {
-//         try {
-//             const filename = await copyFiles(filePath, pythonContainerId);
-
-//             for (let index = 0; index < input.length; ++index) {
-//                 const exOut = await execPyFile(pythonContainerId, filename, input[index].split(' ').join('\n'));
-//                 // if socket connection established then send to client the index of passed test case
-//                 if (exOut !== output[index]) {
-//                     reject({
-//                         msg: 'on wrong answer',
-//                         stderr: `testcase ${index} failed => testcase : (${input[index]}) => expected : ${output[index]} => your output : ${exOut}`
-//                     });
-//                     break;
-//                 }
-//             }
-
-//             resolve({ msg: 'All Test Cases Passed' });
-//         } catch (error) {
-//             reject(error);
-//         }
-//     });
-// }
 
 module.exports = {
     readFile,
@@ -244,6 +241,5 @@ module.exports = {
     deleteFile,
     execCode,
     execCodeAgainstTestcases,
-    initDockerGcc,
-    initDockerPython
+    initAllDockerContainers
 };

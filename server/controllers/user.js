@@ -1,7 +1,7 @@
-const User = require('../DataBase/Model/User');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { dateTimeNowFormated } = require('../utils');
+const { createNewUser, getUserById, findOneUser } = require('../DataBase/database');
 
 const loginController = async (req, res) => {
     console.log('POST /api/user/login', dateTimeNowFormated());
@@ -37,14 +37,7 @@ const registerController = async (req, res) => {
         const passwordHash = await bcrypt.hash(password, salt);
 
         // save a new user account to the db
-        const newUser = new User({
-            name,
-            username,
-            email,
-            passwordHash
-        });
-
-        const savedUser = await newUser.save();
+        const savedUser = await createNewUser({ name, username, email, passwordHash });
 
         // sign the token
         const token = jwt.sign(
@@ -85,7 +78,7 @@ const loggedInController = async (req, res) => {
         const token = req.cookies.token;
         const verified = jwt.verify(token, process.env.JWT_SECRET);
 
-        const user = await User.findById(verified.user);
+        const user = await getUserById(verified.user);
 
         res.status(200).json({
             status: true,
@@ -107,7 +100,7 @@ const changePasswordController = async (req, res) => {
         username = username ? username.trim() : '';
         email = email ? email.trim() : '';
 
-        const existingUser = await User.findOne({ username, email });
+        const existingUser = await findOneUser({ username, email });
         if (!existingUser || (existingUser.username !== username) || (existingUser.email !== email))
             return res.status(401).json({ error: 'Wrong email or username or password.' });
         const passwordCorrect = await bcrypt.compare(

@@ -6,7 +6,8 @@ const QuerySchema = new mongoose.Schema({
     },
     language: {
         type: String,
-        enum: ['c', 'cpp', 'py', 'java', 'js']
+        enum: ['c', 'cpp', 'py', 'java', 'js'],
+        required: true
     },
     quesId: {
         type: String
@@ -18,6 +19,10 @@ const QuerySchema = new mongoose.Schema({
         type: String
     },
     filepath: {
+        type: String,
+        required: true
+    },
+    input: {
         type: String
     },
     testcase: {

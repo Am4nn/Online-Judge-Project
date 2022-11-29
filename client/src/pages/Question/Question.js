@@ -12,8 +12,9 @@ import SendIcon from '@mui/icons-material/Send';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { SERVER_LINK } from '../../dev-server-link';
-import { defaultCCode, defaultCppCode, defaultPythonCode } from './defaultCodes/defaultCodes';
+import defaultCodes from './defaultCodes/defaultCodes';
 import Options from './Options/Options';
+import { correctCode } from './correctCodes/index';
 
 const Question = () => {
 
@@ -34,13 +35,12 @@ const Question = () => {
         [id]
     )
 
-    // not-initialized, submitting, response-ok, response-not-ok, error
     // not-initialized, submitting, submitted
     const [codeSubmittingState, setcodeSubmittingState] = useState('not-initialized');
 
     const [codeFontSize, setcodeFontSize] = useState(15);
     const [selectedLang, setSelectedLang] = useLocalStorage('selectedlangoj', 'cpp');
-    const [code, setCode] = useState(() => (selectedLang === 'cpp' ? defaultCppCode : defaultPythonCode));
+    const [code, setCode] = useState(defaultCodes[selectedLang]);
     const [response, setResponse] = useState([]);
 
     const endRef = useRef(null);
@@ -69,7 +69,6 @@ const Question = () => {
             setResponse(queryData);
 
             if (query.ok) {
-                // console.info("response-ok", queryData);
                 const intervalID = setInterval(async () => {
                     const response = await fetch(
                         `${SERVER_LINK}/api/explore/status/${queryData.queryId}`,
@@ -85,19 +84,16 @@ const Question = () => {
                         clearInterval(intervalID);
                         setcodeSubmittingState('submitted');
                         setResponse(data);
-                        // console.log("response-not-ok ", data);
                     }
                     else if (data.status !== 'pending') {
                         clearInterval(intervalID);
                         setcodeSubmittingState('submitted');
                         setResponse({ ...data.output, status: data.status });
-                        // console.log(`status -> ${data.status}`, data);
                     }
                     // else console.log('status -> pending', data);
                 }, 1000);
             }
             else {
-                // console.log('response not ok ', queryData);
                 setcodeSubmittingState('submitted');
             }
 
@@ -109,24 +105,10 @@ const Question = () => {
     }
 
     const resetCode = () => {
-        switch (selectedLang) {
-            case 'c':
-                setCode(defaultCCode);
-                break;
-            case 'cpp':
-                setCode(defaultCppCode);
-                break;
-            case 'py':
-                setCode(defaultPythonCode);
-                break;
-            // case 'js':
-            //     setCode(defaultJsCode);
-            //     break;
-            // case 'java':
-            //     setCode(defaultJavaCode);
-            //     break;
-            default:
-        }
+        setCode(defaultCodes[selectedLang]);
+    }
+    const showCorrectCode = () => {
+        setCode(correctCode[question.testcase][selectedLang]);
     }
 
     return (
@@ -191,7 +173,9 @@ const Question = () => {
                                 codeFontSize={codeFontSize}
                                 setSelectedLang={setSelectedLang}
                                 setcodeFontSize={setcodeFontSize}
+                                showCorrectCode={showCorrectCode}
                                 codeEditable
+                                correctCodeAvailable={!!correctCode[question.testcase]}
                             />
 
                             <div className={classes.editorText}>

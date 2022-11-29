@@ -12,13 +12,12 @@ const user = require('./routes/user');
 const notes = require('./routes/notes');
 const path = require('path');
 const { connectDB } = require('./DataBase/connectDB');
-const { initDockerGcc, initDockerPython } = require('./CodeExecuter/codeExecutor_dockerv');
+const { initAllDockerContainers } = require('./CodeExecuter/codeExecutor_dockerv');
 
 // Establish Connection to Database
 connectDB();
-// Initiate Docker Containers
-initDockerGcc();
-initDockerPython();
+// Initiate All Docker Containers
+initAllDockerContainers();
 
 // parse json request body
 app.use(express.json());

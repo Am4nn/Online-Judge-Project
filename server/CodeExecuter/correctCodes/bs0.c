@@ -1,6 +1,5 @@
-#include <bits/stdc++.h>
-#define endl '\n'
-using namespace std;
+#include <stdio.h>
+#include <stdlib.h>
 
 int predicate(int x, int k)
 {
@@ -9,7 +8,7 @@ int predicate(int x, int k)
     return 0;
 }
 
-int binarySearch(vector<int> arr, int n, int k)
+int binarySearch(int arr[], int n, int k)
 {
     // edge case
     if (k < arr[0] || k > arr[n - 1])
@@ -35,11 +34,12 @@ int binarySearch(vector<int> arr, int n, int k)
 int main()
 {
     int n, k;
-    cin >> n;
-    vector<int> arr(n);
-    for (size_t i = 0; i < n; i++)
-        cin >> arr[i];
-    cin >> k;
-    cout << binarySearch(arr, n, k);
+    scanf("%d", &n);
+    int *arr = (int *)calloc(n, sizeof(int));
+    for (int i = 0; i < n; ++i)
+        scanf("%d", &arr[i]);
+    scanf("%d", &k);
+    printf("%d", binarySearch(arr, n, k));
+    free(arr);
     return 0;
 }
