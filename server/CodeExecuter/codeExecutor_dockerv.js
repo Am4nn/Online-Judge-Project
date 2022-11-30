@@ -1,38 +1,3 @@
-// ####################################################################################
-const imageNames = ['gcc', 'python', 'node', 'openjdk'];
-const containerIds = {
-    'gcc': '',
-    'python': '',
-    'node': '',
-    'openjdk': ''
-}
-const containerNamePostfix = '-oj-container';
-const containerName = image => image + containerNamePostfix;
-const initDockerContainer = image => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            // check and kill already running container
-            await killContainer(containerName(image));
-            // now create new container of image
-            const data = await createContainer({ name: containerName(image), image });
-            containerIds[image] = data;
-            resolve(`${image} Container Id : ${data}`);
-        } catch (error) {
-            reject(`${image} Docker Error : ${error}`)
-        }
-    });
-}
-const initAllDockerContainers = async () => {
-    try {
-        const res = await Promise.all(imageNames.map(image => initDockerContainer(image)));
-        console.log(res.join('\n'));
-        console.log("\nAll Containers Initialized");
-    } catch (error) {
-        console.error("Docker Error: ", error);
-    }
-}
-// ####################################################################################
-
 const fs = require("fs");
 const path = require("path");
 const { v4: uuid } = require("uuid");
@@ -43,6 +8,88 @@ const {
     deleteFilesDocker, execJsFile,
     compileJavaCode, execJavaClassFile, killContainer
 } = require('./docker');
+
+// ####################################################################################
+// ####################################################################################
+const imageIndex = { GCC: 0, PY: 1, JS: 2, JAVA: 3 };
+const imageNames = [
+    'gcc:latest',
+    'python:3.10-slim',
+    'node:16.17.0-bullseye-slim',
+    'openjdk:20-slim'
+];
+const containerNames = [
+    'gcc-oj-container',
+    'py-oj-container',
+    'js-oj-container',
+    'java-oj-container'
+];
+/** @type {string[]} */
+const containerIds = [];
+const initDockerContainer = (image, index) => {
+    const name = containerNames[index];
+    return new Promise(async (resolve, reject) => {
+        try {
+            // check and kill already running container
+            await killContainer(name);
+            // now create new container of image
+            const data = await createContainer({ name, image });
+            containerIds[index] = data;
+            resolve(`${name} Id : ${data}`);
+        } catch (error) {
+            reject(`${name} Docker Error : ${JSON.stringify(error)}`);
+        }
+    });
+}
+const initAllDockerContainers = async () => {
+    try {
+        const res = await Promise.all(imageNames.map((image, index) => initDockerContainer(image, index)));
+        console.log(res.join('\n'));
+        console.log("\nAll Containers Initialized");
+    } catch (error) {
+        console.error("Docker Error: ", error);
+    }
+}
+const details = {
+    'c': {
+        compiler: compileCCode,
+        compiledExtension: 'out',
+        executor: execOutFile,
+        inputFunction: null,
+        containerId: () => containerIds[imageIndex.GCC]
+    },
+    'cpp': {
+        compiler: compileCppCode,
+        compiledExtension: 'out',
+        executor: execOutFile,
+        inputFunction: null,
+        containerId: () => containerIds[imageIndex.GCC]
+    },
+    'py': {
+        compiler: null,
+        compiledExtension: '',
+        executor: execPyFile,
+        inputFunction: data => (data ? data.split(' ').join('\n') : ''),
+        containerId: () => containerIds[imageIndex.PY]
+    },
+    'js': {
+        compiler: null,
+        compiledExtension: '',
+        executor: execJsFile,
+        inputFunction: null,
+        containerId: () => containerIds[imageIndex.JS]
+    },
+    'java': {
+        compiler: compileJavaCode,
+        compiledExtension: 'class',
+        executor: execJavaClassFile,
+        inputFunction: null,
+        containerId: () => containerIds[imageIndex.JAVA]
+    }
+};
+// ####################################################################################
+// ####################################################################################
+
 
 const codeDirectory = path.join(__dirname, "codeFiles");
 
@@ -76,45 +123,6 @@ const deleteFile = filepath => {
     fs.unlinkSync(filepath);
     console.log('Unlinked :', path.basename(filepath));
 }
-
-const details = {
-    'c': {
-        compiler: compileCCode,
-        compiledExtension: 'out',
-        executor: execOutFile,
-        inputFunction: null,
-        containerId: () => containerIds['gcc']
-    },
-    'cpp': {
-        compiler: compileCppCode,
-        compiledExtension: 'out',
-        executor: execOutFile,
-        inputFunction: null,
-        containerId: () => containerIds['gcc']
-    },
-    'py': {
-        compiler: null,
-        compiledExtension: '',
-        executor: execPyFile,
-        inputFunction: data => (data ? data.split(' ').join('\n') : ''),
-        containerId: () => containerIds['python']
-    },
-    'js': {
-        compiler: null,
-        compiledExtension: '',
-        executor: execJsFile,
-        inputFunction: null,
-        containerId: () => containerIds['node']
-    },
-    'java': {
-        compiler: compileJavaCode,
-        compiledExtension: 'class',
-        executor: execJavaClassFile,
-        inputFunction: null,
-        containerId: () => containerIds['openjdk']
-    }
-};
-
 
 const stderrMsgFn = ({ index, input, output, exOut }) => `Testcase ${index} Failed 
 Testcase: 

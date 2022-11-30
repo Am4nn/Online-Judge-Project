@@ -1,7 +1,8 @@
-// if in development
+// If not in production
 if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config(); // .env file var -> process.env
-} else console.log("In Production !");
+    require('dotenv').config(); // .env file variables -> process.env
+}
+console.log(`In ${process.env.NODE_ENV} env !`);
 
 const express = require('express');
 const app = express();
@@ -23,10 +24,7 @@ initAllDockerContainers();
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({
-    origin: true,
-    credentials: true
-}));
+app.use(cors({ origin: true, credentials: true }));
 
 // api route to get questions and verdicts
 app.use('/api/explore', explore);
@@ -37,14 +35,12 @@ app.use('/api/notes', notes);
 // user login and rgister
 app.use('/api/user', user);
 
-// Serve static assets in production
-// if (process.env.NODE_ENV === 'production') {
-// Set static folder
+// Serve Static Assets
+// Set Static Folder
 app.use(express.static(path.join(__dirname, 'client/build')));
 app.get('*', (req, res) =>
     res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
 );
-// }
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
