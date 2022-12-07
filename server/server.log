@@ -1,0 +1,624 @@
+In undefined env !
+Server running on PORT 5000 12/7/2022, 9:48:02 AM
+Database Connected !!!
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : py-oj-container
+
+Deleted(stopped) : js-oj-container
+
+Deleted(stopped) : gcc-oj-container
+
+gcc-oj-container Id : ea8896f48d8e017d69cb4c80fdb7ab80549134a9464214c18c554686b18ffbd5
+py-oj-container Id : 291ad3ddb4c50c43d0745354bfef6a894440c74f3d1d6c3c887f0137dc8a8892
+js-oj-container Id : 882a1c496e0a7fb25635e8a7c841c87331816aada6de4d6d7d4643d681f9736f
+java-oj-container Id : 2d5188709af357a6914bc46d9f2138b06ef535740fee1e4335245dfc892b67c2
+
+All Containers Initialized
+GET /api/user/loggedIn 12/7/2022, 9:48:11 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 9:48:11 AM
+GET /api/notes/allNotes 12/7/2022, 9:48:37 AM
+GET /api/user/loggedIn 12/7/2022, 9:48:47 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 9:48:47 AM
+GET /api/experimental/logs 12/7/2022, 9:48:48 AM
+GET /api/user/loggedIn 12/7/2022, 9:49:00 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 9:49:00 AM
+GET /api/experimental/logs 12/7/2022, 9:49:00 AM
+GET /api/explore/problems/:id getDetailedQuestion 12/7/2022, 9:49:27 AM
+POST /api/explore/problems/:id sentCodeForVerdict 12/7/2022, 9:49:29 AM
+GET /api/explore/status/:queryId getStatusOfQuery 12/7/2022, 9:49:30 AM
+Unlinked : eabb577a-616c-4171-9092-a5bd5d65177e.java
+GET /api/explore/status/:queryId getStatusOfQuery 12/7/2022, 9:49:31 AM
+GET /api/notes/allNotes 12/7/2022, 9:49:42 AM
+GET /api/notes/:codeid 12/7/2022, 9:49:45 AM
+Note:  Java Program with Input
+POST /api/explore/codeExecutor 12/7/2022, 9:49:46 AM
+GET /api/explore/status/:queryId getStatusOfQuery 12/7/2022, 9:49:47 AM
+Unlinked : 20420eb7-dd4a-44da-b623-f5896394182d.java
+GET /api/explore/status/:queryId getStatusOfQuery 12/7/2022, 9:49:48 AM
+POST /api/explore/codeExecutor 12/7/2022, 9:49:53 AM
+GET /api/explore/status/:queryId getStatusOfQuery 12/7/2022, 9:49:54 AM
+Unlinked : f2ab784a-d5ee-495d-a5c3-1ac1c2a9c59f.java
+GET /api/explore/status/:queryId getStatusOfQuery 12/7/2022, 9:49:55 AM
+GET /api/user/loggedIn 12/7/2022, 9:50:04 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 9:50:04 AM
+GET /api/experimental/logs 12/7/2022, 9:50:04 AM
+GET /api/user/logout 12/7/2022, 9:50:34 AM
+GET /api/user/loggedIn 12/7/2022, 9:50:34 AM
+GET /api/user/loggedIn 12/7/2022, 9:50:38 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 9:50:38 AM
+GET /api/experimental/logs 12/7/2022, 9:50:38 AM
+POST /api/user/login 12/7/2022, 9:50:50 AM
+GET /api/user/loggedIn 12/7/2022, 9:50:50 AM
+GET /api/user/loggedIn 12/7/2022, 9:50:56 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 9:50:56 AM
+GET /api/experimental/logs 12/7/2022, 9:50:56 AM
+GET /api/user/loggedIn 12/7/2022, 9:52:47 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 9:52:47 AM
+GET /api/user/loggedIn 12/7/2022, 9:52:59 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 9:52:59 AM
+GET /api/experimental/logs 12/7/2022, 9:52:59 AM
+GET /api/notes/allNotes 12/7/2022, 9:53:04 AM
+GET /api/notes/allNotes?admin=true 12/7/2022, 9:53:10 AM
+GET /api/user/loggedIn 12/7/2022, 9:53:13 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 9:53:13 AM
+GET /api/experimental/logs 12/7/2022, 9:53:13 AM
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:13:08 AM
+Database Connected !!!
+Deleted(stopped) : py-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : js-oj-container
+
+Deleted(stopped) : gcc-oj-container
+
+gcc-oj-container Id : 3b97926075657a0e92ee44930caf4370aad12b6034bdd94109ad9536504a8b05
+py-oj-container Id : 17cdba5a74b5864d33699b222d7a87f8bf130ed7057b0993de0a86b207769fc8
+js-oj-container Id : 5deb1b985c20741a579794a9a15723273a7bcbe210b2c3d1141aed37b1e30f99
+java-oj-container Id : f5674b6344bcdac3408cbb18f9771b40a289f02f1e741b503b930a9d57855c9c
+
+All Containers Initialized
+GET /api/user/loggedIn 12/7/2022, 10:13:35 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 10:13:36 AM
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:14:42 AM
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:14:44 AM
+Database Connected !!!
+gcc-oj-container Id : 3628862f07520c03b98d1c238b386e6fb1e093a7e5b951b81bbaa974ed10bc56
+py-oj-container Id : dfa1263542d3ccfbba1aa4c0be45053af06253e3e196cf3d3de9f5993e109000
+js-oj-container Id : 84ba72d6aeeb86eb52390fe801850bd7e205cf89e1353d63a9ed3410c6acf073
+java-oj-container Id : 8a322d1eed0f6d2aaccb9d54b367dc380fbb334cea0416da38ba1c915d9e6363
+
+All Containers Initialized
+GET /api/user/loggedIn 12/7/2022, 10:14:47 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 10:14:47 AM
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:15:05 AM
+Database Connected !!!
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : js-oj-container
+
+Deleted(stopped) : py-oj-container
+
+gcc-oj-container Id : ca925d9024602f13d7ae5001c19086fd1f1288a2c9865327195500e0de27605c
+py-oj-container Id : 5b176990186efe60fc4ea46044427d1ad0437a6e00e618b659fc87994c7ad47a
+js-oj-container Id : a43d3d53b376022efd457c6c734453217dce790ea13c4805181d67babe4a854e
+java-oj-container Id : 1a96369e27978e97bdc4280ebe272b70ffec9d9e048d7fd6424a679764c32eee
+
+All Containers Initialized
+GET /api/user/loggedIn 12/7/2022, 10:15:13 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 10:15:13 AM
+GET /api/user/loggedIn 12/7/2022, 10:21:21 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 10:21:21 AM
+GET /api/user/logout 12/7/2022, 10:23:14 AM
+GET /api/user/loggedIn 12/7/2022, 10:23:14 AM
+GET /api/user/loggedIn 12/7/2022, 10:23:19 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 10:23:19 AM
+GET /api/experimental/logs 12/7/2022, 10:23:19 AM
+GET /api/experimental/logs 12/7/2022, 10:24:27 AM
+GET /api/experimental/logs 12/7/2022, 10:24:45 AM
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:24:52 AM
+Database Connected !!!
+Deleted(stopped) : js-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : py-oj-container
+
+Deleted(stopped) : gcc-oj-container
+
+gcc-oj-container Id : d996fcba959a5664be3f04f9a7cf9ad0041715785b3f134ddea8ff5d6da5fcb4
+py-oj-container Id : 73b71156840b90d4b2d6de006e838e7233cc25770360a9dd049e9833eeeeea1c
+js-oj-container Id : 3fb8c57e4d829cbf56f9f6ab230aa332a3ba7a87c916187149c48195b423cbf3
+java-oj-container Id : 1a21cb8e617ca60fefb14cdf4b483937373fb7a07b90c54c89cbf6d01e3264a8
+
+All Containers Initialized
+GET /api/user/loggedIn 12/7/2022, 10:24:55 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 10:24:55 AM
+GET /api/experimental/logs 12/7/2022, 10:24:55 AM
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:26:07 AM
+Database Connected !!!
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : js-oj-container
+
+Deleted(stopped) : py-oj-container
+
+gcc-oj-container Id : 68bcd40c52b30e26358f3099e1f0844b23294624f1452dac3c4457bcb7985fd3
+py-oj-container Id : de215cf5867cb24d612438289f920fcfb9088e318ddb2678e87b66b479d78539
+js-oj-container Id : 36b37ed5ebd35b782b4b51a2660aacca8aa5a667ad38eb3c9cc8190708331fc9
+java-oj-container Id : 357062d5793d199e7ad718fac1666fee84d59aaf84965f82c182072ffbf2cc3f
+
+All Containers Initialized
+GET /api/user/loggedIn 12/7/2022, 10:26:17 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 10:26:17 AM
+GET /api/experimental/logs 12/7/2022, 10:26:17 AM
+POST /api/user/login 12/7/2022, 10:26:28 AM
+GET /api/user/loggedIn 12/7/2022, 10:26:28 AM
+GET /api/user/loggedIn 12/7/2022, 10:26:34 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 10:26:34 AM
+GET /api/experimental/logs 12/7/2022, 10:26:34 AM
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:26:54 AM
+Database Connected !!!
+Deleted(stopped) : py-oj-container
+
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : js-oj-container
+
+Deleted(stopped) : java-oj-container
+
+gcc-oj-container Id : 6bdc2c1bc1d3286ece3ec05b82db94656e298988916756b66cd49d09f089443d
+py-oj-container Id : 020441b5b13911a0058e67ef61dc40f756bbad48eae596627d83482e2e8abff2
+js-oj-container Id : d1c7dfa6484ddb6d39fb83fe0e9bd954d6c26ad77f562cc509131951f6f4d11e
+java-oj-container Id : c723e3f8905d17bcf865955f0976560e0290c36d657d6862f7db8596f7c43a51
+
+All Containers Initialized
+GET /api/experimental/logs 12/7/2022, 10:27:40 AM
+GET /api/experimental/logs 12/7/2022, 10:31:18 AM
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:36:30 AM
+Database Connected !!!
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : js-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : py-oj-container
+
+gcc-oj-container Id : 7fb666ba5c6c27f0ee71816c8475a5b806708c25d8c96ddbba28a80923974012
+py-oj-container Id : 00fa70e2443f7cfdfdf01d6d05fabd29cb1f6d0eb23b737d27109f8a4acf6dff
+js-oj-container Id : 61dfea2175b61ec96bb6ac70d0155316edef204c0b0cea4aafcff085d18cc0c5
+java-oj-container Id : 1ff618bc96acb2c0d2bb1d690a73b59a62053fee372d8d9b95c4620ae403e51e
+
+All Containers Initialized
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:36:49 AM
+Database Connected !!!
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : js-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : py-oj-container
+
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:36:52 AM
+Database Connected !!!
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : js-oj-container
+
+Deleted(stopped) : java-oj-container
+
+gcc-oj-container Id : 05512f8f270fe8d064a7fff20f379248b0ba8513e9669ba25b41dd3df2eea9ca
+py-oj-container Id : d9661ced9587a59d991e4a786ec11e7fdc688aac76112219768e94c08610b242
+js-oj-container Id : 9521e06267bde4c58de0881081bd8f0c1d657a480d982d84497c4660e6ab0f32
+java-oj-container Id : 6085e15fa1a380f5de90ac49dcb4d5ef67930c1d82cc4eee0df9d244187f4922
+
+All Containers Initialized
+GET /api/user/loggedIn 12/7/2022, 10:37:25 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 10:37:25 AM
+GET /api/explore/problems/:id getDetailedQuestion 12/7/2022, 10:37:31 AM
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:39:53 AM
+Database Connected !!!
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : py-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : js-oj-container
+
+gcc-oj-container Id : 3a5f7848fb1fe5269b3a19f864011d5dd7df65624d7891fb799d166b7714e076
+py-oj-container Id : 5ae01353daf427db8af366a4138c3dac0b37acf7d735da446dde7aa67becfe88
+js-oj-container Id : 44b951722565c3edd34c1d83b650c36a693dc3d3517f42a6ca77ee2573629393
+java-oj-container Id : 9e718dcb3d89e388f1d26895c43d2bb9a627b9137c2e2abe3af0c8bfbfb3026a
+
+All Containers Initialized
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:47:18 AM
+Database Connected !!!
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : py-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : js-oj-container
+
+gcc-oj-container Id : 65e2929df41f68d4ec9f8ca640a1f590fd4dbaf9edae6fc986c5ae0d8cfa05c3
+py-oj-container Id : 56db22c7a3f1c993b34f83f8ab0bc17bbd922ef109d7e013a74f93c6ecbf27a6
+js-oj-container Id : 604116c0b1104b365c01ee6eb5cda33ff2896affe4663c3e402cd461f9604451
+java-oj-container Id : d4df84b00310f0335611f64a2d2390bd713b5209025702de39d71b8c48d7d1c6
+
+All Containers Initialized
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:47:53 AM
+Database Connected !!!
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : py-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : js-oj-container
+
+gcc-oj-container Id : 001312c435ec3a6da84fa4e70a912aa71f258d2061bf8a70a701b52310bc24e7
+py-oj-container Id : 27e0c483bca9c114ccfe2f4830919c956bc9f2bcfe78f444ab2ddaf7238d3a69
+js-oj-container Id : 96a3a491bba821708495087a54a75c7a9594f3aa996107d23ac21b7d64f3d674
+java-oj-container Id : 3e87d8cadeed1f1f246a49f6c89071f78fd66e6e71b2306da9cc972f36f54cea
+
+All Containers Initialized
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:48:35 AM
+Database Connected !!!
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:48:37 AM
+Database Connected !!!
+gcc-oj-container Id : 26563594969b9afeed6faedecbbbea05326b51050aa2fc996b9866db8e28e6b2
+py-oj-container Id : 81f9e1eb9d0ccb5aca30e03b4a6b09e9fa4880b6f624e4c50eb7d47d4ae0ae31
+js-oj-container Id : e924fe15db35c493f973936fa03dae24ccb20d2c462d3a893f39f76adcf15e9f
+java-oj-container Id : 7f1a47ad0f1a9789aaa30e850b45d2c52ead9297c096c05ae855b0bf55bf6d7d
+
+All Containers Initialized
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:52:47 AM
+Database Connected !!!
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : js-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : py-oj-container
+
+gcc-oj-container Id : e1a06bcce92db1526210557064e6ea7c05a67b09e13d76dda02aa139fe79324a
+py-oj-container Id : 7d91b77f0beb0dbc27ed05e34bf483c4237edeb38aefb30eb234b4cc6f8d718f
+js-oj-container Id : 19d0be33279fb45ee158b9583106bc4aed5e3adbe0222f64ce9b6f17a4aec880
+java-oj-container Id : 617dfa0a1cc6a222a0e99c105412b5d973d7fd3e0720e99e49635e7061459571
+
+All Containers Initialized
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:54:36 AM
+Database Connected !!!
+Deleted(stopped) : py-oj-container
+
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : js-oj-container
+
+gcc-oj-container Id : 5570ad97f4b8865e26d67e5076b768931fced82b85bbfd428d4429a5457ddb82
+py-oj-container Id : 378dc3f2f47bb8a239c58d8f8dd4f7c8d01d68446af4093eb1f78212d25cf352
+js-oj-container Id : 2b6e88140ad82a30d0f536bfae76ffd8dfdd2f430d5390b6678ba9388e3667c2
+java-oj-container Id : d00999cfa683f3ca8c40f8eb4bc56367921e29d68ced3bc47e321fa47bdf71bf
+
+All Containers Initialized
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:54:57 AM
+Database Connected !!!
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : js-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : py-oj-container
+
+gcc-oj-container Id : e4b436baccb76e526dbbc6c29b73cca646886115b5ebf61275e9aeb2f5dbfb53
+py-oj-container Id : a30d72ae77d46563dd67e22b0982e0b18619195bbb818f9e37a0d1281723213b
+js-oj-container Id : 75b2b2d706e723fa6e5a96568c8f37ebd36eb9663eefa75ba430490762a9df45
+java-oj-container Id : 258e0ff995e01d9ddf6757029b19a758baa6ddbcb363196d01a3f2032535902b
+
+All Containers Initialized
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:59:09 AM
+Database Connected !!!
+Deleted(stopped) : py-oj-container
+
+Deleted(stopped) : js-oj-container
+
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : java-oj-container
+
+gcc-oj-container Id : 47692526e95dfdc864aa6d47cc163b562fdb2ba36612bcf1f20129ffe5c9f845
+py-oj-container Id : 606d4799d259594cf9ef60c4bbdcee354181d51635535ed6cad5cc5d884d2bdf
+js-oj-container Id : 1075e939f953237c9513b1d664e0d7bb592c0a3ebf1462f83d70bfbb702f1ae2
+java-oj-container Id : 39e40a3fb78bf6610fbb72410747a0934abcfb2de3786c4627ab16fcfa959788
+
+All Containers Initialized
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:59:38 AM
+Database Connected !!!
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : py-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : js-oj-container
+
+gcc-oj-container Id : 8cccb38cbf550d4440ff5640e2a6e9bcc37685e713fe671ca134fc6a6f99d5ea
+py-oj-container Id : ed38003bba731e41f7e6445ab20d0c82ee23541a404143253e9cc610a47b0133
+js-oj-container Id : 49acf0d7e0affa868458deca4cb03bede227ceebb5115046dcb7a60c77798dee
+java-oj-container Id : 2d68589bce288b4410ffb3118a6e3990a9eaf61f2b8e9df8721aa30d3390bb31
+
+All Containers Initialized
+In Development  env !
+Server running on PORT 5000 12/7/2022, 10:59:45 AM
+Database Connected !!!
+Deleted(stopped) : py-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : js-oj-container
+
+gcc-oj-container Id : 08b504e16b311cae20443f60f0f994644c6e9f1acc070ee4312488f6e3ab839a
+py-oj-container Id : 6417b5168457b641be6689036e150539ca147825f14e07b8ae5e415dce964bc9
+js-oj-container Id : 46e05a28e677a73ac2c6ec72cefa885f6dbb4239a548b2d50199cc3fce5385f5
+java-oj-container Id : e6d1bfd06daabeb86151cf3be717a38019a5e0ec0d329889adcb628c15fe9873
+
+All Containers Initialized
+In Development  env !
+Server running on PORT 5000 12/7/2022, 11:00:56 AM
+Database Connected !!!
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : js-oj-container
+
+Deleted(stopped) : py-oj-container
+
+gcc-oj-container Id : b52fb86c5836dade7738caf191d3220ee8ae6693462b1653debd7dea2475f43f
+py-oj-container Id : 37375f18836ca676ea7eb2b22ffff590497e1f83e9678a677b7f17e9dee0ea49
+js-oj-container Id : c218437eec27782601003ec81f9195d8360c3b79794029d801bfbce4fcaa590e
+java-oj-container Id : ae62cb8883a3d1517892d736406b01abbd26f97c48ed308c5f8cf0161430c4d2
+
+All Containers Initialized
+In Development  env !
+Server running on PORT 5000 12/7/2022, 11:01:26 AM
+Database Connected !!!
+Deleted(stopped) : js-oj-container
+
+Deleted(stopped) : py-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : gcc-oj-container
+
+gcc-oj-container Id : 871b0872f7325f877ee552dd14a2ee4f06c457b659037aba0d06d20729d7ba59
+py-oj-container Id : 2fb1f1ca90eb51c2fcca0b6059b8ad8eee5361f0b1c5dbac408e928c2330bc07
+js-oj-container Id : 7e7951f705b4fd3a8b769ca5f880e5e121ee1c2ee7b2183b324abc9b94b8d07c
+java-oj-container Id : ecc43ce20ff5459bbed4d410ea2392f881767ad4d1fc0232438f3fa67c631ffc
+
+All Containers Initialized
+In Development  env !
+Server running on PORT 5000 12/7/2022, 11:01:41 AM
+Database Connected !!!
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : py-oj-container
+
+Deleted(stopped) : js-oj-container
+
+Deleted(stopped) : java-oj-container
+
+gcc-oj-container Id : ab59087dab8185ee32f77e59d3e55caf344e8aca00ae3eb873cbf8ac7cf33a71
+py-oj-container Id : 5ab47c40b62dd5a226e0a2e0c2614b1a692dda547461655cb539c18cd2b0cbeb
+js-oj-container Id : 78da96d7e29b2fd8dc2df428c4cff763631a051c315bdd4b8b1e4d67d2bf9c4b
+java-oj-container Id : 127da916cccda95214b3a03e62483f507162039ac7d6731779402c0977bc1afb
+
+All Containers Initialized
+In Development  env !
+Server running on PORT 5000 12/7/2022, 11:02:08 AM
+Database Connected !!!
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : js-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : py-oj-container
+
+gcc-oj-container Id : 03b97b1332047b43d28e3dbc6eefb441e1e24b0cf1ee7fc500002302ed560de3
+py-oj-container Id : fd8d9aba534074a9cf44626d17017455ebe2c5d69288b8cf489537138816baa0
+js-oj-container Id : f03aec1dbadec7fa3b8cfb1fdbdd08c92c5dec28d74de3e1c68cfba3ee2a8e7f
+java-oj-container Id : cd941b14c701ba08ad1a591a17b2fddd3d0f72c9001dcbefccd908522a207b0b
+
+All Containers Initialized
+GET /api/user/loggedIn 12/7/2022, 11:02:51 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:02:51 AM
+GET /api/experimental/logs 12/7/2022, 11:02:51 AM
+GET /api/user/loggedIn 12/7/2022, 11:04:40 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:04:40 AM
+GET /api/experimental/logs 12/7/2022, 11:04:41 AM
+GET /api/user/loggedIn 12/7/2022, 11:04:54 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:04:54 AM
+In Development  env !
+Server running on PORT 5000 12/7/2022, 11:05:24 AM
+Database Connected !!!
+Deleted(stopped) : py-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : js-oj-container
+
+gcc-oj-container Id : 1af88d1da4279eb13eb60ace312797e9872edf4f0505dd99418f6fe5425db3d6
+py-oj-container Id : bc3cbfe02561ea2e352f8b0859568b69b80fd9689d085a5487102201f07f3216
+js-oj-container Id : 411a722e92e27bff06524af20e00496608aaffe3e1c9d63d506bf93d32cf1152
+java-oj-container Id : 05e162cb7acb697f7c564ba0230254ab1e37ba76810d375e7389e71286a098a1
+
+All Containers Initialized
+GET /api/user/loggedIn 12/7/2022, 11:05:34 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:05:34 AM
+GET /api/experimental/logs 12/7/2022, 11:05:34 AM
+GET /api/user/loggedIn 12/7/2022, 11:05:47 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:05:47 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:05:53 AM
+GET /api/user/loggedIn 12/7/2022, 11:05:53 AM
+GET /api/experimental/logs 12/7/2022, 11:05:53 AM
+GET /api/user/loggedIn 12/7/2022, 11:06:02 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:06:02 AM
+GET /api/experimental/logs 12/7/2022, 11:06:02 AM
+In Development  env !
+Server running on PORT 5000 12/7/2022, 11:08:20 AM
+Database Connected !!!
+GET /api/user/loggedIn 12/7/2022, 11:08:21 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:08:21 AM
+Deleted(stopped) : py-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : gcc-oj-container
+
+Deleted(stopped) : js-oj-container
+
+gcc-oj-container Id : 96ab5ad86c013e9c559da61ea80b0e5e570a2a774ed1b4d5ba5660f8b463f5ac
+py-oj-container Id : caf45cd3f30f40aff85d5d007778de1e81b693e9ddc122cd861562b2e0fc0d21
+js-oj-container Id : 13861ed558bf401bcfba3de8a74b53461cf3a01beba2af28d344ed68327e30fe
+java-oj-container Id : fa948f390a06249c82b13e5a4aed66bb76586e060f01dd9aa4d64cc08adc3f88
+
+All Containers Initialized
+GET /api/user/loggedIn 12/7/2022, 11:08:28 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:08:28 AM
+GET /api/experimental/logs 12/7/2022, 11:08:28 AM
+GET /api/user/loggedIn 12/7/2022, 11:08:34 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:08:34 AM
+GET /api/experimental/logs 12/7/2022, 11:08:34 AM
+GET /api/user/loggedIn 12/7/2022, 11:08:42 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:08:42 AM
+GET /api/explore/problems/:id getDetailedQuestion 12/7/2022, 11:08:52 AM
+GET /api/user/loggedIn 12/7/2022, 11:08:58 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:08:58 AM
+GET /api/experimental/logs 12/7/2022, 11:08:59 AM
+GET /api/experimental/logs 12/7/2022, 11:09:58 AM
+GET /api/experimental/logs 12/7/2022, 11:10:02 AM
+GET /api/user/loggedIn 12/7/2022, 11:12:11 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:12:11 AM
+GET /api/experimental/logs 12/7/2022, 11:12:11 AM
+GET /api/user/loggedIn 12/7/2022, 11:12:14 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:12:14 AM
+GET /api/experimental/logs 12/7/2022, 11:12:14 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:12:21 AM
+GET /api/user/loggedIn 12/7/2022, 11:12:21 AM
+GET /api/experimental/logs 12/7/2022, 11:12:21 AM
+GET /api/experimental/logs 12/7/2022, 11:13:49 AM
+GET /api/experimental/logs 12/7/2022, 11:13:55 AM
+GET /api/user/loggedIn 12/7/2022, 11:13:58 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:13:58 AM
+GET /api/user/loggedIn 12/7/2022, 11:14:01 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:14:01 AM
+GET /api/experimental/logs 12/7/2022, 11:14:01 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:14:08 AM
+GET /api/user/loggedIn 12/7/2022, 11:14:08 AM
+GET /api/experimental/logs 12/7/2022, 11:14:08 AM
+GET /api/experimental/logs 12/7/2022, 11:14:43 AM
+GET /api/experimental/logs 12/7/2022, 11:15:15 AM
+GET /api/user/loggedIn 12/7/2022, 11:15:18 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:15:18 AM
+GET /api/experimental/logs 12/7/2022, 11:15:18 AM
+GET /api/user/loggedIn 12/7/2022, 11:15:28 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:15:28 AM
+GET /api/explore/problems/:id getDetailedQuestion 12/7/2022, 11:15:31 AM
+GET /api/notes/allNotes 12/7/2022, 11:15:39 AM
+GET /api/notes/:codeid 12/7/2022, 11:15:55 AM
+Note:  Changed Title3
+GET /api/experimental/logs 12/7/2022, 11:17:00 AM
+GET /api/user/loggedIn 12/7/2022, 11:17:04 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:17:04 AM
+GET /api/experimental/logs 12/7/2022, 11:17:05 AM
+GET /api/user/loggedIn 12/7/2022, 11:17:12 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:17:12 AM
+GET /api/notes/allNotes 12/7/2022, 11:17:15 AM
+GET /api/notes/:codeid 12/7/2022, 11:17:18 AM
+Note:  Semaphore Code
+GET /api/experimental/logs 12/7/2022, 11:18:34 AM
+GET /api/experimental/logs 12/7/2022, 11:19:03 AM
+GET /api/experimental/logs 12/7/2022, 11:19:40 AM
+GET /api/experimental/logs 12/7/2022, 11:20:28 AM
+GET /api/user/loggedIn 12/7/2022, 11:20:47 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:20:47 AM
+GET /api/experimental/logs 12/7/2022, 11:20:47 AM
+GET /api/user/loggedIn 12/7/2022, 11:22:13 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:22:13 AM
+GET /api/user/loggedIn 12/7/2022, 11:22:13 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:22:13 AM
+GET /api/experimental/logs 12/7/2022, 11:22:13 AM
+GET /api/notes/allNotes 12/7/2022, 11:22:14 AM
+GET /api/user/loggedIn 12/7/2022, 11:22:24 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:22:24 AM
+GET /api/experimental/logs 12/7/2022, 11:22:24 AM
+GET /api/user/loggedIn 12/7/2022, 11:22:28 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:22:28 AM
+GET /api/experimental/logs 12/7/2022, 11:22:28 AM
+GET /api/experimental/logs 12/7/2022, 11:25:58 AM
+GET /api/experimental/logs 12/7/2022, 11:26:22 AM
+GET /api/user/loggedIn 12/7/2022, 11:26:27 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:26:27 AM
+GET /api/experimental/logs 12/7/2022, 11:26:27 AM
+GET /api/experimental/logs 12/7/2022, 11:28:02 AM
+GET /api/experimental/logs 12/7/2022, 11:28:15 AM
+GET /api/experimental/logs 12/7/2022, 11:29:09 AM
+GET /api/user/loggedIn 12/7/2022, 11:29:22 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:29:22 AM
+GET /api/experimental/logs 12/7/2022, 11:29:23 AM
+GET /api/user/loggedIn 12/7/2022, 11:29:29 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:29:29 AM
+GET /api/notes/allNotes 12/7/2022, 11:29:35 AM
+GET /api/notes/:codeid 12/7/2022, 11:29:38 AM
+Note:  Semaphore Code
+POST /api/notes/log 12/7/2022, 11:29:50 AM
+Username: aman
+LOG: Visited Mail
+GET /api/user/loggedIn 12/7/2022, 11:29:56 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:29:56 AM
+GET /api/user/loggedIn 12/7/2022, 11:30:46 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:30:46 AM
+GET /api/user/loggedIn 12/7/2022, 11:30:53 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:30:53 AM
+GET /api/experimental/logs 12/7/2022, 11:30:53 AM
+GET /api/user/loggedIn 12/7/2022, 11:34:59 AM
+GET /api/explore/problems getAllQuestions 12/7/2022, 11:34:59 AM
+GET /api/experimental/logs 12/7/2022, 11:34:59 AM

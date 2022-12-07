@@ -2,14 +2,14 @@
 
 const Queue = require('bull');
 const {
-    isGuest, getQueryById,
-    getQuestionById, findOneUser,
-    createNewCode
+    Authorization, Query,
+    Question, User, Code
 } = require('../DataBase/database');
 const {
     deleteFile, readFile, execCode,
     execCodeAgainstTestcases
 } = require('./codeExecutor_dockerv');
+const { dateTimeNowFormated, logger } = require('../utils');
 
 const WORKERS_NUMBER = 5;
 
@@ -20,11 +20,11 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
     const { id: queryId } = data;
     let query = null;
     try {
-        query = await getQueryById(queryId);
+        query = await Query.getQueryById(queryId);
         if (!query) throw Error("Query not found");
 
         // create an entry in code database
-        const code = await createNewCode({ code: (readFile(query.filepath).toString()), language: query.language });
+        const code = await Code.createNewCode({ code: (readFile(query.filepath).toString()), language: query.language });
         query.codeId = code._id;
         query.startTime = new Date();
 
@@ -35,12 +35,12 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
         query.output = response;
         await query.save(); // TODO : saving the changes to database
 
-        const question = await getQuestionById(query.quesId);
+        const question = await Question.getQuestionById(query.quesId);
         question.noOfSuccess += 1;
         await question.save(); // TODO : saving the changes to database
 
-        if (query.username && !isGuest(query.username)) {
-            const user = await findOneUser({ username: query.username });
+        if (query.username && !Authorization.isGuest(query.username)) {
+            const user = await User.findOneUser({ username: query.username });
             if (!user.solvedQuestions) {
                 user.solvedQuestions = [];
             }
@@ -52,7 +52,7 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
 
     } catch (error) {
         if (!error.msg) {
-            console.error('Error without msg in bull.process', error);
+            logger.error('Error without msg in bull.process', error, dateTimeNowFormated());
             error = { ...error, msg: 'some server side errors' };
         }
         if (query) {
@@ -60,7 +60,7 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
             query.status = 'error';
             query.output = error;
             await query.save(); // TODO : saving the changes to database
-        } else console.log('Error in queryQueue: ', error);
+        } else logger.log('Error in queryQueue: ', error, dateTimeNowFormated());
     } finally {
         if (query && query.filepath) deleteFile(query.filepath);
     }
@@ -69,11 +69,11 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
 
 // set status of query to error with some appropriate msg
 queryQueue.on('failed', error => {
-    console.error('bull/redis failed', error.data.id, error.failedReason);
+    logger.error('bull/redis failed', error.data.id, error.failedReason, dateTimeNowFormated());
 })
 
 queryQueue.on('error', error => {
-    console.error('bull/redis error', error);
+    logger.error('bull/redis error', error, dateTimeNowFormated());
 })
 
 
@@ -97,7 +97,7 @@ queryQueue_exec.process(WORKERS_NUMBER, async ({ data }) => {
     const { queryId } = data;
     let query = null;
     try {
-        query = await getQueryById(queryId);
+        query = await Query.getQueryById(queryId);
         if (!query) throw new Error("Query not found");
 
         const { filepath, language, input } = query;
@@ -110,14 +110,14 @@ queryQueue_exec.process(WORKERS_NUMBER, async ({ data }) => {
 
     } catch (error) {
         if (!error.msg) {
-            console.error('Error without msg in bull.process', error);
+            logger.error('Error without msg in bull.process', error, dateTimeNowFormated());
             error = { ...error, msg: 'some server side errors' };
         }
         if (query) {
             query.status = 'error';
             query.output = error;
             await query.save();
-        } else console.log('Error in queryQueue: ', error);
+        } else logger.log('Error in queryQueue: ', error, dateTimeNowFormated());
     } finally {
         if (query && query.filepath) deleteFile(query.filepath);
     }
@@ -126,11 +126,11 @@ queryQueue_exec.process(WORKERS_NUMBER, async ({ data }) => {
 
 // set status of query to error with some appropriate msg
 queryQueue_exec.on('failed', error => {
-    console.error('bull/redis failed', error.data.id, error.failedReason);
+    logger.error('bull/redis failed', error.data.id, error.failedReason, dateTimeNowFormated());
 })
 
 queryQueue_exec.on('error', error => {
-    console.error('bull/redis error', error);
+    logger.error('bull/redis error', error, dateTimeNowFormated());
 })
 
 const addQueryToQueue_Exec = async (queryId) => {

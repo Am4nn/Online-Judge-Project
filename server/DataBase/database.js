@@ -95,10 +95,10 @@ const isGuest = username => {
 
 
 module.exports = {
-    getQuestionList, getQuestionById,
-    createNewQuery, getQueryById, getAllQueriesReverseSorted, deleteQueryById,
-    createNewUser, getUserById, findOneUser,
-    createNewNote, getNoteById, getNoteByFilter, deleteNoteById,
-    createNewCode, getCodeById, deleteCodeById,
-    isAdmin, isGuest
+    Question: { getQuestionList, getQuestionById },
+    Query: { createNewQuery, getQueryById, getAllQueriesReverseSorted, deleteQueryById },
+    User: { createNewUser, getUserById, findOneUser },
+    Note: { createNewNote, getNoteById, getNoteByFilter, deleteNoteById },
+    Code: { createNewCode, getCodeById, deleteCodeById },
+    Authorization: { isAdmin, isGuest }
 };

@@ -1,12 +1,13 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcryptjs');
-const { findOneUser } = require('./DataBase/database');
+const { User } = require('./DataBase/database');
+const { dateTimeNowFormated, logger } = require('./utils');
 
 const loginValidatorHelper = async (req, res, next, credential, credentialName, password) => {
 
     let existingUser = undefined;
-    credentialName === 'email' && (existingUser = await findOneUser({ email: credential }));
-    credentialName === 'username' && (existingUser = await findOneUser({ username: credential }));
+    credentialName === 'email' && (existingUser = await User.findOneUser({ email: credential }));
+    credentialName === 'username' && (existingUser = await User.findOneUser({ username: credential }));
 
     if (!existingUser)
         return res.status(401).json({ error: `Wrong ${credentialName} or password.` });
@@ -34,7 +35,7 @@ const loginValidator = async (req, res, next) => {
 
         await loginValidatorHelper(req, res, next, (email ? email : username), (email ? 'email' : 'username'), password)
     } catch (err) {
-        console.error(err);
+        logger.error(err, dateTimeNowFormated());
         res.status(500).json({ error: "Internal Error" });
     }
 }
@@ -88,13 +89,13 @@ const registerValidator = async (req, res, next) => {
             });
         }
 
-        const existingUserE = await findOneUser({ email });
+        const existingUserE = await User.findOneUser({ email });
         if (existingUserE)
             return res.status(400).json({
                 error: "An account with this email already exists.",
             });
 
-        const existingUserU = await findOneUser({ username });
+        const existingUserU = await User.findOneUser({ username });
         if (existingUserU)
             return res.status(400).json({
                 error: "An account with this username already exists.",
@@ -102,7 +103,7 @@ const registerValidator = async (req, res, next) => {
 
         next();
     } catch (err) {
-        console.error(err);
+        logger.error(err, dateTimeNowFormated());
         res.status(500).json({ error: "Internal Error" });
     }
 }
@@ -118,7 +119,7 @@ const authValidator = (req, res, next) => {
 
         next();
     } catch (err) {
-        console.error(err);
+        logger.error(err, dateTimeNowFormated());
         res.status(401).json({ error: "Unauthorized" });
     }
 }

@@ -26,6 +26,7 @@ const DashBoard = React.lazy(() => import('./pages/DashBoard/DashBoard'));
 const Account = React.lazy(() => import('./pages/Account/Account'));
 const LinkShortner = React.lazy(() => import('./pages/LinkShortner/LinkShortner'));
 const Notes = React.lazy(() => import('./pages/Notes/Notes'));
+const ServerLogs = React.lazy(() => import('./pages/ServerLogs/ServerLogs'));
 const Customform = React.lazy(() => import('./compenents/Customform/Customform'));
 
 
@@ -69,6 +70,7 @@ const App = () => {
                         <Route exact path='/account' element={<Account />} />
                         <Route exact path='/notes' element={<Notes />} />
                         <Route exact path='/linkShortner' element={<LinkShortner />} />
+                        <Route exact path='/serverLogs' element={<ServerLogs />} />
                         <Route exact path='*' element={<NotFound />} />
                     </Routes>
                 </Suspense>

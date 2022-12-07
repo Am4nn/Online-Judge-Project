@@ -2,14 +2,11 @@ const ObjectId = require('mongoose').Types.ObjectId;
 const jwt = require('jsonwebtoken');
 
 const {
-    getQueryById, createNewQuery,
-    getQuestionList, getQuestionById,
-    getAllQueriesReverseSorted,
-    deleteQueryById, getUserById, getCodeById
+    Query, Question, User, Code
 } = require('../DataBase/database');
 const { addQueryToQueue, addQueryToQueue_Exec } = require('../CodeExecuter/queryQueue');
 const { createFile } = require('../CodeExecuter/codeExecutor_dockerv');
-const { dateTimeNowFormated } = require('../utils');
+const { dateTimeNowFormated, logger } = require('../utils');
 
 // ObjectID Validator function
 function isValidObjectId(id) {
@@ -17,29 +14,29 @@ function isValidObjectId(id) {
 }
 
 const problemsController = async (req, res) => {
-    console.log('GET /api/explore/problems getAllQuestions', dateTimeNowFormated());
+    logger.log('GET /api/explore/problems getAllQuestions', dateTimeNowFormated());
     try {
-        const questions = await getQuestionList();
+        const questions = await Question.getQuestionList();
         return res.status(200).json(questions);
     } catch (error) {
-        console.error(error, dateTimeNowFormated());
+        logger.error(error, dateTimeNowFormated());
         return res.status(400).json(error);
     }
 }
 
 const detailedProblemController = async (req, res) => {
-    console.log('GET /api/explore/problems/:id getDetailedQuestion', dateTimeNowFormated());
+    logger.log('GET /api/explore/problems/:id getDetailedQuestion', dateTimeNowFormated());
     try {
         const id = req.params.id;
         if (!isValidObjectId(id))
             return res.status(404).json('not a valid object id');
 
-        const question = await getQuestionById(id);
+        const question = await Question.getQuestionById(id);
         if (!question)
             return res.status(404).json('id does not exists');
         return res.status(200).json(question);
     } catch (error) {
-        console.error(error, dateTimeNowFormated());
+        logger.error(error, dateTimeNowFormated());
         return res.status(400).json(error);
     }
 }
@@ -47,7 +44,7 @@ const detailedProblemController = async (req, res) => {
 const validLanguages = ['c', 'cpp', 'py', 'js', 'java'];
 
 const verdictController = async (req, res) => {
-    console.log('POST /api/explore/problems/:id sentCodeForVerdict', dateTimeNowFormated());
+    logger.log('POST /api/explore/problems/:id sentCodeForVerdict', dateTimeNowFormated());
     try {
         const { language, code, testcase, quesName } = req.body;
         const quesId = req.params.id;
@@ -61,7 +58,7 @@ const verdictController = async (req, res) => {
             if (token) {
                 const verified = jwt.verify(token, process.env.JWT_SECRET);
                 const userId = verified.user;
-                const user = await getUserById(userId);
+                const user = await User.getUserById(userId);
                 username = user.username;
                 user.totalSubmissions += 1;
                 await user.save();
@@ -71,68 +68,68 @@ const verdictController = async (req, res) => {
         }
 
         const { filename } = createFile(language, code);
-        const query = await createNewQuery({ language, filepath: filename, testcase, quesId, quesName, username });
+        const query = await Query.createNewQuery({ language, filepath: filename, testcase, quesId, quesName, username });
 
         const queryId = query['_id'];
         addQueryToQueue(queryId);
 
-        const question = await getQuestionById(quesId);
+        const question = await Question.getQuestionById(quesId);
         question.noOfSubm += 1;
         await question.save();
 
         res.status(201).json({ status: 'pending', msg: "Request queued, wait for response !", queryId });
     } catch (error) {
-        console.error(error, dateTimeNowFormated());
+        logger.error(error, dateTimeNowFormated());
         return res.status(400).json({ status: 'error', msg: 'some error occured submitting the code !', error: JSON.stringify(error) });
     }
 }
 
 const statusController = async (req, res) => {
-    console.log('GET /api/explore/status/:queryId getStatusOfQuery', dateTimeNowFormated());
+    logger.log('GET /api/explore/status/:queryId getStatusOfQuery', dateTimeNowFormated());
     const queryId = req.params.queryId;
     if (!isValidObjectId(queryId))
         return res.status(404).json({ msg: 'not a valid object id' });
     let query = null;
     try {
-        query = await getQueryById(queryId);
+        query = await Query.getQueryById(queryId);
         if (!query) {
             return res.status(404).json({ msg: 'invalid queryId or this query has been deleted !' });
         }
         res.status(200).json(query);
         if (query.type === 'exec' && (query.status === 'success' || query.status === 'error'))
-            await deleteQueryById(queryId);
+            await Query.deleteQueryById(queryId);
     } catch (error) {
-        console.error(error, dateTimeNowFormated());
+        logger.error(error, dateTimeNowFormated());
         res.status(400).json({ msg: 'on error', error: JSON.stringify(error) });
     }
 }
 
 const leaderboardController = async (req, res) => {
-    console.log('GET /api/explore/leaderboard getLeaderboard', dateTimeNowFormated());
+    logger.log('GET /api/explore/leaderboard getLeaderboard', dateTimeNowFormated());
     try {
-        const leaders = await getAllQueriesReverseSorted();
+        const leaders = await Query.getAllQueriesReverseSorted();
         return res.status(200).json(leaders);
     } catch (error) {
-        console.error(error, dateTimeNowFormated());
+        logger.error(error, dateTimeNowFormated());
         return res.status(400).json(error);
     }
 }
 
 const codesController = async (req, res) => {
-    console.log('GET /api/explore/getcode/:codeId getCodeOfAQuery', dateTimeNowFormated());
+    logger.log('GET /api/explore/getcode/:codeId getCodeOfAQuery', dateTimeNowFormated());
     try {
         const codeId = req.params.codeId;
-        const code = await getCodeById(codeId);
+        const code = await Code.getCodeById(codeId);
         if (!code) return res.status(404).json({ error: 'filename does not exists / yet exists or is deleted !' });
         res.status(200).json({ code: code.code, language: code.language });
     } catch (error) {
-        console.error(error, dateTimeNowFormated());
+        logger.error(error, dateTimeNowFormated());
         res.status(400).json({ error: JSON.stringify(error) });
     }
 }
 
 const codeExecutor = async (req, res) => {
-    console.log('POST /api/explore/codeExecutor', dateTimeNowFormated());
+    logger.log('POST /api/explore/codeExecutor', dateTimeNowFormated());
     try {
         const { language, code, input } = req.body;
 
@@ -143,14 +140,14 @@ Or may be this language is not yet supported !`
             });
 
         const { filepath } = createFile(language, code);
-        const query = await createNewQuery({ type: 'exec', filepath, language, input });
+        const query = await Query.createNewQuery({ type: 'exec', filepath, language, input });
 
         const queryId = query['_id'];
         addQueryToQueue_Exec(queryId);
 
         res.status(201).json({ status: 'pending', msg: "Request queued, wait for response !", queryId });
     } catch (error) {
-        console.error(error, dateTimeNowFormated());
+        logger.error(error, dateTimeNowFormated());
         return res.status(400).json({ status: 'error', msg: 'some error occured submitting the code !', error: JSON.stringify(error) });
     }
 }

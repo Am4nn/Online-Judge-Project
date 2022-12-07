@@ -1,5 +1,6 @@
 const { exec, spawn } = require('child_process');
 const path = require('path');
+const { dateTimeNowFormated, logger } = require('../utils');
 
 // name => it is the name to be given to the container
 // image => it is the name of image whose container is to be created
@@ -18,9 +19,9 @@ const createContainer = ({ name, image }) => {
 const stopContainer = container_id_name => {
     return new Promise((resolve, reject) => {
         exec(`docker stop ${container_id_name}`, (error, stdout, stderr) => {
-            stdout && console.log('Deleted(stopped) :', stdout);
-            // error && console.log(`${error}`);
-            // stderr && console.log(`${stderr}`);
+            stdout && logger.log('Deleted(stopped) :', stdout);
+            // error && logger.log(`${error}`);
+            // stderr && logger.log(`${stderr}`);
             resolve();
         });
     });
@@ -30,9 +31,9 @@ const stopContainer = container_id_name => {
 const killContainer = container_id_name => {
     return new Promise((resolve, reject) => {
         exec(`docker kill ${container_id_name}`, (error, stdout, stderr) => {
-            stdout && console.log('Deleted(stopped) :', stdout);
-            // error && console.log(`${error}`);
-            // stderr && console.log(`${stderr}`);
+            stdout && logger.log('Deleted(stopped) :', stdout);
+            // error && logger.log(`${error}`);
+            // stderr && logger.log(`${stderr}`);
             resolve();
         });
     });
@@ -110,7 +111,7 @@ const execOutFile = (containerId, id, testInput) => {
         });
         cmd.on('close', code => {
             resolve('');
-            // console.log(`child process exited with code ${code}`);
+            // logger.log(`child process exited with code ${code}`);
         });
     });
 }
@@ -136,7 +137,7 @@ const execPyFile = (containerId, filename, testInput) => {
         });
         cmd.on('close', code => {
             resolve('');
-            // console.log(`child process exited with code ${code}`);
+            // logger.log(`child process exited with code ${code}`);
         });
     });
 }
@@ -162,7 +163,7 @@ const execJsFile = (containerId, filename, testInput) => {
         });
         cmd.on('close', code => {
             resolve('');
-            // console.log(`child process exited with code ${code}`);
+            // logger.log(`child process exited with code ${code}`);
         });
     });
 }
@@ -188,7 +189,7 @@ const execJavaClassFile = (containerId, id, testInput) => {
             reject({ msg: 'on error', error: `${error.name} => ${error.message}` });
         });
         cmd.on('close', code => {
-            // console.log(`child process exited with code ${code} `);
+            // logger.log(`child process exited with code ${code} `);
             resolve('');
         });
         cmd.stdin.on('error', err => {

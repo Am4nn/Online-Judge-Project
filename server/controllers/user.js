@@ -1,10 +1,10 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { dateTimeNowFormated } = require('../utils');
-const { createNewUser, getUserById, findOneUser } = require('../DataBase/database');
+const { dateTimeNowFormated, logger } = require('../utils');
+const { User } = require('../DataBase/database');
 
 const loginController = async (req, res) => {
-    console.log('POST /api/user/login', dateTimeNowFormated());
+    logger.log('POST /api/user/login', dateTimeNowFormated());
     try {
         // sign the token
         const token = jwt.sign(
@@ -22,13 +22,13 @@ const loginController = async (req, res) => {
             // sameSite: "none",
         }).status(200).json({ msg: "Logged In" });
     } catch (err) {
-        console.error(err, dateTimeNowFormated());
+        logger.error(err, dateTimeNowFormated());
         res.status(500).json({ error: "Internal Error" });
     }
 }
 
 const registerController = async (req, res) => {
-    console.log('POST /api/user/register', dateTimeNowFormated());
+    logger.log('POST /api/user/register', dateTimeNowFormated());
     try {
         const { name, username, email, password } = req.body;
 
@@ -37,7 +37,7 @@ const registerController = async (req, res) => {
         const passwordHash = await bcrypt.hash(password, salt);
 
         // save a new user account to the db
-        const savedUser = await createNewUser({ name, username, email, passwordHash });
+        const savedUser = await User.createNewUser({ name, username, email, passwordHash });
 
         // sign the token
         const token = jwt.sign(
@@ -55,13 +55,13 @@ const registerController = async (req, res) => {
             // sameSite: "none",
         }).status(200).json({ msg: "Registered" });
     } catch (err) {
-        console.error(err, dateTimeNowFormated());
+        logger.error(err, dateTimeNowFormated());
         res.status(500).json({ error: "Internal Error" });
     }
 }
 
 const logoutController = (req, res) => {
-    console.log('GET /api/user/logout', dateTimeNowFormated());
+    logger.log('GET /api/user/logout', dateTimeNowFormated());
     return res.cookie("token", "", {
         httpOnly: true,
         expires: new Date(0),
@@ -71,14 +71,14 @@ const logoutController = (req, res) => {
 }
 
 const loggedInController = async (req, res) => {
-    console.log('GET /api/user/loggedIn', dateTimeNowFormated());
+    logger.log('GET /api/user/loggedIn', dateTimeNowFormated());
     try {
         if (!req.cookies || !req.cookies.token) return res.json(false);
 
         const token = req.cookies.token;
         const verified = jwt.verify(token, process.env.JWT_SECRET);
 
-        const user = await getUserById(verified.user);
+        const user = await User.getUserById(verified.user);
 
         res.status(200).json({
             status: true,
@@ -88,19 +88,19 @@ const loggedInController = async (req, res) => {
             solvedQuestions: user.solvedQuestions
         });
     } catch (err) {
-        console.error(err, dateTimeNowFormated());
+        logger.error(err, dateTimeNowFormated());
         res.json({ status: false });
     }
 }
 
 const changePasswordController = async (req, res) => {
-    console.log('PUT /api/user/changePassword', dateTimeNowFormated());
+    logger.log('PUT /api/user/changePassword', dateTimeNowFormated());
     try {
         let { username, email, password, newPassword } = req.body;
         username = username ? username.trim() : '';
         email = email ? email.trim() : '';
 
-        const existingUser = await findOneUser({ username, email });
+        const existingUser = await User.findOneUser({ username, email });
         if (!existingUser || (existingUser.username !== username) || (existingUser.email !== email))
             return res.status(401).json({ error: 'Wrong email or username or password.' });
         const passwordCorrect = await bcrypt.compare(
@@ -117,7 +117,7 @@ const changePasswordController = async (req, res) => {
         await existingUser.save();
         res.status(200).json({ msg: "Password Changed" });
     } catch (error) {
-        console.error(error, dateTimeNowFormated());
+        logger.error(error, dateTimeNowFormated());
         res.status(500).json({ error });
     }
 }

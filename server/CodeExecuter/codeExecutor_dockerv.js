@@ -8,6 +8,7 @@ const {
     deleteFilesDocker, execJsFile,
     compileJavaCode, execJavaClassFile, killContainer
 } = require('./docker');
+const { dateTimeNowFormated, logger } = require('../utils');
 
 // ####################################################################################
 // ####################################################################################
@@ -44,10 +45,11 @@ const initDockerContainer = (image, index) => {
 const initAllDockerContainers = async () => {
     try {
         const res = await Promise.all(imageNames.map((image, index) => initDockerContainer(image, index)));
-        console.log(res.join('\n'));
-        console.log("\nAll Containers Initialized");
+        logger.log(res.join('\n'));
+        logger.log("\nAll Containers Initialized");
     } catch (error) {
-        console.error("Docker Error: ", error);
+        logger.error("Docker Error: ", error);
+        logger.error(dateTimeNowFormated());
     }
 }
 const details = {
@@ -121,7 +123,7 @@ const deleteFile = filepath => {
 
     if (!fs.existsSync(filepath)) return;
     fs.unlinkSync(filepath);
-    console.log('Unlinked :', path.basename(filepath));
+    logger.log('Unlinked :', path.basename(filepath));
 }
 
 const stderrMsgFn = ({ index, input, output, exOut }) => `Testcase ${index} Failed 
@@ -189,7 +191,7 @@ const execCodeAgainstTestcases = (filePath, testcase, language) => {
                 }
                 deleteFilesDocker(filesToBeDeleted, containerId);
             } catch (error) {
-                console.error('Caught some errors while deleting files from Docker Container', error, containerId);
+                logger.error('Caught some errors while deleting files from Docker Container', error, containerId, dateTimeNowFormated());
             }
         }
     });
@@ -238,7 +240,7 @@ const execCode = async (filePath, language, inputString) => {
             }
             deleteFilesDocker(filesToBeDeleted, containerId);
         } catch (error) {
-            console.error('Caught some errors while deleting files from Docker Container', error, containerId);
+            logger.error('Caught some errors while deleting files from Docker Container', error, containerId, dateTimeNowFormated());
         }
     }
 }

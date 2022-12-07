@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@1,600&display=swap');
+
+#out-pre>div {
+    background-color: hsl(0, 0%, 95%);
+    margin-bottom: 0.05rem;
+}
+
+.token {
+    font-family: 'Raleway', sans-serif;
+    font-size: 1.5em;
+}
+
+.token-get {
+    color: #34568B;
+}
+
+.token-post {
+    color: #9B2335;
+}
+
+.token-put {
+    color: hsl(57, 60%, 50%);
+}
+
+.token-delete {
+    color: hsl(308, 100%, 50%);
+}
+
+.token-error {
+    color: hsl(0, 60%, 50%);
+}
+
+.token-unlinked {
+    color: #55B4B0;
+}
+
+.token-port {
+    color: #9b0c6a;
+}
+
+.token-database {
+    color: hsl(120, 60%, 50%);
+}
+
+.token-production {
+    color: #808cba;
+}
+
+.token-note {
+    color: hsl(209, 74%, 49%);
+}
+
+.token-addnote {
+    color: hsl(342, 81%, 71%);
+}
+
+.token-editnote {
+    color: hsl(342, 91%, 53%);
+}
+
+.token-deletenote {
+    color: hsl(325, 81%, 62%);
+}
+
+.token-containers {
+    color: #103652;
+}
+
+.token-deleted {
+    color: #ff79a3;
+}
+
+.token-failed {
+    color: #6b3722;
+}
+
+.token-log {
+    color: #ffc36c;
+}
+
+
+.token-time {
+    color: purple;
+}
