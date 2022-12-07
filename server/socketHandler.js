@@ -13,12 +13,10 @@ const registerSocketServer = server => {
     io.on("connection", socket => {
         const id = socket.handshake.query.id;
         connectedUsers.push(id);
-        console.log('Connected :', connectedUsers);
         socket.on("disconnect", () => {
             if (connectedUsers.indexOf(id) !== -1) {
                 connectedUsers.splice(connectedUsers.indexOf(id), 1);
             }
-            console.log('Disconnected :', connectedUsers);
         });
     })
 }

@@ -6,7 +6,7 @@ import {
     Menu,
     MenuItem,
 } from '@mui/material';
-import { Share, Note, Link } from '@mui/icons-material';
+import { Share, Note, Link, Description } from '@mui/icons-material';
 import Nav from "react-bootstrap/Nav"
 import { useNavigate } from 'react-router';
 
@@ -38,6 +38,10 @@ const ExtraMenu = ({ setExpand }) => {
     }
     const LSHanlder = () => {
         navigate('/linkShortner');
+        setExpand(false);
+    }
+    const serverLogsHandler = () => {
+        navigate('/serverLogs');
         setExpand(false);
     }
 
@@ -101,6 +105,12 @@ const ExtraMenu = ({ setExpand }) => {
                 >
                     <Link style={{ marginRight: '8px' }} />
                     Link Shortner
+                </MenuItem>
+                <MenuItem
+                    onClick={serverLogsHandler}
+                >
+                    <Description style={{ marginRight: '8px' }} />
+                    Server Logs
                 </MenuItem>
             </Menu>
         </Fragment>

@@ -1,8 +1,10 @@
 .spinner {
     display: inline-block;
+    pointer-events: none;
 }
 
 .spinner:after {
+    pointer-events: none;
     content: ' ';
     display: block;
     width: 10rem;
