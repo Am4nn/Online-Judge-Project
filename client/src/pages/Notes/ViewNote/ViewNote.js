@@ -34,11 +34,6 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
     if (copied === true) setTimeout(() => setCopied(false), 2500);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        setCode('');
-        setLoading(true);
-    }, [noteid]);
-
     const handleClose = () => {
         setOpenModal(false);
     };
@@ -53,32 +48,7 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
         }
     }, [openModal]);
 
-    useEffect(() => {
-        if (!codeid) return;
-
-        // make request to server to fetch code with _id:codeid
-        fetch(
-            `${SERVER_LINK}/api/notes/${codeid}?noteid=${noteid}`,
-            {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                method: 'GET',
-                credentials: 'include'
-            }
-        )
-            .then(async response => {
-                const res = await response.json();
-                if (response.ok) return res;
-                return Promise.reject(res);
-            })
-            .then(response => {
-                setCode(response.code);
-                setLanguage(response.language);
-            })
-            .catch(error => { setCode(JSON.stringify(error)) })
-            .finally(() => setLoading(false))
-    }, [codeid, noteid]);
+    useFetchCodeForNote(codeid, noteid, setCode, setLanguage, setLoading);
 
     const copyHandler = () => {
         const result = copy(code);
@@ -153,7 +123,9 @@ const ViewNote = ({ openModal, setOpenModal, viewNote, setEditNote, setOpenEditM
     const endRef = useRef(null);
 
     useEffect(() => {
+        setCode('');
         setInput('');
+        setLoading(true);
         setCodeSubmittingState('not-initialized');
         setResponse({ status: 'pending' });
     }, [noteid]);
@@ -412,5 +384,35 @@ const ConfirmationDialog = ({ open, setOpen, handleDeleteOperation }) => {
         </Dialog>
     );
 }
+
+const useFetchCodeForNote = (codeid, noteid, setCode, setLanguage, setLoading) => {
+    useEffect(() => {
+        if (!codeid) return;
+
+        // make request to server to fetch code with _id:codeid
+        fetch(
+            `${SERVER_LINK}/api/notes/${codeid}?noteid=${noteid}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                method: 'GET',
+                credentials: 'include'
+            }
+        )
+            .then(async response => {
+                const res = await response.json();
+                if (response.ok) return res;
+                return Promise.reject(res);
+            })
+            .then(response => {
+                setCode(response.code);
+                setLanguage(response.language);
+            })
+            .catch(error => { setCode(JSON.stringify(error)) })
+            .finally(() => setLoading(false))
+    }, [codeid, noteid, setCode, setLanguage, setLoading]);
+}
+
 
 export default ViewNote;

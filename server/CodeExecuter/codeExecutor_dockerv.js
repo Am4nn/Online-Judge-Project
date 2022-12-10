@@ -5,8 +5,8 @@ const {
     compileCCode, compileCppCode,
     copyFiles, createContainer,
     execOutFile, execPyFile,
-    deleteFilesDocker, execJsFile,
-    compileJavaCode, execJavaClassFile, killContainer
+    execJsFile, compileJavaCode, execJavaClassFile,
+    killContainer, deleteFileDocker
 } = require('./docker');
 const { dateTimeNowFormated, logger } = require('../utils');
 
@@ -180,16 +180,17 @@ const execCodeAgainstTestcases = (filePath, testcase, language) => {
         } catch (error) {
             reject(error);
         } finally {
-            if (!filename) return;
             try {
-                let filesToBeDeleted = filename;
-                if (isCompiled) {
-                    if (language === 'java')
-                        filesToBeDeleted += ' Solution.class';
-                    else
-                        filesToBeDeleted += (' ' + (filename.split('.')[0]) + '.' + details[language].compiledExtension);
+                if (filename)
+                    await deleteFileDocker(filename, containerId);
+                if (filename && isCompiled) {
+                    let compiledFile = (
+                        (language === 'java') ?
+                            'Solution.class' :
+                            ((filename.split('.')[0]) + '.' + details[language].compiledExtension)
+                    );
+                    await deleteFileDocker(compiledFile, containerId);
                 }
-                deleteFilesDocker(filesToBeDeleted, containerId);
             } catch (error) {
                 logger.error('Caught some errors while deleting files from Docker Container', error, containerId, dateTimeNowFormated());
             }
@@ -229,16 +230,17 @@ const execCode = async (filePath, language, inputString) => {
     } catch (error) {
         return error;
     } finally {
-        if (!filename) return;
         try {
-            let filesToBeDeleted = filename;
-            if (isCompiled) {
-                if (language === 'java')
-                    filesToBeDeleted += ' Solution.class';
-                else
-                    filesToBeDeleted += (' ' + (filename.split('.')[0]) + '.' + details[language].compiledExtension);
+            if (filename)
+                await deleteFileDocker(filename, containerId);
+            if (filename && isCompiled) {
+                let compiledFile = (
+                    (language === 'java') ?
+                        'Solution.class' :
+                        ((filename.split('.')[0]) + '.' + details[language].compiledExtension)
+                );
+                await deleteFileDocker(compiledFile, containerId);
             }
-            deleteFilesDocker(filesToBeDeleted, containerId);
         } catch (error) {
             logger.error('Caught some errors while deleting files from Docker Container', error, containerId, dateTimeNowFormated());
         }

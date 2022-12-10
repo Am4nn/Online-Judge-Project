@@ -10,7 +10,7 @@ const Footer = () => {
         window.open(link, '_blank');
 
         fetch(
-            `${SERVER_LINK}/api/notes/log`,
+            `${SERVER_LINK}/api/experimental/log`,
             {
                 headers: {
                     'Content-Type': 'application/json'
@@ -19,7 +19,7 @@ const Footer = () => {
                 body: JSON.stringify({ msg: `Visited ${name}` }),
                 credentials: 'include'
             }
-        ).catch(error => console.log(error));
+        ).catch(error => console.error(error));
     }
 
     return (

@@ -29,6 +29,19 @@ const getLogsController = (req, res) => {
     }
 }
 
+const logFromClient = (req, res) => {
+    try {
+        logger.log("POST /api/experimental/log", dateTimeNowFormated());
+        logger.log("Username:", req.username);
+        logger.log("LOG:", req.body.msg);
+        res.status(200).json('logged');
+    } catch (err) {
+        logger.error(err, dateTimeNowFormated());
+        res.status(500).json(err);
+    }
+}
+
+
 module.exports = {
-    getLogsController
+    getLogsController, logFromClient
 }

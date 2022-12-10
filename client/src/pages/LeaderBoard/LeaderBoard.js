@@ -6,6 +6,25 @@ import LoadingSpinner from '../../compenents/LoadingSpinner/LoadingSpinner';
 
 const LeaderBoard = () => {
 
+    const { loading, error, leaders } = useFetchLeader();
+
+    return (
+        <Fragment>
+            {loading && <LoadingSpinner />}
+            {!loading && error && (<div>
+                <div className='errorTemplate'>
+                    <div><span>Msg : </span>Wasn't able to connect to server check if your are not offline or server might not be working !</div>
+                    {error && <div><span>Error : </span>{JSON.stringify(error)}</div>}
+                </div>
+            </div>)}
+            {!loading && !error && (
+                <LeaderTable leaders={[...leaders]} />
+            )}
+        </Fragment>
+    )
+}
+
+const useFetchLeader = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(undefined);
     const [leaders, setLeaders] = useState(undefined);
@@ -29,20 +48,8 @@ const LeaderBoard = () => {
             .finally(() => setLoading(false))
     }, []);
 
-    return (
-        <Fragment>
-            {loading && <LoadingSpinner />}
-            {!loading && error && (<div>
-                <div className='errorTemplate'>
-                    <div><span>Msg : </span>Wasn't able to connect to server check if your are not offline or server might not be working !</div>
-                    {error && <div><span>Error : </span>{JSON.stringify(error)}</div>}
-                </div>
-            </div>)}
-            {!loading && !error && (
-                <LeaderTable leaders={[...leaders]} />
-            )}
-        </Fragment>
-    )
+    return { loading, error, leaders };
 }
+
 
 export default LeaderBoard;

@@ -11,21 +11,22 @@ const ConsoleLogger = new Console({
     stderr: fs.createWriteStream(stderrDir, { flags: 'a' }),
 });
 
-const emitSocketLoggerEvent = (type, msg) => {
+const logging = (type, ...args) => {
+    const msg = args.join(' ');
+    // emitSocketLoggerEvent
     if (Socket.getSocketInstance() && Socket.getConnectedUsers().length) {
         Socket.getSocketInstance().emit(`logger-new-${type}`, msg);
     }
+    // handlerDevelopmentServerLoggig
+    if (process.env.NODE_ENV !== "production") {
+        console[type](msg);
+    }
+    return ConsoleLogger[type](...args);
 }
 
 const logger = {
-    log: (...args) => {
-        emitSocketLoggerEvent('log', args.join(' '));
-        ConsoleLogger.log(...args);
-    },
-    error: (...args) => {
-        emitSocketLoggerEvent('error', args.join(' '));
-        ConsoleLogger.error(...args);
-    }
+    log: (...args) => logging('log', ...args),
+    error: (...args) => logging('error', ...args)
 }
 
 const dateTimeNowFormated = () => {

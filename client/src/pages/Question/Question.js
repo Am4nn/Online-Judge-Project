@@ -2,7 +2,6 @@ import React, { Fragment, useRef, useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 
 import classes from './Question.module.css';
-import useFetch from '../../hooks/useFetch';
 import CodeEditorv3 from './Editor/CodeEditorv3';
 import ButtonCustom from '../../compenents/Button/Button';
 import useLocalStorage from '../../hooks/useLocalStorage';
@@ -11,29 +10,18 @@ import LoadingSpinner from '../../compenents/LoadingSpinner/LoadingSpinner';
 import SendIcon from '@mui/icons-material/Send';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-import { SERVER_LINK } from '../../dev-server-link';
-import defaultCodes from './defaultCodes/defaultCodes';
 import Options from './Options/Options';
+import defaultCodes from './defaultCodes/defaultCodes';
+import { SERVER_LINK } from '../../dev-server-link';
 import { correctCode } from './correctCodes/index';
 
 const Question = () => {
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
+    useScrollToTop();
 
     const { id } = useParams();
 
-    const { loading, error, value: question } = useFetch(
-        `${SERVER_LINK}/api/explore/problems/${id}`,
-        {
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            method: 'GET',
-        },
-        [id]
-    )
+    const { loading, error, question } = useFetchProblems(id);
 
     // not-initialized, submitting, submitted
     const [codeSubmittingState, setcodeSubmittingState] = useState('not-initialized');
@@ -249,5 +237,58 @@ const Question = () => {
         </Fragment >
     )
 }
+
+const useFetchProblems = id => {
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(undefined);
+    const [question, setQuestion] = useState(undefined);
+
+    useEffect(() => {
+        const controller = new AbortController();
+        const signal = controller.signal;
+
+        setLoading(true);
+        setError(undefined);
+        setQuestion(undefined);
+
+        fetch(`${SERVER_LINK}/api/explore/problems/${id}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                method: 'GET',
+                signal,
+            })
+            .then(async res => {
+                if (res.ok) return res.json()
+                const json = await res.json();
+                return await Promise.reject(json);
+            })
+            .then(res => {
+                setQuestion(res);
+                setLoading(false)
+            })
+            .catch(err => {
+                if (err.name === "AbortError") {
+                    console.log("Fetch Cancelled !");
+                } else {
+                    setError(err);
+                    setLoading(false);
+                }
+            });
+
+        return () => { controller.abort(); }
+    }, [id]);
+
+    return { loading, error, question };
+}
+
+const useScrollToTop = (dependencies = []) => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, dependencies);
+}
+
 
 export default Question;

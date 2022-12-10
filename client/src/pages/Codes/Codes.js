@@ -27,24 +27,7 @@ const Codes = () => {
         codeId = searchParams.get('codeId');
     }
 
-    useEffect(() => {
-        if (!codeId) return;
-        fetch(
-            `${SERVER_LINK}/api/explore/getcode/${codeId}`,
-            {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                method: 'GET'
-            }
-        )
-            .then(res => res.json())
-            .then(data => setResponse(data))
-            .catch(error => setResponse({
-                error: `server side error, check your network
-${error}`
-            }))
-    }, [codeId]);
+    useFetchCode(codeId, setResponse);
 
     const [copied, setCopied] = useState(false);
 
@@ -110,5 +93,27 @@ ${error}`
         </Fragment >
     )
 }
+
+const useFetchCode = (codeId, setResponse) => {
+    useEffect(() => {
+        if (!codeId) return;
+        fetch(
+            `${SERVER_LINK}/api/explore/getcode/${codeId}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                method: 'GET'
+            }
+        )
+            .then(res => res.json())
+            .then(data => setResponse(data))
+            .catch(error => setResponse({
+                error: `server side error, check your network
+${error}`
+            }))
+    }, [codeId, setResponse]);
+}
+
 
 export default Codes;

@@ -1,5 +1,6 @@
 const { exec, spawn } = require('child_process');
 const path = require('path');
+const { fileURLToPath } = require('url');
 const { dateTimeNowFormated, logger } = require('../utils');
 
 // name => it is the name to be given to the container
@@ -57,13 +58,22 @@ const copyFiles = (filePath, containerId) => {
  * @param {String} containerId 
  * @return {Promise}
  */
-const deleteFilesDocker = (filenames, containerId) => {
-    const filesToBeDeleted = (Array.isArray(filenames) ? filenames.join(' ') : filenames);
-    return new Promise((resolve, reject) => {
-        exec(`docker exec ${containerId} rm ${filesToBeDeleted}`, (error, stdout, stderr) => {
+const deleteFileDocker = (filename, containerId) => {
+    return new Promise(async (resolve, reject) => {
+        const fileExists = await fileExistsDocker(filename, containerId);
+        if (!fileExists) return resolve('file does not exists');
+        exec(`docker exec ${containerId} rm ${filename}`, (error, stdout, stderr) => {
             error && reject({ msg: 'on error', error, stderr });
             stderr && reject({ msg: 'on stderr', stderr });
-            resolve(filesToBeDeleted);
+            resolve(filename);
+        });
+    });
+}
+
+const fileExistsDocker = (filename, containerId) => {
+    return new Promise((resolve, reject) => {
+        exec(`docker exec ${containerId} sh -c "test -f '${filename}' && echo 'true'"`, (error, stdout, stderr) => {
+            resolve(stdout.trim() === 'true');
         });
     });
 }
@@ -209,16 +219,11 @@ const execJavaClassFile = (containerId, id, testInput) => {
 
 
 module.exports = {
-    createContainer,
-    stopContainer,
-    copyFiles,
-    compileCCode,
-    compileCppCode,
-    execOutFile,
-    execPyFile,
-    deleteFilesDocker,
-    execJsFile,
-    compileJavaCode,
-    execJavaClassFile,
-    killContainer
+    createContainer, stopContainer,
+    copyFiles, compileCCode,
+    compileCppCode, execOutFile,
+    execPyFile, deleteFileDocker,
+    execJsFile, compileJavaCode,
+    execJavaClassFile, killContainer,
+    fileExistsDocker
 };
