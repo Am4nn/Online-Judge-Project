@@ -14,6 +14,7 @@ import Options from './Options/Options';
 import defaultCodes from './defaultCodes/defaultCodes';
 import { SERVER_LINK } from '../../dev-server-link';
 import { correctCode } from './correctCodes/index';
+import { useSelector } from 'react-redux';
 
 const Question = () => {
 
@@ -243,45 +244,68 @@ const useFetchProblems = id => {
     const [error, setError] = useState(undefined);
     const [question, setQuestion] = useState(undefined);
 
-    useEffect(() => {
-        const controller = new AbortController();
-        const signal = controller.signal;
+    /** @type {Object.<string, Array>} */
+    const problems = useSelector(state => state.questions);
 
+    useEffect(() => {
         setLoading(true);
         setError(undefined);
         setQuestion(undefined);
 
-        fetch(`${SERVER_LINK}/api/explore/problems/${id}`,
-            {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                method: 'GET',
-                signal,
-            })
-            .then(async res => {
-                if (res.ok) return res.json()
-                const json = await res.json();
-                return await Promise.reject(json);
-            })
-            .then(res => {
-                setQuestion(res);
-                setLoading(false)
-            })
-            .catch(err => {
-                if (err.name === "AbortError") {
-                    console.log("Fetch Cancelled !");
-                } else {
-                    setError(err);
-                    setLoading(false);
-                }
-            });
+        const matchProblem = problems.questions.find(value => value._id === id);
+        if (matchProblem) setQuestion(matchProblem);
+        else setError(`No such problem found with id: ${id}`);
 
-        return () => { controller.abort(); }
-    }, [id]);
+        setLoading(false);
+    }, [id, problems.questions]);
 
     return { loading, error, question };
 }
+
+// const useFetchProblems = id => {
+//     const [loading, setLoading] = useState(true);
+//     const [error, setError] = useState(undefined);
+//     const [question, setQuestion] = useState(undefined);
+
+//     useEffect(() => {
+//         const controller = new AbortController();
+//         const signal = controller.signal;
+
+//         setLoading(true);
+//         setError(undefined);
+//         setQuestion(undefined);
+
+//         fetch(`${SERVER_LINK}/api/explore/problems/${id}`,
+//             {
+//                 headers: {
+//                     'Content-Type': 'application/json'
+//                 },
+//                 method: 'GET',
+//                 signal,
+//             })
+//             .then(async res => {
+//                 if (res.ok) return res.json()
+//                 const json = await res.json();
+//                 return await Promise.reject(json);
+//             })
+//             .then(res => {
+//                 setQuestion(res);
+//                 setLoading(false)
+//             })
+//             .catch(err => {
+//                 if (err.name === "AbortError") {
+//                     console.log("Fetch Cancelled !");
+//                 } else {
+//                     setError(err);
+//                     setLoading(false);
+//                 }
+//             });
+
+//         return () => { controller.abort(); }
+//     }, [id]);
+
+//     return { loading, error, question };
+// }
 
 const useScrollToTop = (dependencies = []) => {
     useEffect(() => {

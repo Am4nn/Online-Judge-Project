@@ -1,4 +1,4 @@
-import React, { forwardRef, Fragment, useCallback, useEffect, useState } from 'react'
+import React, { forwardRef, Fragment, useCallback, useEffect, useState, useTransition } from 'react'
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box } from '@mui/system';
@@ -13,7 +13,8 @@ import { messageActions } from '../../store/Message/message-slice';
 import LoadingSpinner from '../../compenents/LoadingSpinner/LoadingSpinner';
 import Note from './Note/Note';
 import classes from './Notes.module.css';
-import useDebounce from '../../hooks/useDebounce';
+// import useDebounce from '../../hooks/useDebounce';
+import useTimeout from './../../hooks/useTimeout';
 
 /*
     Schema : _id, title, desc, codeid, username, access, editable, language
@@ -153,15 +154,9 @@ const Notes = () => {
     }, [dispatch]);
 
     const addNoteHandler = () => setOpenAddModal(true);
-    const adminModeHandler = () => isAdmin ? setAdminMode(prev => !prev) : setAdminMode(false);
 
-    useDebounce(() => {
-        if (!searchNoteQuery) setAllNotes(originalAllNotes);
-        else setAllNotes(originalAllNotes.filter(note => (
-            note.title.toLowerCase().includes(searchNoteQuery.toLowerCase()) ||
-            note.desc.toLowerCase().includes(searchNoteQuery.toLowerCase())
-        )));
-    }, 500, [searchNoteQuery]);
+    // const [isSearching] = useSearchNotes_Debounce({ searchNoteQuery, setAllNotes, originalAllNotes });
+    const [isSearching] = useSearchNotes_Transition({ searchNoteQuery, setAllNotes, originalAllNotes });
 
     const refreshNotesList = () => {
         setEditNote({});
@@ -188,79 +183,120 @@ const Notes = () => {
                     <ViewNote setSearchParams={setSearchParams} SlideTransition={SlideTransition} setReloadNeeded={setReloadNeeded} markEditOrDelete={markEditOrDelete} isMobile={isMobile} openModal={openViewModal} setOpenModal={setOpenViewModal} setEditNote={setEditNote} setOpenEditModal={setOpenEditModal} viewNote={viewNote} />
                     <EditNote setSearchParams={setSearchParams} SlideTransition={SlideTransition} setReloadNeeded={setReloadNeeded} markEditOrDelete={markEditOrDelete} isMobile={isMobile} openModal={openEditModal} setOpenModal={setOpenEditModal} editNote={editNote} />
 
-                    <Tooltip TransitionComponent={Zoom} title='Add Note' placement='bottom'>
-                        <Fab onClick={addNoteHandler} className={classes.addNoteFab} aria-label='add-note'>
-                            <NoteAdd sx={{ fontSize: '1.7rem' }} />
-                        </Fab>
-                    </Tooltip>
+                    <Tools
+                        addNoteHandler={addNoteHandler}
+                        isAdmin={isAdmin}
+                        isAdminMode={isAdminMode}
+                        setAdminMode={setAdminMode}
+                    />
 
-                    {isAdmin &&
-                        <Tooltip TransitionComponent={Zoom} title='Admin Mode' placement='bottom'>
-                            <Fab color='secondary' onClick={adminModeHandler} className={classes.adminModeFab} aria-label='admin-mode'>
-                                {isAdminMode ?
-                                    <Cancel sx={{ fontSize: '2.4rem' }} /> :
-                                    <SupervisedUserCircle sx={{ fontSize: '2.4rem' }} />
-                                }
-                            </Fab>
-                        </Tooltip>
-                    }
+                    <Heading
+                        refreshNotesList={refreshNotesList}
+                        reloadNeeded={reloadNeeded}
+                    />
 
-                    <div className={classes.head}>Notes</div>
-                    {reloadNeeded &&
-                        <div style={{
-                            fontSize: '1rem', color: 'hsla(0, 40%, 50%,0.8)',
-                            margin: 'unset', position: 'relative', marginBottom: '0.5rem'
-                        }}><span onClick={refreshNotesList} style={{
-                            zIndex: 100, position: 'relative',
-                            color: 'blue', textDecoration: 'underline',
-                            fontWeight: 500, cursor: 'pointer'
-                        }}>Refresh</span> this page to see changes !</div>
-                    }
-
-                    <SearchComponent searchNoteQuery={searchNoteQuery} setSearchNoteQuery={setSearchNoteQuery} />
+                    <SearchComponent
+                        searchNoteQuery={searchNoteQuery}
+                        setSearchNoteQuery={setSearchNoteQuery}
+                        isSearching={isSearching}
+                    />
 
                     {!loading && (
-                        <Fragment>
-                            <div className={classes.ncLabel}><span>Global Notes by Admin</span><KeyboardArrowRight fontSize='medium' /></div>
-                            <div className={classes.noteList}>
-                                {allNotes.filter(note => (note.access === 'global')).map(note =>
-                                    <Note refreshNotesList={refreshNotesList} key={note._id} note={note} setViewNote={setViewNote} setOpenViewModal={setOpenViewModal} />
-                                )}
-                            </div>
-
-                            <div className={classes.ncLabel}><span>Public Notes by Users/Guest</span></div>
-                            <div className={classes.noteList}>
-                                {allNotes.filter(note => (note.access === 'public')).map(note =>
-                                    <Note refreshNotesList={refreshNotesList} key={note._id} note={note} setViewNote={setViewNote} setOpenViewModal={setOpenViewModal} />
-                                )}
-                            </div>
-
-                            <div className={classes.ncLabel}>
-                                {loggedIn ?
-                                    <span>Private Notes by {username}</span> :
-                                    <span className={classes.red}>To see Private Notes you must be Logged In !</span>
-                                }
-                            </div>
-                            {loggedIn ?
-                                <div className={classes.noteList}>
-                                    {allNotes.filter(note => (note.access === 'private')).length === 0 ?
-                                        <span className={classes.red + ' ' + classes.noNote}>You have not created any Private Note, <button onClick={addNoteHandler}>Make One</button></span> :
-                                        allNotes.filter(note => (note.access === 'private')).map(note =>
-                                            <Note refreshNotesList={refreshNotesList} key={note._id} note={note} setViewNote={setViewNote} setOpenViewModal={setOpenViewModal} />
-                                        )}
-                                </div>
-                                : ""
-                            }
-                        </Fragment>
+                        <NotesSection
+                            allNotes={allNotes}
+                            refreshNotesList={refreshNotesList}
+                            setViewNote={setViewNote}
+                            setOpenViewModal={setOpenViewModal}
+                            loggedIn={loggedIn}
+                            username={username}
+                            addNoteHandler={addNoteHandler}
+                        />
                     )}
+
                 </div>
-            )
-            }
+            )}
         </Fragment >
     )
 };
 
-const SearchComponent = ({ searchNoteQuery, setSearchNoteQuery }) => {
+const useSearchNotes_Transition = ({ searchNoteQuery, setAllNotes, originalAllNotes }) => {
+    const [isSearching, startTransition] = useTransition();
+    useEffect(() => {
+        startTransition(() => {
+            if (!searchNoteQuery) setAllNotes(originalAllNotes);
+            else setAllNotes(originalAllNotes.filter(note => (
+                note.title.toLowerCase().includes(searchNoteQuery.toLowerCase()) ||
+                note.desc.toLowerCase().includes(searchNoteQuery.toLowerCase())
+            )));
+        });
+    }, [searchNoteQuery, originalAllNotes, setAllNotes]);
+    return [isSearching];
+}
+
+const useSearchNotes_Debounce = ({ searchNoteQuery, setAllNotes, originalAllNotes }) => {
+    const [isSearching, setIsSearching] = useState(false);
+    const { reset, clear } = useTimeout(() => {
+
+        if (!searchNoteQuery) setAllNotes(originalAllNotes);
+        else setAllNotes(originalAllNotes.filter(note => (
+            note.title.toLowerCase().includes(searchNoteQuery.toLowerCase()) ||
+            note.desc.toLowerCase().includes(searchNoteQuery.toLowerCase())
+        )));
+
+        setIsSearching(false);
+    }, 500);
+    useEffect(() => {
+        setIsSearching(true);
+        reset();
+    }, [searchNoteQuery, reset]);
+    useEffect(() => {
+        setIsSearching(false);
+        clear();
+    }, [clear]);
+    return [isSearching];
+}
+
+const Tools = ({ addNoteHandler, isAdmin, isAdminMode, setAdminMode }) => {
+    const adminModeHandler = () => isAdmin ? setAdminMode(prev => !prev) : setAdminMode(false);
+    return (
+        <Fragment>
+            <Tooltip TransitionComponent={Zoom} title='Add Note' placement='bottom'>
+                <Fab onClick={addNoteHandler} className={classes.addNoteFab} aria-label='add-note'>
+                    <NoteAdd sx={{ fontSize: '1.7rem' }} />
+                </Fab>
+            </Tooltip>
+
+            {isAdmin &&
+                <Tooltip TransitionComponent={Zoom} title='Admin Mode' placement='bottom'>
+                    <Fab color='secondary' onClick={adminModeHandler} className={classes.adminModeFab} aria-label='admin-mode'>
+                        {isAdminMode ?
+                            <Cancel sx={{ fontSize: '2.4rem' }} /> :
+                            <SupervisedUserCircle sx={{ fontSize: '2.4rem' }} />
+                        }
+                    </Fab>
+                </Tooltip>
+            }
+        </Fragment>
+    );
+};
+
+const Heading = ({ reloadNeeded, refreshNotesList }) => (
+    <Fragment>
+        <div className={classes.head}>Notes</div>
+        {reloadNeeded &&
+            <div style={{
+                fontSize: '1rem', color: 'hsla(0, 40%, 50%,0.8)',
+                margin: 'unset', position: 'relative', marginBottom: '0.5rem'
+            }}><span onClick={refreshNotesList} style={{
+                zIndex: 100, position: 'relative',
+                color: 'blue', textDecoration: 'underline',
+                fontWeight: 500, cursor: 'pointer'
+            }}>Refresh</span> this page to see changes !</div>
+        }
+    </Fragment>
+);
+
+const SearchComponent = ({ searchNoteQuery, setSearchNoteQuery, isSearching }) => {
     return (
         <Box sx={{
             position: 'relative',
@@ -299,7 +335,45 @@ const SearchComponent = ({ searchNoteQuery, setSearchNoteQuery }) => {
                 onChange={event => setSearchNoteQuery(event.target.value)}
                 value={searchNoteQuery}
             />
+            {isSearching && <span style={{ display: 'flex', alignItems: 'center', marginRight: '5px' }} className='spin' color='black' />}
         </Box>
+    );
+}
+
+const NotesSection = ({ allNotes, refreshNotesList, setViewNote, setOpenViewModal, loggedIn, username, addNoteHandler }) => {
+    return (
+        <Fragment>
+            <div className={classes.ncLabel}><span>Global Notes by Admin</span><KeyboardArrowRight fontSize='medium' /></div>
+            <div className={classes.noteList}>
+                {allNotes.filter(note => (note.access === 'global')).map(note =>
+                    <Note refreshNotesList={refreshNotesList} key={note._id} note={note} setViewNote={setViewNote} setOpenViewModal={setOpenViewModal} />
+                )}
+            </div>
+
+            <div className={classes.ncLabel}><span>Public Notes by Users/Guest</span></div>
+            <div className={classes.noteList}>
+                {allNotes.filter(note => (note.access === 'public')).map(note =>
+                    <Note refreshNotesList={refreshNotesList} key={note._id} note={note} setViewNote={setViewNote} setOpenViewModal={setOpenViewModal} />
+                )}
+            </div>
+
+            <div className={classes.ncLabel}>
+                {loggedIn ?
+                    <span>Private Notes by {username}</span> :
+                    <span className={classes.red}>To see Private Notes you must be Logged In !</span>
+                }
+            </div>
+            {loggedIn ?
+                <div className={classes.noteList}>
+                    {allNotes.filter(note => (note.access === 'private')).length === 0 ?
+                        <span className={classes.red + ' ' + classes.noNote}>You have not created any Private Note, <button onClick={addNoteHandler}>Make One</button></span> :
+                        allNotes.filter(note => (note.access === 'private')).map(note =>
+                            <Note refreshNotesList={refreshNotesList} key={note._id} note={note} setViewNote={setViewNote} setOpenViewModal={setOpenViewModal} />
+                        )}
+                </div>
+                : ""
+            }
+        </Fragment>
     );
 }
 

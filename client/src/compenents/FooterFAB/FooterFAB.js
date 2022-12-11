@@ -27,7 +27,7 @@ const FooterFAB = () => {
                             position: 'fixed',
                             bottom: '1em',
                             left: '1em',
-                            opacity: '0.9',
+                            opacity: '0.85',
                             backgroundColor: '#ffd43b'
                         }}
                     >

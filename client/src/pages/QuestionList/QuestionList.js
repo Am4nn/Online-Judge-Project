@@ -27,31 +27,10 @@ const QuestionList = () => {
     const problems = useSelector(state => state.questions);
     const [questions, setQuestions] = useState([]);
 
-    useEffect(() => {
-        if (!easy && !medium && !hard) {
-            setQuestions(problems.questions);
-        }
-        else setQuestions(problems.questions.filter(element => (
-            (easy && element.difficulty === 'easy') ||
-            (medium && element.difficulty === 'medium') ||
-            (hard && element.difficulty === 'hard')
-        )));
-
-        if (solved || unsolved)
-            setQuestions(questions => questions.filter(ele => (
-                (solved && solvedQuestions.includes(ele._id)) ||
-                (unsolved && !solvedQuestions.includes(ele._id))
-            )));
-
-    }, [easy, medium, hard, problems, solved, unsolved, solvedQuestions])
+    useFilterQuestions({ easy, medium, hard, problems, solved, unsolved, solvedQuestions, setQuestions });
 
     const isMobile = useMediaQuery('(max-width:1000px)');
-
     const [isSideBar, setSideBar] = useState(false);
-
-    const handleFilterClickAway = () => {
-        setSideBar(false);
-    }
 
     return (
         <div className={classes.questions}>
@@ -70,7 +49,7 @@ const QuestionList = () => {
                         (problems && problems.questions && problems.questions.length > 0) ? (
                             <Fragment>
                                 {isMobile ? (
-                                    <ClickAwayListener onClickAway={handleFilterClickAway}>
+                                    <ClickAwayListener onClickAway={() => setSideBar(false)}>
                                         <div>
                                             <Fab
                                                 onClick={() => setSideBar(prev => !prev)}
@@ -136,31 +115,24 @@ const QuestionList = () => {
     )
 }
 
+const useFilterQuestions = ({ easy, medium, hard, problems, solved, unsolved, solvedQuestions, setQuestions }) => {
+    useEffect(() => {
+        if (!easy && !medium && !hard) {
+            setQuestions(problems.questions);
+        }
+        else setQuestions(problems.questions.filter(element => (
+            (easy && element.difficulty === 'easy') ||
+            (medium && element.difficulty === 'medium') ||
+            (hard && element.difficulty === 'hard')
+        )));
+
+        if (solved || unsolved)
+            setQuestions(questions => questions.filter(ele => (
+                (solved && solvedQuestions.includes(ele._id)) ||
+                (unsolved && !solvedQuestions.includes(ele._id))
+            )));
+
+    }, [easy, medium, hard, problems, solved, unsolved, solvedQuestions, setQuestions])
+}
+
 export default QuestionList;
-
-
-/*
-    {isMobile && (
-        <Fab
-            onClick={() => setSideBar(prev => !prev)}
-            style={{ position: 'fixed', marginLeft: '0.9rem', marginTop: '0.6rem', opacity: '0.8' }} color="secondary"
-            aria-label="filter"
-        >
-            {isSideBar ? <CloseIcon /> : <EditIcon />}
-        </Fab>
-    )}
-    {(isSideBar || !isMobile) && (
-        <div className={classes.filter}>
-            <div className={classes.filterabs}>
-                <Filter
-                    setEasy={setEasy}
-                    setMedium={setMedium}
-                    setHard={setHard}
-                    easy={easy}
-                    medium={medium}
-                    hard={hard}
-                />
-            </div>
-        </div>
-    )} 
-*/

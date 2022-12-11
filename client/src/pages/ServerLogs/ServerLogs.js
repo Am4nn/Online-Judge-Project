@@ -22,8 +22,6 @@ const ServerLogs = () => {
     useServerLogsSocket(setStdout, setStderr);
     useColorTokens([isOut, stderr, stdout]);
 
-
-
     return (
         <Fragment>
             <Tools

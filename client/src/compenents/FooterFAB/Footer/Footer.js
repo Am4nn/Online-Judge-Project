@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react'
-import { FavoriteBorder, GitHub, Instagram, LinkedIn, Mail } from '@mui/icons-material';
+import { FavoriteBorder, GitHub, Instagram, LinkedIn, Mail, StarBorder } from '@mui/icons-material';
 import { Box } from '@mui/material';
 import classes from './Footer.module.css';
 import { SERVER_LINK } from '../../../dev-server-link';
@@ -42,6 +42,9 @@ const Footer = () => {
             <div>This Website is made with <FavoriteBorder /></div>
             <div>by <a style={{ textDecoration: 'none' }} href="https://www.linkedin.com/in/aman-arya-79a52121b" target="_blank" rel="noopener noreferrer">
                 Aman Arya
+            </a></div>
+            <div>Give this website a <a style={{ textDecoration: 'none' }} href="https://github.com/Am4nn/Online-Judge-Project" target="_blank" rel="noopener noreferrer">
+                <StarBorder /> <span style={{ color: 'black' }}>on</span> GitHub
             </a></div>
         </Fragment>
     )
