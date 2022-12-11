@@ -7,7 +7,7 @@
 - Deployed and can be used by many users by Horizontal Scaling.
 - You can visit Live site here: [Online Judge](https://bit.ly/oj-server)
 
-# Run Online-Judge Locally
+## Run Online-Judge Locally
 
 - Navigate to client directory and install all dependencies for client side code using command : 'npm install' and then run 'npm start' to run react on [PORT 3000](https://localhost:3000).
 - Navigate to the server directory and install the dependencies using the command 'npm install'.
