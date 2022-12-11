@@ -1,3 +1,5 @@
+.vscode
+
 /client/node_modules
 /client/.DS_Store
 /client/.env.local
