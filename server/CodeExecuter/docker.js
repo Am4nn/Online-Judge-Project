@@ -1,7 +1,6 @@
 const { exec, spawn } = require('child_process');
 const path = require('path');
-const { fileURLToPath } = require('url');
-const { dateTimeNowFormated, logger } = require('../utils');
+const { logger } = require('../utils');
 
 // name => it is the name to be given to the container
 // image => it is the name of image whose container is to be created
@@ -41,7 +40,7 @@ const killContainer = container_id_name => {
 }
 
 // this fn copies file from server to docker container (in root directory)
-const copyFiles = (filePath, containerId) => {
+const copyFilesToDocker = (filePath, containerId) => {
     const filename = path.basename(filePath);
     return new Promise((resolve, reject) => {
         exec(`docker cp "${filePath}" ${containerId}:/${filename}`, (error, stdout, stderr) => {
@@ -78,11 +77,51 @@ const fileExistsDocker = (filename, containerId) => {
     });
 }
 
-// C and C++
-const compileCCode = (containerId, filename) => {
+// ############################################################
+
+/**
+ * @callback CompExecCmd
+ * @param {string} id - FileName or FileId
+ * @returns {string}
+*/
+/**
+ * @typedef {Object} ExecDetail
+ * @property {(CompExecCmd|null)} compilerCmd
+ * @property {CompExecCmd} executorCmd
+*/
+/**
+ * @type {Object.<string, ExecDetail>}
+*/
+const details = {
+    'c': {
+        compilerCmd: id => `gcc ${id}.c -o ${id}.out -lpthread -lrt`,
+        executorCmd: id => `./${id}.out`,
+    },
+    'cpp': {
+        compilerCmd: id => `g++ ${id}.cpp -o ${id}.out`,
+        executorCmd: id => `./${id}.out`,
+    },
+    'py': {
+        compilerCmd: null,
+        executorCmd: id => `python ${id}`,
+    },
+    'js': {
+        compilerCmd: null,
+        executorCmd: id => `node ${id}`,
+    },
+    'java': {
+        compilerCmd: id => `javac ${id}.java`,
+        executorCmd: id => `java Solution`, // TODO: Update 'java Solution', to use id
+    }
+};
+
+// Compile
+const compile = (containerId, filename, language) => {
     const id = filename.split(".")[0];
+    const command = details[language].compilerCmd ? details[language].compilerCmd(id) : null;
     return new Promise((resolve, reject) => {
-        exec(`docker exec ${containerId} gcc ${id}.c -o ${id}.out -lpthread -lrt`, (error, stdout, stderr) => {
+        if (!command) return resolve(filename);
+        exec(`docker exec ${containerId} ${command}`, (error, stdout, stderr) => {
             error && reject({ msg: 'on error', error, stderr });
             stderr && reject({ msg: 'on stderr', stderr });
             resolve(id);
@@ -90,110 +129,25 @@ const compileCCode = (containerId, filename) => {
     });
 }
 
-const compileCppCode = (containerId, filename) => {
-    const id = filename.split(".")[0];
+// Execute
+const execute = (containerId, id, testInput, language) => {
+    const command = details[language].executorCmd ? details[language].executorCmd(id) : null;
     return new Promise((resolve, reject) => {
-        exec(`docker exec ${containerId} g++ ${id}.cpp -o ${id}.out`, (error, stdout, stderr) => {
-            error && reject({ msg: 'on error', error, stderr });
-            stderr && reject({ msg: 'on stderr', stderr });
-            resolve(id);
-        });
-    });
-}
-
-const execOutFile = (containerId, id, testInput) => {
-    return new Promise((resolve, reject) => {
-        const cmd = spawn('docker', ['exec', '-i', `${containerId} ./${id}.out`], { shell: true });
-        cmd.stdin.on('error', err => {
-            reject({ msg: 'on stdin error', error: `${err}` });
-        });
-        cmd.stdin.write(testInput);
-        cmd.stdin.end();
-        cmd.on('error', error => {
-            reject({ msg: 'on error', error: `${error.name} => ${error.message}` });
-        });
-        cmd.stderr.on('data', data => {
-            reject({ msg: 'on stderr', stderr: `${data}` });
-        });
-        cmd.stdout.on('data', data => {
-            const exOut = `${data}`.trim();
-            resolve(exOut);
-        });
-        cmd.on('close', code => {
-            resolve('');
-            // logger.log(`child process exited with code ${code}`);
-        });
-    });
-}
-
-// Python
-const execPyFile = (containerId, filename, testInput) => {
-    return new Promise((resolve, reject) => {
-        const cmd = spawn('docker', ['exec', '-i', `${containerId} python ${filename}`], { shell: true });
-        cmd.stdin.on('error', err => {
-            reject({ msg: 'on stdin error', error: `${err}` });
-        });
-        cmd.stdin.write(testInput);
-        cmd.stdin.end();
-        cmd.on('error', error => {
-            reject({ msg: 'on error', error: `${error.name} => ${error.message}` });
-        });
-        cmd.stderr.on('data', data => {
-            reject({ msg: 'on stderr', stderr: `${data}` });
-        });
-        cmd.stdout.on('data', data => {
-            const exOut = `${data}`.trim();
-            resolve(exOut);
-        });
-        cmd.on('close', code => {
-            resolve('');
-            // logger.log(`child process exited with code ${code}`);
-        });
-    });
-}
-
-// Javascript
-const execJsFile = (containerId, filename, testInput) => {
-    return new Promise((resolve, reject) => {
-        const cmd = spawn('docker', ['exec', '-i', `${containerId} node ${filename}`], { shell: true });
-        cmd.stdin.on('error', err => {
-            reject({ msg: 'on stdin error', error: `${err}` });
-        });
-        cmd.stdin.write(testInput);
-        cmd.stdin.end();
-        cmd.on('error', error => {
-            reject({ msg: 'on error', error: `${error.name} => ${error.message}` });
-        });
-        cmd.stderr.on('data', data => {
-            reject({ msg: 'on stderr', stderr: `${data}` });
-        });
-        cmd.stdout.on('data', data => {
-            const exOut = `${data}`.trim();
-            resolve(exOut);
-        });
-        cmd.on('close', code => {
-            resolve('');
-            // logger.log(`child process exited with code ${code}`);
-        });
-    });
-}
-
-// Java
-const compileJavaCode = (containerId, filename) => {
-    const id = filename.split(".")[0];
-    return new Promise((resolve, reject) => {
-        exec(`docker exec ${containerId} javac ${id}.java`, (error, stdout, stderr) => {
-            error && reject({ msg: 'on error', error, stderr });
-            stderr && reject({ msg: 'on stderr', stderr });
-            resolve(id);
-        });
-    });
-}
-
-const execJavaClassFile = (containerId, id, testInput) => {
-    return new Promise((resolve, reject) => {
-        const cmd = spawn('docker', ['exec', '-i', `${containerId} java Solution`], { shell: true });
+        if (!command) return reject('Language Not Supported');
+        const cmd = spawn('docker', ['exec', '-i', `${containerId} ${command}`], { shell: true });
         cmd.on('spawn', () => { })
+        cmd.stdin.on('error', err => {
+            reject({ msg: 'on stdin error', error: `${err}` });
+        });
+        cmd.stdin.write(testInput);
+        cmd.stdin.end();
+        cmd.stderr.on('data', data => {
+            reject({ msg: 'on stderr', stderr: `${data}` });
+        });
+        cmd.stdout.on('data', data => {
+            const exOut = `${data}`.trim();
+            resolve(exOut);
+        });
         cmd.on('exit', (exitCode, signal) => { })
         cmd.on('error', error => {
             reject({ msg: 'on error', error: `${error.name} => ${error.message}` });
@@ -202,28 +156,16 @@ const execJavaClassFile = (containerId, id, testInput) => {
             // logger.log(`child process exited with code ${code} `);
             resolve('');
         });
-        cmd.stdin.on('error', err => {
-            reject({ msg: 'on stdin error', error: `${err}` });
-        });
-        cmd.stderr.on('data', data => {
-            reject({ msg: 'on stderr', stderr: `${data}` });
-        });
-        cmd.stdout.on('data', data => {
-            const exOut = `${data}`.trim();
-            resolve(exOut);
-        });
-        cmd.stdin.write(testInput);
-        cmd.stdin.end();
     });
 }
+
+// ############################################################
+
 
 
 module.exports = {
     createContainer, stopContainer,
-    copyFiles, compileCCode,
-    compileCppCode, execOutFile,
-    execPyFile, deleteFileDocker,
-    execJsFile, compileJavaCode,
-    execJavaClassFile, killContainer,
-    fileExistsDocker
+    copyFilesToDocker, deleteFileDocker,
+    killContainer, fileExistsDocker,
+    compile, execute
 };

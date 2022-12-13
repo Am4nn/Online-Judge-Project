@@ -2,11 +2,9 @@ const fs = require("fs");
 const path = require("path");
 const { v4: uuid } = require("uuid");
 const {
-    compileCCode, compileCppCode,
-    copyFiles, createContainer,
-    execOutFile, execPyFile,
-    execJsFile, compileJavaCode, execJavaClassFile,
-    killContainer, deleteFileDocker
+    copyFilesToDocker, createContainer,
+    killContainer, deleteFileDocker,
+    compile, execute
 } = require('./docker');
 const { dateTimeNowFormated, logger } = require('../utils');
 
@@ -52,39 +50,30 @@ const initAllDockerContainers = async () => {
         logger.error(dateTimeNowFormated());
     }
 }
-const details = {
+
+const languageSpecificDetails = {
     'c': {
-        compiler: compileCCode,
         compiledExtension: 'out',
-        executor: execOutFile,
         inputFunction: null,
         containerId: () => containerIds[imageIndex.GCC]
     },
     'cpp': {
-        compiler: compileCppCode,
         compiledExtension: 'out',
-        executor: execOutFile,
         inputFunction: null,
         containerId: () => containerIds[imageIndex.GCC]
     },
     'py': {
-        compiler: null,
         compiledExtension: '',
-        executor: execPyFile,
         inputFunction: data => (data ? data.split(' ').join('\n') : ''),
         containerId: () => containerIds[imageIndex.PY]
     },
     'js': {
-        compiler: null,
         compiledExtension: '',
-        executor: execJsFile,
         inputFunction: null,
         containerId: () => containerIds[imageIndex.JS]
     },
     'java': {
-        compiler: compileJavaCode,
         compiledExtension: 'class',
-        executor: execJavaClassFile,
         inputFunction: null,
         containerId: () => containerIds[imageIndex.JAVA]
     }
@@ -140,9 +129,9 @@ Or may be this language is not yet supported !`
 const execCodeAgainstTestcases = (filePath, testcase, language) => {
 
     // check if language is supported or not
-    if (!details[language]) return { msg: languageErrMsg };
+    if (!languageSpecificDetails[language]) return { msg: languageErrMsg };
 
-    let containerId = details[language].containerId();
+    let containerId = languageSpecificDetails[language].containerId();
     if (!containerId) return reject({ msg: languageErrMsg });
 
     if (!filePath.includes("\\") && !filePath.includes("/"))
@@ -151,20 +140,15 @@ const execCodeAgainstTestcases = (filePath, testcase, language) => {
     const { input, output } = require(`./testcases/${testcase}`)
 
     return new Promise(async (resolve, reject) => {
-        let filename = null, isCompiled = false;
+        let filename = null;
         try {
-            filename = await copyFiles(filePath, containerId);
-            let compiledId = filename;
-            if (details[language].compiler) {
-                compiledId = await details[language].compiler(containerId, filename);
-                isCompiled = true;
-            }
+            filename = await copyFilesToDocker(filePath, containerId);
+            const compiledId = await compile(containerId, filename, language);
 
             for (let index = 0; index < input.length; ++index) {
-                const exOut = await details[language].executor(
-                    containerId,
-                    compiledId,
-                    details[language].inputFunction ? details[language].inputFunction(input[index]) : input[index]
+                const exOut = await execute(containerId, compiledId,
+                    languageSpecificDetails[language].inputFunction ? languageSpecificDetails[language].inputFunction(input[index]) : input[index],
+                    language
                 );
                 // if socket connection established then send to client the index of passed test case
                 if (exOut !== output[index]) {
@@ -183,13 +167,13 @@ const execCodeAgainstTestcases = (filePath, testcase, language) => {
             try {
                 if (filename)
                     await deleteFileDocker(filename, containerId);
-                if (filename && isCompiled) {
-                    let compiledFile = (
-                        (language === 'java') ?
-                            'Solution.class' :
-                            ((filename.split('.')[0]) + '.' + details[language].compiledExtension)
+
+                if (filename && languageSpecificDetails[language].compiledExtension) {
+                    // TODO: Update 'Solution.class' to id.class
+                    await deleteFileDocker(
+                        ((language === 'java') ? 'Solution.class' : ((filename.split('.')[0]) + '.' + languageSpecificDetails[language].compiledExtension)),
+                        containerId
                     );
-                    await deleteFileDocker(compiledFile, containerId);
                 }
             } catch (error) {
                 logger.error('Caught some errors while deleting files from Docker Container', error, containerId, dateTimeNowFormated());
@@ -203,29 +187,22 @@ const execCode = async (filePath, language, inputString) => {
     if (!inputString) inputString = '';
 
     // check if language is supported or not
-    if (!details[language]) return { msg: languageErrMsg };
+    if (!languageSpecificDetails[language]) return { msg: languageErrMsg };
 
-    let containerId = details[language].containerId();
+    let containerId = languageSpecificDetails[language].containerId();
     if (!containerId) return { msg: languageErrMsg };
 
     if (!filePath.includes("\\") && !filePath.includes("/"))
         filePath = path.join(codeDirectory, filePath);
 
-    let filename = null, isCompiled = false;
+    let filename = null;
     try {
-        filename = await copyFiles(filePath, containerId);
-        let compiledId = filename;
-        if (details[language].compiler) {
-            compiledId = await details[language].compiler(containerId, filename);
-            isCompiled = true;
-        }
-
-        const exOut = await details[language].executor(
-            containerId,
-            compiledId,
-            details[language].inputFunction ? details[language].inputFunction(inputString) : inputString
+        filename = await copyFilesToDocker(filePath, containerId);
+        const compiledId = await compile(containerId, filename, language);
+        const exOut = await execute(containerId, compiledId,
+            languageSpecificDetails[language].inputFunction ? languageSpecificDetails[language].inputFunction(inputString) : inputString,
+            language
         );
-
         return ({ msg: "Compiled Successfully", stdout: exOut });
     } catch (error) {
         return error;
@@ -233,13 +210,13 @@ const execCode = async (filePath, language, inputString) => {
         try {
             if (filename)
                 await deleteFileDocker(filename, containerId);
-            if (filename && isCompiled) {
-                let compiledFile = (
-                    (language === 'java') ?
-                        'Solution.class' :
-                        ((filename.split('.')[0]) + '.' + details[language].compiledExtension)
+
+            if (filename && languageSpecificDetails[language].compiledExtension) {
+                // TODO: Update 'Solution.class' to id.class
+                await deleteFileDocker(
+                    ((language === 'java') ? 'Solution.class' : ((filename.split('.')[0]) + '.' + languageSpecificDetails[language].compiledExtension)),
+                    containerId
                 );
-                await deleteFileDocker(compiledFile, containerId);
             }
         } catch (error) {
             logger.error('Caught some errors while deleting files from Docker Container', error, containerId, dateTimeNowFormated());
@@ -248,10 +225,8 @@ const execCode = async (filePath, language, inputString) => {
 }
 
 module.exports = {
-    readFile,
-    createFile,
-    deleteFile,
-    execCode,
+    readFile, createFile,
+    deleteFile, execCode,
     execCodeAgainstTestcases,
     initAllDockerContainers
 };
