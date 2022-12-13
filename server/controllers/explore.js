@@ -14,7 +14,6 @@ function isValidObjectId(id) {
 }
 
 const problemsController = async (req, res) => {
-    logger.log('GET /api/explore/problems getAllQuestions', dateTimeNowFormated());
     try {
         const questions = await Question.getQuestionList();
         return res.status(200).json(questions);
@@ -25,7 +24,6 @@ const problemsController = async (req, res) => {
 }
 
 const detailedProblemController = async (req, res) => {
-    logger.log('GET /api/explore/problems/:id getDetailedQuestion', dateTimeNowFormated());
     try {
         const id = req.params.id;
         if (!isValidObjectId(id))
@@ -44,7 +42,6 @@ const detailedProblemController = async (req, res) => {
 const validLanguages = ['c', 'cpp', 'py', 'js', 'java'];
 
 const verdictController = async (req, res) => {
-    logger.log('POST /api/explore/problems/:id sentCodeForVerdict', dateTimeNowFormated());
     try {
         const { language, code, testcase, quesName } = req.body;
         const quesId = req.params.id;
@@ -85,7 +82,6 @@ const verdictController = async (req, res) => {
 }
 
 const statusController = async (req, res) => {
-    logger.log('GET /api/explore/status/:queryId getStatusOfQuery', dateTimeNowFormated());
     const queryId = req.params.queryId;
     if (!isValidObjectId(queryId))
         return res.status(404).json({ msg: 'not a valid object id' });
@@ -105,7 +101,6 @@ const statusController = async (req, res) => {
 }
 
 const leaderboardController = async (req, res) => {
-    logger.log('GET /api/explore/leaderboard getLeaderboard', dateTimeNowFormated());
     try {
         const leaders = await Query.getAllQueriesReverseSorted();
         return res.status(200).json(leaders);
@@ -116,7 +111,6 @@ const leaderboardController = async (req, res) => {
 }
 
 const codesController = async (req, res) => {
-    logger.log('GET /api/explore/getcode/:codeId getCodeOfAQuery', dateTimeNowFormated());
     try {
         const codeId = req.params.codeId;
         const code = await Code.getCodeById(codeId);
@@ -129,7 +123,6 @@ const codesController = async (req, res) => {
 }
 
 const codeExecutor = async (req, res) => {
-    logger.log('POST /api/explore/codeExecutor', dateTimeNowFormated());
     try {
         const { language, code, input } = req.body;
 

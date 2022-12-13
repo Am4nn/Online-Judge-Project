@@ -3,6 +3,7 @@ import { SERVER_LINK } from '../../dev-server-link';
 
 import LeaderTable from './LeaderTable/LeaderTable';
 import LoadingSpinner from '../../compenents/LoadingSpinner/LoadingSpinner';
+import { errorFormatter } from '../../App';
 
 const LeaderBoard = () => {
 
@@ -14,7 +15,7 @@ const LeaderBoard = () => {
             {!loading && error && (<div>
                 <div className='errorTemplate'>
                     <div><span>Msg : </span>Wasn't able to connect to server check if your are not offline or server might not be working !</div>
-                    {error && <div><span>Error : </span>{JSON.stringify(error)}</div>}
+                    {error && <div><span>Error : </span>{errorFormatter(error)}</div>}
                 </div>
             </div>)}
             {!loading && !error && (

@@ -15,7 +15,6 @@ const readLastNLines = (filePath, start, nLines = defaultNLines) => {
 }
 
 const getLogsController = (req, res) => {
-    logger.log('GET /api/experimental/logs', dateTimeNowFormated());
     try {
         const pageNo = (req.query && req.query.pageNo && req.query.pageNo >= 1) ? req.query.pageNo : 1;
         if (!Authorization.isAdmin(req.username))
@@ -31,7 +30,6 @@ const getLogsController = (req, res) => {
 
 const logFromClient = (req, res) => {
     try {
-        logger.log("POST /api/experimental/log", dateTimeNowFormated());
         logger.log("Username:", req.username);
         logger.log("LOG:", req.body.msg);
         res.status(200).json('logged');

@@ -14,7 +14,6 @@ function isValidObjectId(id) {
 
 // gets all notes (global and public) but private notes only which belong to user
 const getAllNotes = async (req, res) => {
-    logger.log(`GET /api/notes/allNotes${(req.query.admin === 'true') ? '?admin=true' : ''}`, dateTimeNowFormated());
     const isAdminMode = (Authorization.isAdmin(req.username) && (req.query.admin === 'true'));
     try {
         const filter = isAdminMode ? {} : {
@@ -33,7 +32,6 @@ const getAllNotes = async (req, res) => {
 
 // gets code and language for a codeid
 const getNote = async (req, res) => {
-    logger.log("GET /api/notes/:codeid", dateTimeNowFormated());
     try {
         const codeid = req.params.codeid;
         const noteid = req.query.noteid;
@@ -58,7 +56,6 @@ const getNote = async (req, res) => {
 
 // add note and code to database
 const addNote = async (req, res) => {
-    logger.log("POST /api/notes", dateTimeNowFormated());
     try {
         const user = req.user;
         const username = req.username;
@@ -89,7 +86,6 @@ const addNote = async (req, res) => {
 
 // edits a note
 const editNote = async (req, res) => {
-    logger.log("PUT /api/notes/:noteid", dateTimeNowFormated());
     try {
         const username = req.username;
         const noteid = req.params.noteid;
@@ -135,7 +131,6 @@ const editNote = async (req, res) => {
 
 // deletes a note permanently
 const deleteNote = async (req, res) => {
-    logger.log("DELETE /api/notes/:noteid", dateTimeNowFormated());
     try {
         const username = req.username;
         const noteid = req.params.noteid;

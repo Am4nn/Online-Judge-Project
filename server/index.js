@@ -1,6 +1,5 @@
 const { dateTimeNowFormated, logger } = require('./utils');
 
-
 // If not in production
 if (process.env.NODE_ENV !== "production") {
     require('dotenv').config(); // .env file variables -> process.env
@@ -17,6 +16,10 @@ const notes = require('./routes/notes');
 const experimental = require('./routes/experimental');
 const path = require('path');
 const http = require('http');
+const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
+const hpp = require('hpp');
+const rateLimit = require("express-rate-limit");
 const { connectDB } = require('./DataBase/connectDB');
 const { initAllDockerContainers } = require('./CodeExecuter/codeExecutor_dockerv');
 const { Socket } = require('./socketHandler');
@@ -30,7 +33,22 @@ initAllDockerContainers();
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+
+// Security
 app.use(cors({ origin: true, credentials: true }));
+app.use(mongoSanitize());
+app.use(hpp());
+app.use(helmet());
+app.use(rateLimit({
+    windowMs: 10 * 60 * 1000, // 10 Minutes
+    max: 500
+}));
+
+// logging middleware
+app.use((req, res, next) => {
+    logger.log(req.method, req.url, dateTimeNowFormated());
+    next();
+});
 
 // api route to get questions and verdicts
 app.use('/api/explore', explore);
@@ -44,17 +62,18 @@ app.use('/api/user', user);
 // experimental routes
 app.use('/api/experimental', experimental);
 
-// Serve Static Assets
-// Set Static Folder
+// Serve Static Assets In Production
 if (process.env.NODE_ENV === "production") {
+    // Set Static Folder
     app.use(express.static(path.join(__dirname, 'client/build')));
     app.get('*', (req, res) =>
         res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
     );
 }
 
-// setup socket connection
+// creating a http server
 const server = http.createServer(app);
+// setup socket connection
 Socket.registerSocketServer(server);
 
 const port = process.env.PORT || 5000;

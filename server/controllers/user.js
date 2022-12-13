@@ -4,7 +4,6 @@ const { dateTimeNowFormated, logger } = require('../utils');
 const { User } = require('../DataBase/database');
 
 const loginController = async (req, res) => {
-    logger.log('POST /api/user/login', dateTimeNowFormated());
     try {
         // sign the token
         const token = jwt.sign(
@@ -28,7 +27,6 @@ const loginController = async (req, res) => {
 }
 
 const registerController = async (req, res) => {
-    logger.log('POST /api/user/register', dateTimeNowFormated());
     try {
         const { name, username, email, password } = req.body;
 
@@ -61,7 +59,6 @@ const registerController = async (req, res) => {
 }
 
 const logoutController = (req, res) => {
-    logger.log('GET /api/user/logout', dateTimeNowFormated());
     return res.cookie("token", "", {
         httpOnly: true,
         expires: new Date(0),
@@ -71,7 +68,6 @@ const logoutController = (req, res) => {
 }
 
 const loggedInController = async (req, res) => {
-    logger.log('GET /api/user/loggedIn', dateTimeNowFormated());
     try {
         if (!req.cookies || !req.cookies.token) return res.json(false);
 
@@ -94,7 +90,6 @@ const loggedInController = async (req, res) => {
 }
 
 const changePasswordController = async (req, res) => {
-    logger.log('PUT /api/user/changePassword', dateTimeNowFormated());
     try {
         let { username, email, password, newPassword } = req.body;
         username = username ? username.trim() : '';
