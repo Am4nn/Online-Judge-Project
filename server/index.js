@@ -23,6 +23,7 @@ const rateLimit = require("express-rate-limit");
 const { connectDB } = require('./DataBase/connectDB');
 const { initAllDockerContainers } = require('./CodeExecuter/codeExecutor_dockerv');
 const { Socket } = require('./socketHandler');
+const { loggingMiddleware } = require('./middlewares');
 
 // Establish Connection to Database
 connectDB();
@@ -44,11 +45,8 @@ app.use(rateLimit({
     max: 500
 }));
 
-// logging middleware
-app.use((req, res, next) => {
-    logger.log(req.method, req.url, dateTimeNowFormated());
-    next();
-});
+// logging all server side requests
+app.use('/api', loggingMiddleware);
 
 // api route to get questions and verdicts
 app.use('/api/explore', explore);
@@ -56,11 +54,12 @@ app.use('/api/explore', explore);
 // api route to get and post notes
 app.use('/api/notes', notes);
 
-// user login and rgister
+// api route for user login and register
 app.use('/api/user', user);
 
 // experimental routes
 app.use('/api/experimental', experimental);
+
 
 // Serve Static Assets In Production
 if (process.env.NODE_ENV === "production") {

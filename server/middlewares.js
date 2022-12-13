@@ -141,4 +141,13 @@ const authProvider = (req, res, next) => {
     next();
 }
 
-module.exports = { loginValidator, registerValidator, authValidator, authProvider };
+const loggingMiddleware = (req, res, next) => {
+    logger.log(req.method, req.url, dateTimeNowFormated());
+    next();
+}
+
+module.exports = {
+    loginValidator, registerValidator,
+    authValidator, authProvider,
+    loggingMiddleware
+};
