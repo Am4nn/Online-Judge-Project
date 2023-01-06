@@ -5,7 +5,7 @@
 - Used Docker and Sandboxing techniques to make online judge more secure.
 - Used Poling and Queue to handle multiple requests.
 - Deployed and can be used by many users by Horizontal Scaling.
-- You can visit Live site here: [Online Judge](https://bit.ly/oj-server)
+- You can visit Live site here: [Online Judge](https://bit.ly/oj-am4n)
 
 ## Run Online-Judge Locally
 
