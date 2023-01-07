@@ -9,14 +9,15 @@ const {
     codesController,
     codeExecutor
 } = require('../controllers/explore');
+const { loggingMiddleware } = require('../middlewares');
 
 // api/explore/
-router.get('/problems', problemsController);
-router.get('/problems/:id', detailedProblemController);
-router.post('/problems/:id', verdictController);
-router.get('/status/:queryId', statusController);
-router.get('/leaderboard', leaderboardController);
-router.get('/getcode/:codeId', codesController);
-router.post('/codeExecutor', codeExecutor);
+router.get('/problems', loggingMiddleware, problemsController);
+router.get('/problems/:id', loggingMiddleware, detailedProblemController);
+router.post('/problems/:id', loggingMiddleware, verdictController);
+router.get('/status/:queryId', loggingMiddleware, statusController);
+router.get('/leaderboard', loggingMiddleware, leaderboardController);
+router.get('/getcode/:codeId', loggingMiddleware, codesController);
+router.post('/codeExecutor', loggingMiddleware, codeExecutor);
 
 module.exports = router;

@@ -23,7 +23,7 @@ const rateLimit = require("express-rate-limit");
 const { connectDB } = require('./DataBase/connectDB');
 const { initAllDockerContainers } = require('./CodeExecuter/codeExecutor_dockerv');
 const { Socket } = require('./socketHandler');
-const { loggingMiddleware } = require('./middlewares');
+// const { loggingMiddleware } = require('./middlewares');
 
 // Establish Connection to Database
 connectDB();
@@ -45,8 +45,13 @@ app.use(rateLimit({
     max: 500
 }));
 
+// creating a http server
+const server = http.createServer(app);
+// setup socket connection
+Socket.registerSocketServer(server);
+
 // logging all server side requests
-app.use('/api', loggingMiddleware);
+// app.use('/api', loggingMiddleware);
 
 // api route to get questions and verdicts
 app.use('/api/explore', explore);
@@ -69,11 +74,6 @@ if (process.env.NODE_ENV === "production") {
         res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
     );
 }
-
-// creating a http server
-const server = http.createServer(app);
-// setup socket connection
-Socket.registerSocketServer(server);
 
 const port = process.env.PORT || 5000;
 server.listen(port, () => {
