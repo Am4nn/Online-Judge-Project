@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: oj-server
+    env: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_URL
+        value: mongodb+srv://am4n_arya:88GaaXXn6MdPIPU0@cluster0.kgjmd.mongodb.net/oj-server?retryWrites=true&w=majority
+      - key: JWT_SECRET
+        value: dsbfjbjksdf56asd13asd
+  - type: redis
+    name: oj-redis
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: everywhere
