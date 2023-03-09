@@ -4,8 +4,12 @@ const jwt = require('jsonwebtoken');
 const {
     Query, Question, User, Code
 } = require('../DataBase/database');
-const { addQueryToQueue, addQueryToQueue_Exec } = require('../CodeExecuter/queryQueue');
-const { createFile } = require('../CodeExecuter/codeExecutor_dockerv');
+
+const queryQueueDir = `../CodeExecuter/queryQueue${(process.env.NO_REDIS) ? '_noredis' : ''}`;
+const { addQueryToQueue, addQueryToQueue_Exec } = require(queryQueueDir);
+
+const codeExecutorDir = `../CodeExecuter/codeExecutor${(process.env.NO_DOCKER ? "_nodockerv" : "_dockerv")}`;
+const { createFile } = require(codeExecutorDir);
 const { dateTimeNowFormated, logger } = require('../utils');
 
 // ObjectID Validator function

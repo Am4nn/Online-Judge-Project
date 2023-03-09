@@ -5,7 +5,8 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "set NODE_ENV=Development && nodemon index.js",
+        "dev": "set NODE_ENV=Development&&nodemon index.js",
+        "dev-noredis-nodocker": "set NODE_ENV=Development&&set NO_REDIS=true&&set NO_DOCKER=true&&nodemon index.js",
         "start": "node index.js"
     },
     "author": "",
@@ -23,9 +24,11 @@
         "helmet": "^6.0.1",
         "hpp": "^0.2.3",
         "jsonwebtoken": "^8.5.1",
+        "kue": "^0.11.6",
         "mongoose": "^6.4.2",
         "nodemon": "^2.0.18",
         "path": "^0.12.7",
+        "redis-mock": "^0.56.3",
         "socket.io": "^4.5.4",
         "uuid": "^8.3.2",
         "xss-clean": "^0.1.1"

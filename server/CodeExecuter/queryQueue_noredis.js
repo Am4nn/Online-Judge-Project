@@ -1,10 +1,10 @@
-// Requirements: Bull requires a Redis version greater than or equal to 2.8.18
 
-const Queue = require('bull');
+const kue = require('kue');
 const {
     Authorization, Query,
     Question, User, Code
 } = require('../DataBase/database');
+
 const codeExecutorDir = `./codeExecutor${(process.env.NO_DOCKER ? "_nodockerv" : "_dockerv")}`;
 const {
     deleteFile, readFile, execCode,
@@ -12,21 +12,44 @@ const {
 } = require(codeExecutorDir);
 const { dateTimeNowFormated, logger } = require('../utils');
 
-logger.log("Redis version greater than or equal to 2.8.18 Required !");
+logger.log("No Redis Required !");
 
 const WORKERS_NUMBER = 5;
-const QUEUE_CONFIG = {
-    defaultJobOptions: {
-        removeOnComplete: true,
-        removeOnFail: true
-    }
+
+const redisMock = require('redis-mock');
+
+const queue = kue.createQueue({
+    prefix: 'queue',
+    jobEvents: false,
+    disableSearch: true,
+    jobQueueSchedulingInterval: 1000,
+    redis: {
+        createClientFactory: () => redisMock.createClient(),
+    },
+});
+
+// ###############################################################
+// ###############################################################
+
+const addQueryToQueue = async (queryId) => {
+    const job = queue.create('query-queue', { id: queryId })
+        .priority('high')
+        .attempts(3)
+        .backoff(true)
+        .removeOnComplete(true)
+        // .removeOnFail(true)
+        .save(err => {
+            if (err) {
+                logger.error('Error adding job to queue', err, dateTimeNowFormated());
+            } else {
+                logger.log('Job added to queue', job.id, dateTimeNowFormated());
+            }
+        });
+    return job;
 };
 
-
-const queryQueue = new Queue('query-queue', QUEUE_CONFIG);
-
-queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
-    const { id: queryId } = data;
+queue.process('query-queue', WORKERS_NUMBER, async (job, done) => {
+    const { id: queryId } = job.data;
     let query = null;
     try {
         query = await Query.getQueryById(queryId);
@@ -61,7 +84,7 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
 
     } catch (error) {
         if (!error.msg) {
-            logger.error('Error without msg in bull.process', error, dateTimeNowFormated());
+            logger.error('Error without msg in kue process', error, dateTimeNowFormated());
             error = { ...error, msg: 'some server side errors' };
         }
         if (query) {
@@ -69,41 +92,39 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
             query.status = 'error';
             query.output = error;
             await query.save(); // TODO : saving the changes to database
-        } else logger.log('Error in queryQueue: ', error, dateTimeNowFormated());
+        } else logger.log('Error in kue process: ', error, dateTimeNowFormated());
     } finally {
         if (query && query.filepath) deleteFile(query.filepath);
     }
-    return true;
-})
+    done();
+});
 
-// set status of query to error with some appropriate msg
-queryQueue.on('failed', error => {
-    logger.error('bull/redis failed', error.data.id, error.failedReason, dateTimeNowFormated());
-})
-
-queryQueue.on('error', error => {
-    logger.error('bull/redis error', error, dateTimeNowFormated());
-})
-
-
-const addQueryToQueue = async queryId => {
-    await queryQueue.add({ id: queryId });
-}
-
-
-
-
-
+// ###############################################################
 // ###############################################################
 
 
+// ###############################################################
+// ###############################################################
 
+const addQueryToQueue_Exec = async (queryId) => {
+    const job = queue.create('query-queue-exec', { id: queryId })
+        .priority('high')
+        .attempts(3)
+        .backoff(true)
+        .removeOnComplete(true)
+        .removeOnFail(true)
+        .save(err => {
+            if (err) {
+                logger.error('Error adding job to queue', err, dateTimeNowFormated());
+            } else {
+                logger.log('Job added to queue', job.id, dateTimeNowFormated());
+            }
+        });
+    return job;
+};
 
-
-const queryQueue_exec = new Queue('query-queue-exec', QUEUE_CONFIG);
-
-queryQueue_exec.process(WORKERS_NUMBER, async ({ data }) => {
-    const { queryId } = data;
+queue.process('query-queue-exec', WORKERS_NUMBER, async (job, done) => {
+    const { id: queryId } = job.data;
     let query = null;
     try {
         query = await Query.getQueryById(queryId);
@@ -130,23 +151,22 @@ queryQueue_exec.process(WORKERS_NUMBER, async ({ data }) => {
     } finally {
         if (query && query.filepath) deleteFile(query.filepath);
     }
-    return true;
+    done();
 });
 
+// ###############################################################
+// ###############################################################
+
+
+
 // set status of query to error with some appropriate msg
-queryQueue_exec.on('failed', error => {
-    logger.error('bull/redis failed', error.data.id, error.failedReason, dateTimeNowFormated());
-})
+queue.on('job failed', (id, err) => {
+    logger.error('kue failed', id, err, dateTimeNowFormated());
+});
 
-queryQueue_exec.on('error', error => {
-    logger.error('bull/redis error', error, dateTimeNowFormated());
-})
-
-const addQueryToQueue_Exec = async (queryId) => {
-    await queryQueue_exec.add({ queryId });
-}
-
-
+queue.on('error', err => {
+    logger.error('kue error', err, dateTimeNowFormated());
+});
 
 module.exports = {
     addQueryToQueue,

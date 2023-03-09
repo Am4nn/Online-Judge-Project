@@ -53,7 +53,7 @@ const copyFilesToDocker = (filePath, containerId) => {
 
 /**
  * @description This fn deletes file/files from a container
- * @param {Array | String} filenames
+ * @param {Array | String} filename
  * @param {String} containerId 
  * @return {Promise}
  */

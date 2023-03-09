@@ -21,8 +21,10 @@ const helmet = require("helmet");
 const hpp = require('hpp');
 const rateLimit = require("express-rate-limit");
 const { connectDB } = require('./DataBase/connectDB');
-const { initAllDockerContainers } = require('./CodeExecuter/codeExecutor_dockerv');
 const { Socket } = require('./socketHandler');
+
+const codeExecutorDir = `./CodeExecuter/codeExecutor${(process.env.NO_DOCKER ? "_nodockerv" : "_dockerv")}`;
+const { initAllDockerContainers } = require(codeExecutorDir);
 // const { loggingMiddleware } = require('./middlewares');
 
 // Establish Connection to Database
@@ -67,13 +69,13 @@ app.use('/api/experimental', experimental);
 
 
 // Serve Static Assets In Production
-if (process.env.NODE_ENV === "production") {
-    // Set Static Folder
-    app.use(express.static(path.join(__dirname, 'client/build')));
-    app.get('*', (req, res) =>
-        res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
-    );
-}
+// if (process.env.NODE_ENV === "production") {
+// Set Static Folder
+app.use(express.static(path.join(__dirname, 'client/build')));
+app.get('*', (req, res) =>
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
+);
+// }
 
 const port = process.env.PORT || 5000;
 server.listen(port, () => {

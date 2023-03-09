@@ -41,7 +41,7 @@ export const errorFormatter = err => {
     err.ok && (errorString += `ok: ${err.ok} \n`);
     err.headers && (errorString += `headers: ${JSON.stringify(err.headers)} \n`);
     err.body && (errorString += `body: ${JSON.stringify(err.body)} \n`);
-    return <div style={{ display: 'inline', whiteSpace: 'pre-line' }}>{errorString}</div>;
+    return <div style={{ display: 'inline', whiteSpace: 'pre' }}>{errorString}</div>;
 }
 
 const App = () => {
