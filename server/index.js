@@ -1,7 +1,7 @@
 const { dateTimeNowFormated, logger } = require('./utils');
 
 // If not in production
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== "production" || process.env.CONTAINERIZED === "true") {
     require('dotenv').config(); // .env file variables -> process.env
 }
 logger.log(`In ${process.env.NODE_ENV} env !`);
