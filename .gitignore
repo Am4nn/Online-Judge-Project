@@ -9,9 +9,7 @@ ecosystem.config.js
 /client/.env.development.local
 /client/.env.test.local
 /client/.env.production.local
-/client/package-lock.json
 
 /server/.env
 /server/node_modules
 /server/client/node_modules
-/server/package-lock.json
