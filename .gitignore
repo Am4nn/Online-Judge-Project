@@ -1,13 +1,17 @@
 .vscode
 
+dump.rdb
+ecosystem.config.js
+
 /client/node_modules
 /client/.DS_Store
 /client/.env.local
 /client/.env.development.local
 /client/.env.test.local
 /client/.env.production.local
-
+/client/package-lock.json
 
 /server/.env
 /server/node_modules
 /server/client/node_modules
+/server/package-lock.json
