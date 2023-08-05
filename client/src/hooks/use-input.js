@@ -27,13 +27,13 @@ const useInput = (validateValue) => {
     const valueIsValid = validateValue(inputState.value);
     const hasError = !valueIsValid && inputState.isTouched;
 
-    const valueChangeHandler = (event) => {
+    const valueChangeHandler = useCallback(event => {
         dispatch({ type: 'INPUT', value: event.target.value });
-    };
+    }, []);
 
-    const inputBlurHandler = (event) => {
+    const inputBlurHandler = useCallback(() => {
         dispatch({ type: 'BLUR' });
-    };
+    }, []);
 
     const reset = useCallback(() => {
         dispatch({ type: 'RESET' });

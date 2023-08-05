@@ -7,81 +7,92 @@ const Note = require('./Model/Note');
 
 // Question
 const getQuestionList = async () => {
-    const questions = await Question.find({});
-    return questions;
+    return await Question.find({});
 }
 const getQuestionById = async id => {
-    const question = await Question.findById(`${id}`);
-    return question;
+    return await Question.findById(`${id}`);
 }
+const incrNoOfSubm = async quesId => {
+    return await Question.updateOne({ _id: quesId }, { $inc: { noOfSubm: 1 } });
+}
+const incrNoOfSuccess = async quesId => {
+    return await Question.updateOne({ _id: quesId }, { $inc: { noOfSuccess: 1 } });
+}
+
 
 
 // Query
 const createNewQuery = async params => {
-    const query = new Query(params);
-    await query.save();
-    return query;
+    return await Query.create(params);
 }
 const getQueryById = async queryId => {
-    const query = await Query.findById(`${queryId}`);
-    return query;
+    return await Query.findById(`${queryId}`);
 }
 const getAllQueriesReverseSorted = async () => {
-    const leaders = await Query.find({ type: { $ne: 'exec' } }).sort({ _id: -1 });
-    return leaders;
+    return await Query.find({ type: { $ne: 'exec' } }).sort({ _id: -1 });
 }
 const deleteQueryById = async queryId => {
-    await Query.findByIdAndDelete(queryId);
+    return await Query.findByIdAndDelete(queryId);
+}
+const getQueryByIdAndUpdate = async (queryId, options) => {
+    return await Query.findOneAndUpdate(
+        { _id: queryId },
+        options,
+        { new: true }
+    );
 }
 
 
 // User
 const createNewUser = async ({ name, username, email, passwordHash }) => {
-    const newUser = new User({ name, username, email, passwordHash });
-    const savedUser = await newUser.save();
-    return savedUser;
+    return await User.create({ name, username, email, passwordHash });
 }
 const getUserById = async userId => {
-    const user = await User.findById(userId);
-    return user;
+    return await User.findById(userId);
 }
 const findOneUser = async filter => {
-    const user = await User.findOne(filter);
-    return user;
+    return await User.findOne(filter);
+}
+const addSolvedQuestionToUser = async (username, quesId) => {
+    return await User.findOneAndUpdate(
+        { username },
+        { $addToSet: { solvedQuestions: quesId } },
+        { new: true }
+    );
+}
+const incrTotalSubmInUser = async (userId) => {
+    return await User.findByIdAndUpdate(
+        userId,
+        { $inc: { totalSubmissions: 1 } },
+        { new: true }
+    );
 }
 
 
 // Note
 const createNewNote = async params => {
-    const note = new Note(params);
-    await note.save();
-    return note;
+    return await Note.create(params);
 }
 const getNoteById = async noteId => {
-    const note = await Note.findById(noteId);
-    return note;
+    return await Note.findById(noteId);
 }
 const getNoteByFilter = async filter => {
-    const notes = await Note.find(filter);
-    return notes;
+    return await Note.find(filter);
 }
 const deleteNoteById = async noteId => {
-    await Note.deleteOne({ _id: noteId });
+    return await Note.deleteOne({ _id: noteId });
 }
 
 
 // Code
 const createNewCode = async params => {
-    const code = new Code(params);
-    await code.save();
-    return code;
+    return await Code.create(params);
 }
 const getCodeById = async codeId => {
-    const code = await Code.findById(codeId);
-    return code;
+    return await Code.findById(codeId);
 }
 const deleteCodeById = async codeId => {
-    await Code.deleteOne({ _id: codeId });
+    return await Code.deleteOne({ _id: codeId });
 }
 
 
@@ -95,9 +106,9 @@ const isGuest = username => {
 
 
 module.exports = {
-    Question: { getQuestionList, getQuestionById },
-    Query: { createNewQuery, getQueryById, getAllQueriesReverseSorted, deleteQueryById },
-    User: { createNewUser, getUserById, findOneUser },
+    Question: { getQuestionList, getQuestionById, incrNoOfSubm, incrNoOfSuccess },
+    Query: { createNewQuery, getQueryById, getAllQueriesReverseSorted, deleteQueryById, getQueryByIdAndUpdate },
+    User: { createNewUser, getUserById, findOneUser, addSolvedQuestionToUser, incrTotalSubmInUser },
     Note: { createNewNote, getNoteById, getNoteByFilter, deleteNoteById },
     Code: { createNewCode, getCodeById, deleteCodeById },
     Authorization: { isAdmin, isGuest }

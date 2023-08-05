@@ -3,29 +3,18 @@ import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import classes from './Customform.module.css'
 import useInput from '../../hooks/use-input'
-import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { changePassword, login, register } from '../../store/Auth/auth-actions'
 import { authActions } from '../../store/Auth/auth-slice'
-import { FilledInput, FormControl, FormControlLabel, FormLabel, IconButton, InputAdornment, InputLabel, Radio, RadioGroup, Tooltip, Zoom } from '@mui/material'
-import { useMediaQuery } from '@mui/material'
+import { FilledInput, FormControl, FormControlLabel, FormLabel, IconButton, InputAdornment, InputLabel, Radio, RadioGroup } from '@mui/material'
 
-import { LOGIN, REGISTER, CHANGEPASSWORD } from '../../App';
+import { LOGIN, REGISTER, CHANGEPASSWORD } from '../../utils';
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 
-const Customform = props => {
-
-    const { pageType } = props; // login, register
-
-    const isMobile = useMediaQuery('(max-width:1000px)');
-    const tooltipPlacement = 'right';
+const Customform = ({ pageType }) => {
 
     const dispatch = useDispatch();
     const loginState = useSelector(state => state.auth);
-
-    useEffect(() => {
-        return () => dispatch(authActions.setError({ error: undefined }));
-    }, [dispatch, pageType]);
 
     const {
         value: name,
@@ -87,7 +76,7 @@ const Customform = props => {
     } = useInput(value => (value.length >= 6 && value === password));
     const passVerErrorMsg = 'Verify Password is necessary and should be same as Password';
 
-    // username, email
+    // emailUnameSelection: username, email
     const [emailUnameSelection, setEUSelection] = useState('username');
 
     useEffect(() => {
@@ -97,7 +86,9 @@ const Customform = props => {
         resetPass();
         resetPassVer();
         resetOldPass();
-    }, [pageType, resetName, resetUsername, resetEmail, resetPass, resetPassVer, resetOldPass]);
+
+        return () => dispatch(authActions.setError({ error: undefined }));
+    }, [pageType, dispatch, resetName, resetUsername, resetEmail, resetPass, resetPassVer, resetOldPass]);
 
     // final validations for form
     const isRegisterFormValid = isNameValid && isUserameValid &&
@@ -116,7 +107,6 @@ const Customform = props => {
         default: break;
     }
 
-    // fix fogin with  email and username
     const loginHandler = () => {
         emailUnameSelection === 'username' && dispatch(login(username, undefined, password));
         emailUnameSelection === 'email' && dispatch(login(undefined, email, password));
@@ -161,134 +151,64 @@ const Customform = props => {
                         }
 
                         {pageType === REGISTER &&
-                            <div className='form-group mt-4'>
-                                <Tooltip
-                                    arrow
-                                    placement={tooltipPlacement}
-                                    TransitionComponent={Zoom}
-                                    title={nameErrorMsg}
-                                    open={!isMobile && hasNameError}
-                                >
-                                    <TextField
-                                        id='name'
-                                        type='text'
-                                        label="Name"
-                                        variant="filled"
-                                        placeholder='Less than 10 characters'
-                                        onChange={nameChangeHandler}
-                                        onBlur={nameBlurHandler}
-                                        value={name}
-                                        sx={hasNameError ? {
-                                            backgroundColor: '#fddddd',
-                                        } : {}}
-                                    />
-                                </Tooltip>
-                                {isMobile && hasNameError &&
-                                    <div className={classes.validError}>
-                                        {nameErrorMsg}
-                                    </div>
-                                }
-                            </div>
+                            <CustomInput
+                                id='name'
+                                type='text'
+                                label="Name"
+                                value={name}
+                                placeholder='Less than 10 characters'
+                                blurHandler={nameBlurHandler}
+                                changeHandler={nameChangeHandler}
+                                hasError={hasNameError}
+                                errorMsg={nameErrorMsg}
+                            />
                         }
 
                         {pageType === LOGIN &&
-                            <FormControl sx={{
-                                borderTop: '2px solid rgb(0,0,0,0.08)',
-                                borderBottom: '2px solid rgb(0,0,0,0.08)',
-                                marginTop: '0.5rem',
-                                padding: '0 0.7rem'
-                            }}>
-                                <FormLabel id="login-mode">Choose with what you want to login</FormLabel>
-                                <RadioGroup
-                                    row
-                                    aria-labelledby="login-mode"
-                                    name="login-mode"
-                                    value={emailUnameSelection}
-                                    onChange={event => setEUSelection(event.target.value)}
-                                >
-                                    <FormControlLabel
-                                        value="username"
-                                        control={<Radio />}
-                                        label="Username"
-                                    />
-                                    <FormControlLabel
-                                        value="email"
-                                        control={<Radio />}
-                                        label="Email"
-                                    />
-                                </RadioGroup>
-                            </FormControl>
+                            <CustomRadioInput
+                                id="login-mode"
+                                value={emailUnameSelection}
+                                onChange={event => setEUSelection(event.target.value)}
+                                label="Select the login method you wish to use"
+                                radioBtnList={[
+                                    { value: "username", label: "Username" },
+                                    { value: "email", label: "Email" }
+                                ]}
+                            />
                         }
 
-
                         {(pageType === REGISTER || pageType === CHANGEPASSWORD || emailUnameSelection === 'username') &&
-                            <div className='form-group mt-4'>
-                                <Tooltip
-                                    arrow
-                                    placement={tooltipPlacement}
-                                    TransitionComponent={Zoom}
-                                    title={usernameErrorMsg}
-                                    open={!isMobile && hasUsernameError}
-                                >
-                                    <TextField
-                                        id='username'
-                                        type='text'
-                                        label="Username"
-                                        variant="filled"
-                                        placeholder='4 <= username < 10'
-                                        onChange={usernameChangeHandler}
-                                        onBlur={usernameBlurHandler}
-                                        value={username}
-                                        sx={hasUsernameError ? {
-                                            backgroundColor: '#fddddd',
-                                        } : {}}
-                                    />
-                                </Tooltip>
-                                {isMobile && hasUsernameError &&
-                                    <div className={classes.validError}>
-                                        {usernameErrorMsg}
-                                    </div>
-                                }
-                            </div>
+                            <CustomInput
+                                id='username'
+                                type='text'
+                                label="Username"
+                                value={username}
+                                placeholder='4 <= username < 10'
+                                blurHandler={usernameBlurHandler}
+                                changeHandler={usernameChangeHandler}
+                                hasError={hasUsernameError}
+                                errorMsg={usernameErrorMsg}
+                            />
                         }
 
                         {(pageType === REGISTER || pageType === CHANGEPASSWORD || emailUnameSelection === 'email') &&
-                            <div className='form-group mt-3'>
-                                <Tooltip
-                                    arrow
-                                    placement={tooltipPlacement}
-                                    TransitionComponent={Zoom}
-                                    title={emailErrorMsg}
-                                    open={!isMobile && hasEmailError}
-                                >
-                                    <TextField
-                                        id='email'
-                                        type='email'
-                                        label="Email"
-                                        placeholder='Enter valid Email'
-                                        variant="filled"
-                                        onBlur={emailBlurHandler}
-                                        onChange={emailChangeHandler}
-                                        value={email}
-                                        sx={hasEmailError ? {
-                                            backgroundColor: '#fddddd',
-                                        } : {}}
-                                    />
-                                </Tooltip>
-                                {isMobile && hasEmailError &&
-                                    <div className={classes.validError}>
-                                        {emailErrorMsg}
-                                    </div>
-                                }
-                            </div>
+                            <CustomInput
+                                id='email'
+                                type='email'
+                                label="Email"
+                                value={email}
+                                placeholder='Enter valid Email'
+                                blurHandler={emailBlurHandler}
+                                changeHandler={emailChangeHandler}
+                                hasError={hasEmailError}
+                                errorMsg={emailErrorMsg}
+                            />
                         }
 
                         {pageType === CHANGEPASSWORD &&
                             <CustomPasswordInput
                                 emailUnameSelection={emailUnameSelection}
                                 pageType={pageType}
-                                isMobile={isMobile}
-                                tooltipPlacement={tooltipPlacement}
                                 errorMsg={oldPassErrorMsg}
                                 hasError={hasOldPassError}
                                 id='oldPassword'
@@ -297,18 +217,12 @@ const Customform = props => {
                                 blurHandler={oldPassBlurHandler}
                                 label="Old Password"
                                 placeholder='Minimum Length 6'
-                                sx={hasOldPassError ? {
-                                    backgroundColor: '#fddddd',
-                                } : {}}
-                                transitionComponent={Zoom}
                             />
                         }
 
                         <CustomPasswordInput
                             emailUnameSelection={emailUnameSelection}
                             pageType={pageType}
-                            isMobile={isMobile}
-                            tooltipPlacement={tooltipPlacement}
                             errorMsg={passErrorMsg}
                             hasError={hasPassError}
                             id='password'
@@ -317,18 +231,12 @@ const Customform = props => {
                             blurHandler={passBlurHandler}
                             label={`${pageType === CHANGEPASSWORD ? 'New ' : ''}Password`}
                             placeholder='Minimum Length 6'
-                            transitionComponent={Zoom}
-                            sx={hasPassError ? {
-                                backgroundColor: '#fddddd',
-                            } : {}}
                         />
 
                         {(pageType === REGISTER || pageType === CHANGEPASSWORD) &&
                             <CustomPasswordInput
                                 emailUnameSelection={emailUnameSelection}
                                 pageType={pageType}
-                                isMobile={isMobile}
-                                tooltipPlacement={tooltipPlacement}
                                 errorMsg={passVerErrorMsg}
                                 hasError={hasPassVerError}
                                 id='passwordVerify'
@@ -337,10 +245,6 @@ const Customform = props => {
                                 blurHandler={passVerBlurHandler}
                                 label='Re-Enter Password'
                                 placeholder={`Same as ${pageType === CHANGEPASSWORD ? 'New ' : ''}Password`}
-                                transitionComponent={Zoom}
-                                sx={hasPassVerError ? {
-                                    backgroundColor: '#fddddd',
-                                } : {}}
                             />
                         }
 
@@ -378,7 +282,7 @@ const Customform = props => {
     )
 }
 
-const CustomPasswordInput = ({ emailUnameSelection, pageType, isMobile, tooltipPlacement, errorMsg, hasError, id, value, changeHandler, label, placeholder, sx, transitionComponent, blurHandler }) => {
+const CustomPasswordInput = ({ emailUnameSelection, pageType, errorMsg, hasError, id, value, changeHandler, label, placeholder, blurHandler }) => {
 
     const [showPassword, setShowPassword] = useState(false);
 
@@ -396,44 +300,94 @@ const CustomPasswordInput = ({ emailUnameSelection, pageType, isMobile, tooltipP
 
     return (
         <div className='form-group mt-3'>
-            <Tooltip
-                arrow
-                placement={tooltipPlacement}
-                TransitionComponent={transitionComponent}
-                title={errorMsg}
-                open={!isMobile && hasError}
-            >
-                <FormControl sx={{ width: '25ch' }} variant="filled">
-                    <InputLabel htmlFor={id}>{label}</InputLabel>
-                    <FilledInput
-                        id={id}
-                        type={showPassword ? 'text' : 'password'}
-                        value={value}
-                        onChange={changeHandler}
-                        onBlur={blurHandler}
-                        placeholder={placeholder}
-                        sx={sx ? sx : {}}
-                        endAdornment={
-                            <InputAdornment position="end">
-                                <IconButton
-                                    aria-label="toggle password visibility"
-                                    onClick={handleClickShowPassword}
-                                    onMouseDown={handleMouseDownPassword}
-                                    edge="end"
-                                >
-                                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                                </IconButton>
-                            </InputAdornment>
-                        }
-                    />
-                </FormControl>
-            </Tooltip>
-            {isMobile && hasError &&
+            <FormControl sx={{ width: '25ch' }} variant="filled">
+                <InputLabel htmlFor={id}>{label}</InputLabel>
+                <FilledInput
+                    id={id}
+                    type={showPassword ? 'text' : 'password'}
+                    value={value}
+                    onChange={changeHandler}
+                    onBlur={blurHandler}
+                    placeholder={placeholder}
+                    sx={hasError ? {
+                        backgroundColor: '#fddddd',
+                    } : {}}
+                    endAdornment={
+                        <InputAdornment position="end">
+                            <IconButton
+                                aria-label="toggle password visibility"
+                                onClick={handleClickShowPassword}
+                                onMouseDown={handleMouseDownPassword}
+                                edge="end"
+                            >
+                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                        </InputAdornment>
+                    }
+                />
+            </FormControl>
+            {hasError &&
                 <div className={classes.validError}>
                     {errorMsg}
                 </div>
             }
         </div>
+    );
+}
+
+const CustomInput = ({ errorMsg, hasError, id, value, type, changeHandler, label, placeholder, blurHandler }) => {
+    return (
+        <div className='form-group mt-3'>
+            <FormControl sx={{ width: '25ch' }} variant="filled">
+                <InputLabel htmlFor={id}>{label}</InputLabel>
+                <FilledInput
+                    id={id}
+                    type={type}
+                    placeholder={placeholder}
+                    value={value}
+                    onChange={changeHandler}
+                    onBlur={blurHandler}
+                    sx={hasError ? {
+                        backgroundColor: '#fddddd',
+                    } : {}}
+                />
+            </FormControl>
+            {hasError &&
+                <div className={classes.validError}>
+                    {errorMsg}
+                </div>
+            }
+        </div>
+    )
+}
+
+const CustomRadioInput = ({ id, value, onChange, label, radioBtnList }) => {
+    return (
+        <FormControl sx={{
+            borderTop: '2px solid rgb(0,0,0,0.08)',
+            borderBottom: '2px solid rgb(0,0,0,0.08)',
+            marginTop: '0.5rem',
+            padding: '0 0.7rem'
+        }}>
+            <FormLabel id={id}>{label}</FormLabel>
+            <RadioGroup
+                row
+                aria-labelledby={id}
+                name={id}
+                value={value}
+                onChange={onChange}
+            >
+                {
+                    radioBtnList.map(btn => (
+                        <FormControlLabel
+                            value={btn.value}
+                            control={<Radio />}
+                            label={btn.label}
+                        />
+                    ))
+                }
+            </RadioGroup>
+        </FormControl>
     );
 }
 

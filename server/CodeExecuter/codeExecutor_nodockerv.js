@@ -161,9 +161,8 @@ const execCodeAgainstTestcases = (filePath, testcase, language) => {
     const { input, output } = require(`./testcases/${testcase}`)
 
     return new Promise(async (resolve, reject) => {
-        let filename = null;
         try {
-            filename = path.basename(filePath);
+            const filename = path.basename(filePath);
             const compiledId = await compile(filename, language);
 
             for (let index = 0; index < input.length; ++index) {
@@ -184,20 +183,6 @@ const execCodeAgainstTestcases = (filePath, testcase, language) => {
             resolve({ msg: 'All Test Cases Passed' });
         } catch (error) {
             reject(error);
-        } finally {
-            try {
-                if (filename)
-                    deleteFile(filename);
-
-                if (filename && details[language].compiledExtension) {
-                    // TODO: Update 'Solution.class' to id.class
-                    deleteFile(
-                        ((language === 'java') ? 'Solution.class' : ((filename.split('.')[0]) + '.' + details[language].compiledExtension))
-                    );
-                }
-            } catch (error) {
-                logger.error('Caught some errors while deleting files from Docker Container', error, dateTimeNowFormated());
-            }
         }
     });
 }
@@ -212,9 +197,8 @@ const execCode = async (filePath, language, inputString) => {
     if (!filePath.includes("\\") && !filePath.includes("/"))
         filePath = path.join(codeDirectory, filePath);
 
-    let filename = null;
     try {
-        filename = path.basename(filePath);
+        const filename = path.basename(filePath);
         const compiledId = await compile(filename, language);
         const exOut = await execute(compiledId,
             details[language].inputFunction ? details[language].inputFunction(inputString) : inputString,
@@ -223,20 +207,6 @@ const execCode = async (filePath, language, inputString) => {
         return ({ msg: "Compiled Successfully", stdout: exOut });
     } catch (error) {
         return error;
-    } finally {
-        try {
-            if (filename)
-                deleteFile(filename);
-
-            if (filename && details[language].compiledExtension) {
-                // TODO: Update 'Solution.class' to id.class
-                deleteFile(
-                    ((language === 'java') ? 'Solution.class' : ((filename.split('.')[0]) + '.' + details[language].compiledExtension))
-                );
-            }
-        } catch (error) {
-            logger.error('Caught some errors while deleting files from Docker Container', error, dateTimeNowFormated());
-        }
     }
 }
 
@@ -244,5 +214,6 @@ module.exports = {
     readFile, createFile,
     deleteFile, execCode,
     execCodeAgainstTestcases,
-    initAllDockerContainers
+    initAllDockerContainers,
+    languageSpecificDetails: details
 };

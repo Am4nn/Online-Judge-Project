@@ -3,7 +3,7 @@ import { SERVER_LINK } from '../../dev-server-link';
 
 import LeaderTable from './LeaderTable/LeaderTable';
 import LoadingSpinner from '../../compenents/LoadingSpinner/LoadingSpinner';
-import { errorFormatter } from '../../App';
+import { errorFormatter } from '../../utils';
 
 const LeaderBoard = () => {
 

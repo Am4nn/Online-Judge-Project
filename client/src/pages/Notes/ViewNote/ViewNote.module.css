@@ -15,7 +15,8 @@
     border: 1px solid hsla(var(--col), 44%, 76%, 0.5);
     letter-spacing: 0.03em;
     position: relative;
-    text-align: justify;
+    text-align: initial;
+    white-space: pre-wrap;
 }
 
 .response::before {

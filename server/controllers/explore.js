@@ -55,30 +55,25 @@ const verdictController = async (req, res) => {
 
         let username = 'guest';
         const token = req.cookies.token;
-        try {
-            if (token) {
+        if (token) {
+            try {
                 const verified = jwt.verify(token, process.env.JWT_SECRET);
-                const userId = verified.user;
-                const user = await User.getUserById(userId);
+                const user = await User.incrTotalSubmInUser(verified.user);
                 username = user.username;
-                user.totalSubmissions += 1;
-                await user.save();
+            } catch {
+                username = 'guest';
             }
-        } catch {
-            username = 'guest';
         }
 
         const { filename } = createFile(language, code);
-        const query = await Query.createNewQuery({ language, filepath: filename, testcase, quesId, quesName, username });
+        const codeDoc = await Code.createNewCode({ language, code, username });
+        const query = await Query.createNewQuery({ language, filepath: filename, testcase, quesId, quesName, username, codeId: codeDoc._id });
 
-        const queryId = query['_id'];
-        addQueryToQueue(queryId);
+        await addQueryToQueue(query);
 
-        const question = await Question.getQuestionById(quesId);
-        question.noOfSubm += 1;
-        await question.save();
+        await Question.incrNoOfSubm(quesId);
 
-        res.status(201).json({ status: 'pending', msg: "Request queued, wait for response !", queryId });
+        res.status(201).json({ status: 'pending', msg: "Request queued, wait for response !", queryId: query._id });
     } catch (error) {
         logger.error(error, dateTimeNowFormated());
         return res.status(400).json({ status: 'error', msg: 'some error occured submitting the code !', error: JSON.stringify(error) });
@@ -126,23 +121,22 @@ const codesController = async (req, res) => {
     }
 }
 
+const invalidLanguage = `Please select a language / valid language.
+Or may be this language is not yet supported !`
+
 const codeExecutor = async (req, res) => {
     try {
         const { language, code, input } = req.body;
 
         if (!validLanguages.includes(language))
-            return res.status(400).json({
-                msg: `Please select a language / valid language.
-Or may be this language is not yet supported !`
-            });
+            return res.status(400).json({ msg: invalidLanguage });
 
         const { filepath } = createFile(language, code);
         const query = await Query.createNewQuery({ type: 'exec', filepath, language, input });
 
-        const queryId = query['_id'];
-        addQueryToQueue_Exec(queryId);
+        addQueryToQueue_Exec(query);
 
-        res.status(201).json({ status: 'pending', msg: "Request queued, wait for response !", queryId });
+        res.status(201).json({ status: 'pending', msg: "Request queued, wait for response !", queryId: query._id });
     } catch (error) {
         logger.error(error, dateTimeNowFormated());
         return res.status(400).json({ status: 'error', msg: 'some error occured submitting the code !', error: JSON.stringify(error) });

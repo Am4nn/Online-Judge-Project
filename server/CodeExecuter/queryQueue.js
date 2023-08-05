@@ -3,12 +3,12 @@
 const Queue = require('bull');
 const {
     Authorization, Query,
-    Question, User, Code
+    Question, User,
 } = require('../DataBase/database');
 const codeExecutorDir = `./codeExecutor${(process.env.NO_DOCKER ? "_nodockerv" : "_dockerv")}`;
 const {
-    deleteFile, readFile, execCode,
-    execCodeAgainstTestcases
+    deleteFile, execCode,
+    execCodeAgainstTestcases, languageSpecificDetails
 } = require(codeExecutorDir);
 const { dateTimeNowFormated, logger } = require('../utils');
 
@@ -22,41 +22,25 @@ const QUEUE_CONFIG = {
     }
 };
 
-
 const queryQueue = new Queue('query-queue', QUEUE_CONFIG);
 
 queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
-    const { id: queryId } = data;
-    let query = null;
+    const query = data;
+    const startTime = new Date();
     try {
-        query = await Query.getQueryById(queryId);
-        if (!query) throw Error("Query not found");
-
-        // create an entry in code database
-        const code = await Code.createNewCode({ code: (readFile(query.filepath).toString()), language: query.language });
-        query.codeId = code._id;
-        query.startTime = new Date();
-
         let response = await execCodeAgainstTestcases(query.filepath, query.testcase, query.language);
 
-        query.completeTime = new Date();
-        query.status = 'success';
-        query.output = response;
-        await query.save(); // TODO : saving the changes to database
+        await Query.getQueryByIdAndUpdate(query._id, {
+            startTime,
+            completeTime: new Date(),
+            status: 'success',
+            output: response
+        });
 
-        const question = await Question.getQuestionById(query.quesId);
-        question.noOfSuccess += 1;
-        await question.save(); // TODO : saving the changes to database
+        await Question.incrNoOfSuccess(query.quesId);
 
         if (query.username && !Authorization.isGuest(query.username)) {
-            const user = await User.findOneUser({ username: query.username });
-            if (!user.solvedQuestions) {
-                user.solvedQuestions = [];
-            }
-            if (!user.solvedQuestions.includes(query.quesId)) {
-                user.solvedQuestions.push(query.quesId);
-            }
-            await user.save(); // TODO : saving the changes to database
+            await User.addSolvedQuestionToUser(query.username, query.quesId);
         }
 
     } catch (error) {
@@ -65,13 +49,23 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
             error = { ...error, msg: 'some server side errors' };
         }
         if (query) {
-            query.completeTime = new Date();
-            query.status = 'error';
-            query.output = error;
-            await query.save(); // TODO : saving the changes to database
-        } else logger.log('Error in queryQueue: ', error, dateTimeNowFormated());
+            await Query.getQueryByIdAndUpdate(query._id, {
+                startTime,
+                completeTime: new Date(),
+                status: 'error',
+                output: error
+            });
+        } else {
+            logger.log('Error in queryQueue: ', error, dateTimeNowFormated());
+        }
     } finally {
         if (query && query.filepath) deleteFile(query.filepath);
+        if (query && query.filepath && languageSpecificDetails[query.language].compiledExtension) {
+            // TODO: Update 'Solution.class' to id.class
+            deleteFile(
+                (query.language === 'java') ? 'Solution.class' : ((query.filepath.split('.')[0]) + '.' + languageSpecificDetails[query.language].compiledExtension)
+            );
+        }
     }
     return true;
 })
@@ -86,8 +80,8 @@ queryQueue.on('error', error => {
 })
 
 
-const addQueryToQueue = async queryId => {
-    await queryQueue.add({ id: queryId });
+const addQueryToQueue = async query => {
+    await queryQueue.add(query);
 }
 
 
@@ -103,19 +97,17 @@ const addQueryToQueue = async queryId => {
 const queryQueue_exec = new Queue('query-queue-exec', QUEUE_CONFIG);
 
 queryQueue_exec.process(WORKERS_NUMBER, async ({ data }) => {
-    const { queryId } = data;
-    let query = null;
+    const query = data;
+    const startTime = new Date();
     try {
-        query = await Query.getQueryById(queryId);
-        if (!query) throw new Error("Query not found");
+        let response = await execCode(query.filepath, query.language, query.input);
 
-        const { filepath, language, input } = query;
-
-        let response = await execCode(filepath, language, input);
-
-        query.status = 'success';
-        query.output = response;
-        await query.save();
+        await Query.getQueryByIdAndUpdate(query._id, {
+            startTime,
+            completeTime: new Date(),
+            status: 'success',
+            output: response,
+        });
 
     } catch (error) {
         if (!error.msg) {
@@ -123,12 +115,23 @@ queryQueue_exec.process(WORKERS_NUMBER, async ({ data }) => {
             error = { ...error, msg: 'some server side errors' };
         }
         if (query) {
-            query.status = 'error';
-            query.output = error;
-            await query.save();
-        } else logger.log('Error in queryQueue: ', error, dateTimeNowFormated());
+            await Query.getQueryByIdAndUpdate(query._id, {
+                startTime,
+                completeTime: new Date(),
+                status: 'error',
+                output: error,
+            });
+        } else {
+            logger.log('Error in queryQueue: ', error, dateTimeNowFormated());
+        }
     } finally {
         if (query && query.filepath) deleteFile(query.filepath);
+        if (query && query.filepath && languageSpecificDetails[query.language].compiledExtension) {
+            // TODO: Update 'Solution.class' to id.class
+            deleteFile(
+                (query.language === 'java') ? 'Solution.class' : ((query.filepath.split('.')[0]) + '.' + languageSpecificDetails[query.language].compiledExtension)
+            );
+        }
     }
     return true;
 });
@@ -142,8 +145,8 @@ queryQueue_exec.on('error', error => {
     logger.error('bull/redis error', error, dateTimeNowFormated());
 })
 
-const addQueryToQueue_Exec = async (queryId) => {
-    await queryQueue_exec.add({ queryId });
+const addQueryToQueue_Exec = async (query) => {
+    await queryQueue_exec.add(query);
 }
 
 

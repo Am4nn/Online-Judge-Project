@@ -1,0 +1,159 @@
+In Development env !
+Redis version greater than or equal to 2.8.18 Required !
+Server running on PORT 5000 8/2/2023, 6:52:10 PM
+GET /loggedIn 8/2/2023, 6:52:11 PM
+GET /problems 8/2/2023, 6:52:11 PM
+Database Connected !!!
+gcc-oj-container Id : 81b265d86cbebc0b0983ecde8c73dc28047c57b18bd7e82d7927a5240f220a64
+py-oj-container Id : 10847039b065df83c62a07ea7dfafa30fa83088ba2bef5ea825457ce7de56b54
+js-oj-container Id : 786bbe7be7e77948ca39f9cc4757cd727ff20f54f01d3c4440e52380fc41164c
+java-oj-container Id : c6aa1d42e1db04e3d453336b8b93eb4eb9353053a6be0990e9871e06224b5a3f
+
+All Containers Initialized
+In Development env !
+Redis version greater than or equal to 2.8.18 Required !
+Server running on PORT 5000 8/2/2023, 6:54:40 PM
+In Development env !
+Redis version greater than or equal to 2.8.18 Required !
+Server running on PORT 5000 8/2/2023, 6:55:20 PM
+Database Connected !!!
+gcc-oj-container Id : 9cfef78f21c0cb84fa461aa53bbef42ab8f761e76bdca97c802605b586e019f0
+py-oj-container Id : 476023c1bae565982b96dbbe8bcb43ee423892dce09fb55b27165930ffbbbbc3
+js-oj-container Id : 8801ad98da4c960a26bcbad3d0c1f592241884f6ecda7582d18cfb0fdae57734
+java-oj-container Id : 48b1eced394e27ee3b81411fc47a7610168b361cff5ff5367c2cfd0c198f4cbc
+
+All Containers Initialized
+GET /loggedIn 8/2/2023, 6:55:28 PM
+GET /problems 8/2/2023, 6:55:28 PM
+GET /allNotes 8/2/2023, 6:55:32 PM
+GET /leaderboard 8/2/2023, 6:55:35 PM
+GET /loggedIn 8/2/2023, 6:58:33 PM
+GET /problems 8/2/2023, 6:58:33 PM
+In Development env !
+Redis version greater than or equal to 2.8.18 Required !
+Server running on PORT 5000 8/2/2023, 6:59:16 PM
+Deleted(stopped) : py-oj-container
+
+Deleted(stopped) : java-oj-container
+
+Deleted(stopped) : js-oj-container
+
+Deleted(stopped) : gcc-oj-container
+
+GET /loggedIn 8/2/2023, 6:59:19 PM
+GET /problems 8/2/2023, 6:59:19 PM
+GET /loggedIn 8/2/2023, 6:59:21 PM
+GET /problems 8/2/2023, 6:59:21 PM
+GET /loggedIn 8/2/2023, 6:59:22 PM
+GET /problems 8/2/2023, 6:59:22 PM
+GET /loggedIn 8/2/2023, 6:59:22 PM
+GET /problems 8/2/2023, 6:59:22 PM
+gcc-oj-container Id : a0cfef92664747a9e9167688fbfaf581b1117b266c3851e2373e7a6e7f1b6ae1
+py-oj-container Id : bc9ace1e5cf8a3c1d61646d3f00a4271a8be2f7934736a3f7a1fbe5e800f4cf4
+js-oj-container Id : 26cd5ee11edd27173e74e323de41fffd2514edafb065bb1f53807142d75c5cd2
+java-oj-container Id : 504d633ba355c9ca74aa6de8c243e635553b7b261090d857e369972622389065
+
+All Containers Initialized
+GET /loggedIn 8/2/2023, 6:59:23 PM
+GET /problems 8/2/2023, 6:59:23 PM
+GET /loggedIn 8/2/2023, 6:59:24 PM
+GET /problems 8/2/2023, 6:59:24 PM
+Database Connected !!!
+GET /problems 8/2/2023, 7:02:23 PM
+GET /loggedIn 8/2/2023, 7:02:23 PM
+GET /loggedIn 8/2/2023, 7:05:38 PM
+GET /problems 8/2/2023, 7:05:38 PM
+GET /allNotes 8/2/2023, 7:07:45 PM
+GET /633f4d734fe449be866f90e7?noteid=633f4d734fe449be866f90e9 8/2/2023, 7:07:47 PM
+Note:  A Global Note
+GET /63459923bba8a7e44081eb4d?noteid=63459923bba8a7e44081eb4f 8/2/2023, 7:07:51 PM
+Note:  Radix Sort
+POST /codeExecutor 8/2/2023, 7:07:53 PM
+GET /status/64ca5c31460983721b53f85f 8/2/2023, 7:07:55 PM
+Unlinked : 1a1f22f1-9d0d-4be0-9b1b-a638c113179d.cpp
+Unlinked : 1a1f22f1-9d0d-4be0-9b1b-a638c113179d.out
+GET /status/64ca5c31460983721b53f85f 8/2/2023, 7:07:56 PM
+GET /loggedIn 8/2/2023, 7:09:49 PM
+GET /problems 8/2/2023, 7:09:49 PM
+GET /leaderboard 8/2/2023, 7:12:41 PM
+GET /loggedIn 8/2/2023, 7:18:21 PM
+GET /problems 8/2/2023, 7:18:21 PM
+GET /leaderboard 8/2/2023, 7:18:21 PM
+GET /leaderboard 8/2/2023, 7:18:47 PM
+GET /getcode/64c972cea661183e6b1b6568 8/2/2023, 7:18:55 PM
+GET /leaderboard 8/2/2023, 7:18:58 PM
+GET /getcode/64c97438bef17ded5701aa87 8/2/2023, 7:19:16 PM
+GET /leaderboard 8/2/2023, 7:19:21 PM
+GET /loggedIn 8/2/2023, 7:19:23 PM
+GET /problems 8/2/2023, 7:19:23 PM
+GET /logs?pageNo=1 8/2/2023, 7:19:28 PM
+GET /problems 8/2/2023, 7:24:35 PM
+GET /loggedIn 8/2/2023, 7:24:35 PM
+GET /loggedIn 8/2/2023, 7:25:47 PM
+GET /problems 8/2/2023, 7:25:47 PM
+GET /loggedIn 8/2/2023, 7:26:12 PM
+GET /problems 8/2/2023, 7:26:12 PM
+GET /loggedIn 8/2/2023, 7:26:23 PM
+GET /problems 8/2/2023, 7:26:23 PM
+GET /loggedIn 8/2/2023, 7:26:47 PM
+GET /problems 8/2/2023, 7:26:47 PM
+GET /loggedIn 8/2/2023, 7:26:53 PM
+GET /problems 8/2/2023, 7:26:53 PM
+GET /loggedIn 8/2/2023, 7:30:34 PM
+GET /problems 8/2/2023, 7:30:34 PM
+GET /loggedIn 8/2/2023, 7:35:37 PM
+GET /problems 8/2/2023, 7:35:37 PM
+GET /loggedIn 8/2/2023, 7:35:54 PM
+GET /problems 8/2/2023, 7:35:54 PM
+POST /login 8/2/2023, 7:36:07 PM
+GET /loggedIn 8/2/2023, 7:36:07 PM
+GET /loggedIn 8/2/2023, 7:36:09 PM
+GET /problems 8/2/2023, 7:36:09 PM
+GET /problems 8/2/2023, 7:58:22 PM
+GET /loggedIn 8/2/2023, 7:58:22 PM
+GET /loggedIn 8/2/2023, 8:01:59 PM
+GET /problems 8/2/2023, 8:01:59 PM
+GET /loggedIn 8/2/2023, 8:05:00 PM
+GET /problems 8/2/2023, 8:05:00 PM
+GET /problems 8/2/2023, 8:05:15 PM
+GET /loggedIn 8/2/2023, 8:05:15 PM
+GET /loggedIn 8/2/2023, 8:09:10 PM
+GET /problems 8/2/2023, 8:09:10 PM
+GET /loggedIn 8/2/2023, 8:10:16 PM
+GET /problems 8/2/2023, 8:10:16 PM
+In undefined env !
+Redis version greater than or equal to 2.8.18 Required !
+Server running on PORT 5000 8/5/2023, 5:08:38 PM
+Database Connected !!!
+In Development env !
+Redis version greater than or equal to 2.8.18 Required !
+Server running on PORT 5000 8/5/2023, 5:08:56 PM
+Database Connected !!!
+gcc-oj-container Id : de5f1fa0a0423c27bfd5c375e6e85d6fee34669341694ca97f9a6fb8497eecbe
+py-oj-container Id : 3a478e10400bab19afa4ebcabfbfc27744dbd4b58ca2cf4a38471d91bf56ea69
+js-oj-container Id : 82976fe8894b36416066f3049d0a579fdf2170bdb84bfc76c7f598ce03246696
+java-oj-container Id : fb49dc7aa3d8000b6c90d126ff34d3bd28ca121557c9462ab46d3a437556baef
+
+All Containers Initialized
+GET /loggedIn 8/5/2023, 5:08:59 PM
+GET /problems 8/5/2023, 5:08:59 PM
+GET /loggedIn 8/5/2023, 5:09:31 PM
+GET /problems 8/5/2023, 5:09:31 PM
+GET /loggedIn 8/5/2023, 5:12:29 PM
+GET /problems 8/5/2023, 5:12:29 PM
+GET /loggedIn 8/5/2023, 5:13:01 PM
+GET /problems 8/5/2023, 5:13:01 PM
+GET /loggedIn 8/5/2023, 5:15:20 PM
+GET /problems 8/5/2023, 5:15:20 PM
+GET /allNotes 8/5/2023, 5:15:31 PM
+GET /leaderboard 8/5/2023, 5:16:01 PM
+GET /loggedIn 8/5/2023, 5:25:34 PM
+GET /problems 8/5/2023, 5:25:34 PM
+GET /problems 8/5/2023, 5:36:23 PM
+GET /loggedIn 8/5/2023, 5:36:23 PM
+GET /loggedIn 8/5/2023, 5:42:26 PM
+GET /problems 8/5/2023, 5:42:26 PM
+GET /loggedIn 8/5/2023, 5:42:47 PM
+GET /problems 8/5/2023, 5:42:47 PM
+GET /leaderboard 8/5/2023, 5:42:53 PM
+GET /allNotes 8/5/2023, 5:43:11 PM

@@ -2,8 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { v4: uuid } = require("uuid");
 const {
-    copyFilesToDocker, createContainer,
-    killContainer, deleteFileDocker,
+    createContainer, killContainer,
     compile, execute
 } = require('./docker');
 const { dateTimeNowFormated, logger } = require('../utils');
@@ -140,9 +139,8 @@ const execCodeAgainstTestcases = (filePath, testcase, language) => {
     const { input, output } = require(`./testcases/${testcase}`)
 
     return new Promise(async (resolve, reject) => {
-        let filename = null;
         try {
-            filename = await copyFilesToDocker(filePath, containerId);
+            let filename = path.basename(filePath);
             const compiledId = await compile(containerId, filename, language);
 
             for (let index = 0; index < input.length; ++index) {
@@ -163,21 +161,6 @@ const execCodeAgainstTestcases = (filePath, testcase, language) => {
             resolve({ msg: 'All Test Cases Passed' });
         } catch (error) {
             reject(error);
-        } finally {
-            try {
-                if (filename)
-                    await deleteFileDocker(filename, containerId);
-
-                if (filename && languageSpecificDetails[language].compiledExtension) {
-                    // TODO: Update 'Solution.class' to id.class
-                    await deleteFileDocker(
-                        ((language === 'java') ? 'Solution.class' : ((filename.split('.')[0]) + '.' + languageSpecificDetails[language].compiledExtension)),
-                        containerId
-                    );
-                }
-            } catch (error) {
-                logger.error('Caught some errors while deleting files from Docker Container', error, containerId, dateTimeNowFormated());
-            }
         }
     });
 }
@@ -195,9 +178,8 @@ const execCode = async (filePath, language, inputString) => {
     if (!filePath.includes("\\") && !filePath.includes("/"))
         filePath = path.join(codeDirectory, filePath);
 
-    let filename = null;
     try {
-        filename = await copyFilesToDocker(filePath, containerId);
+        let filename = path.basename(filePath);
         const compiledId = await compile(containerId, filename, language);
         const exOut = await execute(containerId, compiledId,
             languageSpecificDetails[language].inputFunction ? languageSpecificDetails[language].inputFunction(inputString) : inputString,
@@ -206,21 +188,6 @@ const execCode = async (filePath, language, inputString) => {
         return ({ msg: "Compiled Successfully", stdout: exOut });
     } catch (error) {
         return error;
-    } finally {
-        try {
-            if (filename)
-                await deleteFileDocker(filename, containerId);
-
-            if (filename && languageSpecificDetails[language].compiledExtension) {
-                // TODO: Update 'Solution.class' to id.class
-                await deleteFileDocker(
-                    ((language === 'java') ? 'Solution.class' : ((filename.split('.')[0]) + '.' + languageSpecificDetails[language].compiledExtension)),
-                    containerId
-                );
-            }
-        } catch (error) {
-            logger.error('Caught some errors while deleting files from Docker Container', error, containerId, dateTimeNowFormated());
-        }
     }
 }
 
@@ -228,5 +195,6 @@ module.exports = {
     readFile, createFile,
     deleteFile, execCode,
     execCodeAgainstTestcases,
-    initAllDockerContainers
+    initAllDockerContainers,
+    languageSpecificDetails
 };
