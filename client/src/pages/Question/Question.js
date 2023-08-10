@@ -252,12 +252,16 @@ const useFetchProblems = id => {
         setError(undefined);
         setQuestion(undefined);
 
-        const matchProblem = problems.questions.find(value => value._id === id);
-        if (matchProblem) setQuestion(matchProblem);
-        else setError(`No such problem found with id: ${id}`);
+        if (!problems.isLoading) {
 
-        setLoading(false);
-    }, [id, problems.questions]);
+            const matchProblem = problems.questions.find(value => value._id === id);
+            if (matchProblem) setQuestion(matchProblem);
+            else setError(`No such problem found with id: ${id}`);
+
+            setLoading(false);
+        }
+
+    }, [id, problems]);
 
     return { loading, error, question };
 }

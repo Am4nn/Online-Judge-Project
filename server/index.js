@@ -1,4 +1,4 @@
-const { dateTimeNowFormated, logger } = require('./utils');
+const { dateTimeNowFormated, logger } = require('./utils/logging');
 
 // If not in production
 if (process.env.NODE_ENV !== "production" || process.env.CONTAINERIZED === "true") {

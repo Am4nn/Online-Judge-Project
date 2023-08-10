@@ -16,7 +16,7 @@ const FooterFAB = () => {
                 <Tooltip
                     placement='top'
                     TransitionComponent={Zoom}
-                    title='Footer'
+                    title='About Me'
                 >
                     <Fab
                         size='large'

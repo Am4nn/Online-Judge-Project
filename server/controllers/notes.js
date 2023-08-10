@@ -1,7 +1,7 @@
 const {
     Code, Note, Authorization
 } = require('../DataBase/database');
-const { dateTimeNowFormated, logger } = require('../utils');
+const { dateTimeNowFormated, logger } = require('../utils/logging');
 
 const ObjectId = require('mongoose').Types.ObjectId;
 // ObjectID Validator function

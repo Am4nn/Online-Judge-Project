@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcryptjs');
 const { User } = require('./DataBase/database');
-const { dateTimeNowFormated, logger } = require('./utils');
+const { dateTimeNowFormated, logger } = require('./utils/logging');
 
 const loginValidatorHelper = async (req, res, next, credential, credentialName, password) => {
 

@@ -1,2 +1,0 @@
-Docker Error:  js-oj-container Docker Error : {"msg":"on docker error","error":{"code":127,"killed":false,"signal":null,"cmd":"docker run -i -d --rm --mount type=bind,src=\"C:\\Aman\\Coding-Bamzii\\Web Development\\MERN STACK\\Online-Judge-Project\\server\\CodeExecuter\\codeFiles\",dst=/codeFiles --name js-oj-container --label oj=oj node:16.17.0-bullseye-slim"},"stderr":"docker: Error response from daemon: open \\\\.\\pipe\\docker_engine_linux: The system cannot find the file specified.\nSee 'docker run --help'.\n"}
-8/5/2023, 5:08:38 PM

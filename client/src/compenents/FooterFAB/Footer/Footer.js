@@ -1,14 +1,12 @@
 import React, { Fragment } from 'react'
-import { FavoriteBorder, GitHub, Instagram, LinkedIn, Mail, StarBorder } from '@mui/icons-material';
+import { GitHub, Instagram, LinkedIn, Mail } from '@mui/icons-material';
 import { Box } from '@mui/material';
 import classes from './Footer.module.css';
 import { SERVER_LINK } from '../../../dev-server-link';
 
 const Footer = () => {
 
-    const clickHandler = (link, name) => {
-        window.open(link, '_blank');
-
+    const propogate = name => {
         fetch(
             `${SERVER_LINK}/api/experimental/log`,
             {
@@ -20,6 +18,11 @@ const Footer = () => {
                 credentials: 'include'
             }
         ).catch(error => console.error(error));
+    }
+
+    const clickHandler = (link, name) => {
+        window.open(link, '_blank');
+        propogate(name);
     }
 
     return (
@@ -38,13 +41,12 @@ const Footer = () => {
                     <Mail className={classes.logos} />
                 </span>
             </Box>
-            <div>Copyright ©2022 All rights reserved</div>
-            <div>This Website is made with <FavoriteBorder /></div>
-            <div>by <a style={{ textDecoration: 'none' }} href="https://www.linkedin.com/in/aman-arya-79a52121b" target="_blank" rel="noopener noreferrer">
+            <div>Copyright © {new Date().getFullYear()} All rights reserved</div>
+            <div>Made with ❤️ by <a onClick={() => propogate("Name-LinkedIn")} style={{ textDecoration: 'none' }} href="https://www.linkedin.com/in/aman-arya-79a52121b" target="_blank" rel="noopener noreferrer">
                 Aman Arya
             </a></div>
-            <div>Give this website a <a style={{ textDecoration: 'none' }} href="https://github.com/Am4nn/Online-Judge-Project" target="_blank" rel="noopener noreferrer">
-                <StarBorder /> <span style={{ color: 'black' }}>on</span> GitHub
+            <div>Give this website a <a onClick={() => propogate("Star-Github")} style={{ textDecoration: 'none' }} href="https://github.com/Am4nn/Online-Judge-Project" target="_blank" rel="noopener noreferrer">
+                ⭐ <span style={{ color: 'black' }}>on</span> GitHub
             </a></div>
         </Fragment>
     )

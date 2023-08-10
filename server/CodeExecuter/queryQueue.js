@@ -3,14 +3,18 @@
 const Queue = require('bull');
 const {
     Authorization, Query,
-    Question, User,
+    Question, User
 } = require('../DataBase/database');
 const codeExecutorDir = `./codeExecutor${(process.env.NO_DOCKER ? "_nodockerv" : "_dockerv")}`;
 const {
-    deleteFile, execCode,
-    execCodeAgainstTestcases, languageSpecificDetails
+    execCode, execCodeAgainstTestcases, languageSpecificDetails
 } = require(codeExecutorDir);
-const { dateTimeNowFormated, logger } = require('../utils');
+
+const {
+    deleteFile, deleteFolderRecursive
+} = require('../utils/file');
+const { dateTimeNowFormated, logger } = require('../utils/logging');
+const path = require('path');
 
 logger.log("Redis version greater than or equal to 2.8.18 Required !");
 
@@ -24,11 +28,28 @@ const QUEUE_CONFIG = {
 
 const queryQueue = new Queue('query-queue', QUEUE_CONFIG);
 
+const processAgainstTestcases = async query => {
+    let response = await execCodeAgainstTestcases(query.filepath, query.language, query.testcase);
+
+    await Question.incrNoOfSuccess(query.quesId);
+
+    if (query.username && !Authorization.isGuest(query.username)) {
+        await User.addSolvedQuestionToUser(query.username, query.quesId);
+    }
+
+    return response;
+}
+
+const processAgainstInput = async query => {
+    return await execCode(query.filepath, query.language, query.input);
+}
+
 queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
-    const query = data;
+    const { query, withTestcase } = data;
     const startTime = new Date();
     try {
-        let response = await execCodeAgainstTestcases(query.filepath, query.testcase, query.language);
+
+        const response = await (withTestcase ? processAgainstTestcases(query) : processAgainstInput(query));
 
         await Query.getQueryByIdAndUpdate(query._id, {
             startTime,
@@ -36,12 +57,6 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
             status: 'success',
             output: response
         });
-
-        await Question.incrNoOfSuccess(query.quesId);
-
-        if (query.username && !Authorization.isGuest(query.username)) {
-            await User.addSolvedQuestionToUser(query.username, query.quesId);
-        }
 
     } catch (error) {
         if (!error.msg) {
@@ -61,10 +76,13 @@ queryQueue.process(WORKERS_NUMBER, async ({ data }) => {
     } finally {
         if (query && query.filepath) deleteFile(query.filepath);
         if (query && query.filepath && languageSpecificDetails[query.language].compiledExtension) {
-            // TODO: Update 'Solution.class' to id.class
-            deleteFile(
-                (query.language === 'java') ? 'Solution.class' : ((query.filepath.split('.')[0]) + '.' + languageSpecificDetails[query.language].compiledExtension)
-            );
+            // if code got compiled then delete the compiled file
+            const filepath = query.filepath.split('.')[0];
+            if (query.language === 'java') {
+                deleteFolderRecursive(path.join(__dirname, "codeFiles", filepath));
+            } else {
+                deleteFile((filepath + '.' + languageSpecificDetails[query.language].compiledExtension));
+            }
         }
     }
     return true;
@@ -79,79 +97,15 @@ queryQueue.on('error', error => {
     logger.error('bull/redis error', error, dateTimeNowFormated());
 })
 
-
-const addQueryToQueue = async query => {
-    await queryQueue.add(query);
+/**
+ * Adds query to queue
+ * @param {*} query 
+ * @param {Boolean} withTestcase - code should be checked against testcase or not
+ */
+const addQueryToQueue = async (query, withTestcase = false) => {
+    return await queryQueue.add({ query, withTestcase });
 }
-
-
-
-
-
-// ###############################################################
-
-
-
-
-
-const queryQueue_exec = new Queue('query-queue-exec', QUEUE_CONFIG);
-
-queryQueue_exec.process(WORKERS_NUMBER, async ({ data }) => {
-    const query = data;
-    const startTime = new Date();
-    try {
-        let response = await execCode(query.filepath, query.language, query.input);
-
-        await Query.getQueryByIdAndUpdate(query._id, {
-            startTime,
-            completeTime: new Date(),
-            status: 'success',
-            output: response,
-        });
-
-    } catch (error) {
-        if (!error.msg) {
-            logger.error('Error without msg in bull.process', error, dateTimeNowFormated());
-            error = { ...error, msg: 'some server side errors' };
-        }
-        if (query) {
-            await Query.getQueryByIdAndUpdate(query._id, {
-                startTime,
-                completeTime: new Date(),
-                status: 'error',
-                output: error,
-            });
-        } else {
-            logger.log('Error in queryQueue: ', error, dateTimeNowFormated());
-        }
-    } finally {
-        if (query && query.filepath) deleteFile(query.filepath);
-        if (query && query.filepath && languageSpecificDetails[query.language].compiledExtension) {
-            // TODO: Update 'Solution.class' to id.class
-            deleteFile(
-                (query.language === 'java') ? 'Solution.class' : ((query.filepath.split('.')[0]) + '.' + languageSpecificDetails[query.language].compiledExtension)
-            );
-        }
-    }
-    return true;
-});
-
-// set status of query to error with some appropriate msg
-queryQueue_exec.on('failed', error => {
-    logger.error('bull/redis failed', error.data.id, error.failedReason, dateTimeNowFormated());
-})
-
-queryQueue_exec.on('error', error => {
-    logger.error('bull/redis error', error, dateTimeNowFormated());
-})
-
-const addQueryToQueue_Exec = async (query) => {
-    await queryQueue_exec.add(query);
-}
-
-
 
 module.exports = {
-    addQueryToQueue,
-    addQueryToQueue_Exec
+    addQueryToQueue
 };

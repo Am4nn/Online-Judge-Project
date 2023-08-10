@@ -6,11 +6,10 @@ const {
 } = require('../DataBase/database');
 
 const queryQueueDir = `../CodeExecuter/queryQueue${(process.env.NO_REDIS) ? '_noredis' : ''}`;
-const { addQueryToQueue, addQueryToQueue_Exec } = require(queryQueueDir);
+const { addQueryToQueue } = require(queryQueueDir);
 
-const codeExecutorDir = `../CodeExecuter/codeExecutor${(process.env.NO_DOCKER ? "_nodockerv" : "_dockerv")}`;
-const { createFile } = require(codeExecutorDir);
-const { dateTimeNowFormated, logger } = require('../utils');
+const { createFile } = require('../utils/file');
+const { dateTimeNowFormated, logger } = require('../utils/logging');
 
 // ObjectID Validator function
 function isValidObjectId(id) {
@@ -69,7 +68,7 @@ const verdictController = async (req, res) => {
         const codeDoc = await Code.createNewCode({ language, code, username });
         const query = await Query.createNewQuery({ language, filepath: filename, testcase, quesId, quesName, username, codeId: codeDoc._id });
 
-        await addQueryToQueue(query);
+        await addQueryToQueue(query, true);
 
         await Question.incrNoOfSubm(quesId);
 
@@ -134,7 +133,7 @@ const codeExecutor = async (req, res) => {
         const { filepath } = createFile(language, code);
         const query = await Query.createNewQuery({ type: 'exec', filepath, language, input });
 
-        addQueryToQueue_Exec(query);
+        addQueryToQueue(query, false);
 
         res.status(201).json({ status: 'pending', msg: "Request queued, wait for response !", queryId: query._id });
     } catch (error) {

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require("path");
 const { Authorization } = require('../DataBase/database');
-const { dateTimeNowFormated, logger } = require('../utils');
+const { dateTimeNowFormated, logger } = require('../utils/logging');
 
 const stdoutDir = path.join(__dirname, "../server.log");
 const stderrDir = path.join(__dirname, "../server.error");

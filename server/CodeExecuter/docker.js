@@ -1,8 +1,7 @@
 const { exec, spawn } = require('child_process');
-const path = require('path');
-const { logger } = require('../utils');
+const { logger } = require('../utils/logging');
+const { codeDirectory } = require('./index');
 
-const codeFilesDir = path.join(__dirname, 'codeFiles');
 const STDOUT = "stdout", STDERR = "stderr";
 
 /**
@@ -11,7 +10,7 @@ const STDOUT = "stdout", STDERR = "stderr";
  */
 const createContainer = ({ name, image }) => {
     return new Promise((resolve, reject) => {
-        exec(`docker run -i -d --rm --mount type=bind,src="${codeFilesDir}",dst=/codeFiles --name ${name} --label oj=oj ${image}`, (error, stdout, stderr) => {
+        exec(`docker run -i -d --rm --mount type=bind,src="${codeDirectory}",dst=/codeFiles --name ${name} --label oj=oj ${image}`, (error, stdout, stderr) => {
             (error || stderr) && reject({ msg: 'on docker error', error, stderr });
             const containerId = `${stdout}`.trim();
             resolve(containerId);
@@ -20,76 +19,15 @@ const createContainer = ({ name, image }) => {
 }
 
 /**
- * It takes almost 10sec to stop the container, as it sends 
- * sigterm and then sigkill signals to processes inside container
+ * It stops the container instantly, as it brutally stops the container
  * @param {String} container_id_name - container id or container name
- */
-const stopContainer = container_id_name => {
-    return new Promise((resolve) => {
-        exec(`docker stop ${container_id_name}`, (error, stdout, stderr) => {
-            stdout && logger.log('Deleted(stopped) :', stdout);
-            resolve();
-        });
-    });
-}
-
-/**
- * It stops the container instantly, as it brutally stops
- * @param {String} container_id_name - container id or container name
+ * @returns {Promise<String>} - container id or container name
  */
 const killContainer = container_id_name => {
     return new Promise((resolve) => {
         exec(`docker kill ${container_id_name}`, (error, stdout, stderr) => {
             stdout && logger.log('Deleted(stopped) :', stdout);
-            resolve();
-        });
-    });
-}
-
-/**
- * This fn copies file from server to docker container (in root directory)
- * @param {String} filePath 
- * @param {String} containerId 
- * @returns {Promise<String|any>} - filename
- */
-const copyFilesToDocker = (filePath, containerId) => {
-    const filename = path.basename(filePath);
-    return new Promise((resolve, reject) => {
-        exec(`docker cp "${filePath}" ${containerId}:/${filename}`, (error, stdout, stderr) => {
-            error && reject({ msg: 'on error', error, stderr });
-            stderr && reject({ msg: 'on stderr', stderr });
-            resolve(filename);
-        });
-    });
-}
-
-/**
- * @description This fn deletes file/files from a container
- * @param {Array | String} filename
- * @param {String} containerId 
- * @return {Promise}
- */
-const deleteFileDocker = (filename, containerId) => {
-    return new Promise(async (resolve, reject) => {
-        const fileExists = await fileExistsDocker(filename, containerId);
-        if (!fileExists) return resolve('file does not exists');
-        exec(`docker exec ${containerId} rm ${filename}`, (error, stdout, stderr) => {
-            error && reject({ msg: 'on error', error, stderr });
-            stderr && reject({ msg: 'on stderr', stderr });
-            resolve(filename);
-        });
-    });
-}
-
-/**
- * @param {String} filename 
- * @param {String} containerId 
- * @returns {Promise<Boolean>}
- */
-const fileExistsDocker = (filename, containerId) => {
-    return new Promise((resolve, reject) => {
-        exec(`docker exec ${containerId} sh -c "test -f '${filename}' && echo 'true'"`, (error, stdout, stderr) => {
-            resolve(stdout.trim() === 'true');
+            resolve(container_id_name);
         });
     });
 }
@@ -125,8 +63,8 @@ const details = {
         executorCmd: id => `node ./codeFiles/${id}`,
     },
     'java': {
-        compilerCmd: id => `javac ./codeFiles/${id}.java`,
-        executorCmd: id => `java -cp ./codeFiles Solution`, // TODO: Update 'java Solution', to use id
+        compilerCmd: id => `javac -d ./codeFiles/${id} ./codeFiles/${id}.java`,
+        executorCmd: id => `java -cp ./codeFiles/${id} Solution`,
     }
 };
 
@@ -205,8 +143,7 @@ const execute = (containerId, filename, input, language, onProgress = null) => {
 
 
 module.exports = {
-    createContainer, stopContainer,
-    copyFilesToDocker, deleteFileDocker,
-    killContainer, fileExistsDocker,
+    createContainer,
+    killContainer,
     compile, execute, STDOUT, STDERR
 };

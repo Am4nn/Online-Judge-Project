@@ -1,11 +1,10 @@
-const fs = require("fs");
 const path = require("path");
-const { v4: uuid } = require("uuid");
 const {
     createContainer, killContainer,
     compile, execute
 } = require('./docker');
-const { dateTimeNowFormated, logger } = require('../utils');
+const { dateTimeNowFormated, logger } = require('../utils/logging');
+const { codeDirectory, languageErrMsg, stderrMsgFn } = require('./index');
 
 // ####################################################################################
 // ####################################################################################
@@ -81,51 +80,7 @@ const languageSpecificDetails = {
 // ####################################################################################
 
 
-const codeDirectory = path.join(__dirname, "codeFiles");
-
-// for the first time create 'codeFiles' directory
-if (!fs.existsSync(codeDirectory)) {
-    fs.mkdirSync(codeDirectory, { recursive: true });
-}
-
-const createFile = (fileExtension, content) => {
-    const id = uuid();
-    const filename = `${id}.${fileExtension}`;
-    const filepath = path.join(codeDirectory, filename);
-    fs.writeFileSync(filepath, content);
-    return { filepath, filename };
-}
-
-const readFile = filepath => {
-    if (!filepath.includes("\\") && !filepath.includes("/"))
-        filepath = path.join(codeDirectory, filepath);
-
-    if (!fs.existsSync(filepath))
-        return undefined;
-    return fs.readFileSync(filepath);
-}
-
-const deleteFile = filepath => {
-    if (!filepath.includes("\\") && !filepath.includes("/"))
-        filepath = path.join(codeDirectory, filepath);
-
-    if (!fs.existsSync(filepath)) return;
-    fs.unlinkSync(filepath);
-    logger.log('Unlinked :', path.basename(filepath));
-}
-
-const stderrMsgFn = ({ index, input, output, exOut }) => `Testcase ${index} Failed 
-Testcase: 
-${input} 
-Expected Output: 
-${output} 
-Your Output: 
-${exOut}`;
-
-const languageErrMsg = `Please select a language / valid language.
-Or may be this language is not yet supported !`
-
-const execCodeAgainstTestcases = (filePath, testcase, language) => {
+const execCodeAgainstTestcases = (filePath, language, testcase) => {
 
     // check if language is supported or not
     if (!languageSpecificDetails[language]) return { msg: languageErrMsg };
@@ -192,8 +147,7 @@ const execCode = async (filePath, language, inputString) => {
 }
 
 module.exports = {
-    readFile, createFile,
-    deleteFile, execCode,
+    execCode,
     execCodeAgainstTestcases,
     initAllDockerContainers,
     languageSpecificDetails

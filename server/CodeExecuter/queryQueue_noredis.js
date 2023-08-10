@@ -2,15 +2,19 @@
 const kue = require('kue');
 const {
     Authorization, Query,
-    Question, User, Code
+    Question, User
 } = require('../DataBase/database');
 
 const codeExecutorDir = `./codeExecutor${(process.env.NO_DOCKER ? "_nodockerv" : "_dockerv")}`;
 const {
-    deleteFile, readFile, execCode,
-    execCodeAgainstTestcases
+    execCode, execCodeAgainstTestcases, languageSpecificDetails
 } = require(codeExecutorDir);
-const { dateTimeNowFormated, logger } = require('../utils');
+
+const {
+    deleteFile, deleteFolderRecursive
+} = require('../utils/file');
+const { dateTimeNowFormated, logger } = require('../utils/logging');
+const path = require('path');
 
 logger.log("No Redis Required !");
 
@@ -28,11 +32,13 @@ const queue = kue.createQueue({
     },
 });
 
-// ###############################################################
-// ###############################################################
-
-const addQueryToQueue = async (queryId) => {
-    const job = queue.create('query-queue', { id: queryId })
+/**
+ * Adds query to queue
+ * @param {*} query 
+ * @param {Boolean} withTestcase - code should be checked against testcase or not
+ */
+const addQueryToQueue = async (query, withTestcase = false) => {
+    const job = queue.create('query-queue', { query, withTestcase })
         .priority('high')
         .attempts(3)
         .backoff(true)
@@ -48,95 +54,35 @@ const addQueryToQueue = async (queryId) => {
     return job;
 };
 
-queue.process('query-queue', WORKERS_NUMBER, async (job, done) => {
-    const { id: queryId } = job.data;
-    let query = null;
-    try {
-        query = await Query.getQueryById(queryId);
-        if (!query) throw Error("Query not found");
+const processAgainstTestcases = async query => {
+    let response = await execCodeAgainstTestcases(query.filepath, query.language, query.testcase);
 
-        // create an entry in code database
-        const code = await Code.createNewCode({ code: (readFile(query.filepath).toString()), language: query.language });
-        query.codeId = code._id;
-        query.startTime = new Date();
+    await Question.incrNoOfSuccess(query.quesId);
 
-        let response = await execCodeAgainstTestcases(query.filepath, query.testcase, query.language);
-
-        query.completeTime = new Date();
-        query.status = 'success';
-        query.output = response;
-        await query.save(); // TODO : saving the changes to database
-
-        const question = await Question.getQuestionById(query.quesId);
-        question.noOfSuccess += 1;
-        await question.save(); // TODO : saving the changes to database
-
-        if (query.username && !Authorization.isGuest(query.username)) {
-            const user = await User.findOneUser({ username: query.username });
-            if (!user.solvedQuestions) {
-                user.solvedQuestions = [];
-            }
-            if (!user.solvedQuestions.includes(query.quesId)) {
-                user.solvedQuestions.push(query.quesId);
-            }
-            await user.save(); // TODO : saving the changes to database
-        }
-
-    } catch (error) {
-        if (!error.msg) {
-            logger.error('Error without msg in kue process', error, dateTimeNowFormated());
-            error = { ...error, msg: 'some server side errors' };
-        }
-        if (query) {
-            query.completeTime = new Date();
-            query.status = 'error';
-            query.output = error;
-            await query.save(); // TODO : saving the changes to database
-        } else logger.log('Error in kue process: ', error, dateTimeNowFormated());
-    } finally {
-        if (query && query.filepath) deleteFile(query.filepath);
+    if (query.username && !Authorization.isGuest(query.username)) {
+        await User.addSolvedQuestionToUser(query.username, query.quesId);
     }
-    done();
-});
 
-// ###############################################################
-// ###############################################################
+    return response;
+}
 
+const processAgainstInput = async query => {
+    return await execCode(query.filepath, query.language, query.input);
+}
 
-// ###############################################################
-// ###############################################################
-
-const addQueryToQueue_Exec = async (queryId) => {
-    const job = queue.create('query-queue-exec', { id: queryId })
-        .priority('high')
-        .attempts(3)
-        .backoff(true)
-        .removeOnComplete(true)
-        .removeOnFail(true)
-        .save(err => {
-            if (err) {
-                logger.error('Error adding job to queue', err, dateTimeNowFormated());
-            } else {
-                logger.log('Job added to queue', job.id, dateTimeNowFormated());
-            }
-        });
-    return job;
-};
-
-queue.process('query-queue-exec', WORKERS_NUMBER, async (job, done) => {
-    const { id: queryId } = job.data;
-    let query = null;
+queue.process('query-queue', WORKERS_NUMBER, async (job, done) => {
+    const { query, withTestcase } = job.data;
+    const startTime = new Date();
     try {
-        query = await Query.getQueryById(queryId);
-        if (!query) throw new Error("Query not found");
 
-        const { filepath, language, input } = query;
+        const response = await (withTestcase ? processAgainstTestcases(query) : processAgainstInput(query));
 
-        let response = await execCode(filepath, language, input);
-
-        query.status = 'success';
-        query.output = response;
-        await query.save();
+        await Query.getQueryByIdAndUpdate(query._id, {
+            startTime,
+            completeTime: new Date(),
+            status: 'success',
+            output: response
+        });
 
     } catch (error) {
         if (!error.msg) {
@@ -144,20 +90,29 @@ queue.process('query-queue-exec', WORKERS_NUMBER, async (job, done) => {
             error = { ...error, msg: 'some server side errors' };
         }
         if (query) {
-            query.status = 'error';
-            query.output = error;
-            await query.save();
-        } else logger.log('Error in queryQueue: ', error, dateTimeNowFormated());
+            await Query.getQueryByIdAndUpdate(query._id, {
+                startTime,
+                completeTime: new Date(),
+                status: 'error',
+                output: error
+            });
+        } else {
+            logger.log('Error in queryQueue: ', error, dateTimeNowFormated());
+        }
     } finally {
         if (query && query.filepath) deleteFile(query.filepath);
+        if (query && query.filepath && languageSpecificDetails[query.language].compiledExtension) {
+            // if code got compiled then delete the compiled file
+            const filepath = query.filepath.split('.')[0];
+            if (query.language === 'java') {
+                deleteFolderRecursive(path.join(__dirname, "codeFiles", filepath));
+            } else {
+                deleteFile((filepath + '.' + languageSpecificDetails[query.language].compiledExtension));
+            }
+        }
     }
     done();
 });
-
-// ###############################################################
-// ###############################################################
-
-
 
 // set status of query to error with some appropriate msg
 queue.on('job failed', (id, err) => {
@@ -169,6 +124,5 @@ queue.on('error', err => {
 });
 
 module.exports = {
-    addQueryToQueue,
-    addQueryToQueue_Exec
+    addQueryToQueue
 };
