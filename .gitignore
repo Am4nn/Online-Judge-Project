@@ -3,6 +3,7 @@
 dump.rdb
 ecosystem.config.js
 
+/client/.env
 /client/build
 /client/node_modules
 /client/.DS_Store

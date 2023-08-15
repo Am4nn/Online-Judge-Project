@@ -1,1 +1,1 @@
-export const SERVER_LINK = 'http://localhost:5000';
+export const SERVER_LINK = process.env.SERVER_LINK ? process.env.SERVER_LINK : "";
