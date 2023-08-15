@@ -14,7 +14,7 @@ import LoadingSpinner from '../../compenents/LoadingSpinner/LoadingSpinner';
 import Note from './Note/Note';
 import classes from './Notes.module.css';
 // import useDebounce from '../../hooks/useDebounce';
-import useTimeout from './../../hooks/useTimeout';
+// import useTimeout from './../../hooks/useTimeout';
 
 /*
     Schema : _id, title, desc, codeid, username, access, editable, language
@@ -233,28 +233,28 @@ const useSearchNotes_Transition = ({ searchNoteQuery, setAllNotes, originalAllNo
     return [isSearching];
 }
 
-const useSearchNotes_Debounce = ({ searchNoteQuery, setAllNotes, originalAllNotes }) => {
-    const [isSearching, setIsSearching] = useState(false);
-    const { reset, clear } = useTimeout(() => {
+// const useSearchNotes_Debounce = ({ searchNoteQuery, setAllNotes, originalAllNotes }) => {
+//     const [isSearching, setIsSearching] = useState(false);
+//     const { reset, clear } = useTimeout(() => {
 
-        if (!searchNoteQuery) setAllNotes(originalAllNotes);
-        else setAllNotes(originalAllNotes.filter(note => (
-            note.title.toLowerCase().includes(searchNoteQuery.toLowerCase()) ||
-            note.desc.toLowerCase().includes(searchNoteQuery.toLowerCase())
-        )));
+//         if (!searchNoteQuery) setAllNotes(originalAllNotes);
+//         else setAllNotes(originalAllNotes.filter(note => (
+//             note.title.toLowerCase().includes(searchNoteQuery.toLowerCase()) ||
+//             note.desc.toLowerCase().includes(searchNoteQuery.toLowerCase())
+//         )));
 
-        setIsSearching(false);
-    }, 500);
-    useEffect(() => {
-        setIsSearching(true);
-        reset();
-    }, [searchNoteQuery, reset]);
-    useEffect(() => {
-        setIsSearching(false);
-        clear();
-    }, [clear]);
-    return [isSearching];
-}
+//         setIsSearching(false);
+//     }, 500);
+//     useEffect(() => {
+//         setIsSearching(true);
+//         reset();
+//     }, [searchNoteQuery, reset]);
+//     useEffect(() => {
+//         setIsSearching(false);
+//         clear();
+//     }, [clear]);
+//     return [isSearching];
+// }
 
 const Tools = ({ addNoteHandler, isAdmin, isAdminMode, setAdminMode }) => {
     const adminModeHandler = () => isAdmin ? setAdminMode(prev => !prev) : setAdminMode(false);
