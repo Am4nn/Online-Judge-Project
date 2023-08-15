@@ -146,8 +146,17 @@ const loggingMiddleware = (req, res, next) => {
     next();
 }
 
+// check if NO_EXECUTION is explicitly set to true or in case of DOCKER env check if container is healthy
+const checkExecServiceAvailable = (req, res, next) => {
+    if (process.env.NO_EXECUTION) {
+        return res.status(503).json({ msg: "Execution service not available", error: "Sorry currently server can't handle code execution" });
+    }
+    // todo: else if(!process.env.NO_DOCKER) then check language's docker container is healthy
+    next();
+}
+
 module.exports = {
     loginValidator, registerValidator,
     authValidator, authProvider,
-    loggingMiddleware
+    loggingMiddleware, checkExecServiceAvailable
 };
