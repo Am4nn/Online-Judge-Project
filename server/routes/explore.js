@@ -15,12 +15,13 @@ const { loggingMiddleware, checkExecServiceAvailable } = require('../middlewares
 
 router.get('/problems', loggingMiddleware, problemsController);
 router.get('/problems/:id', loggingMiddleware, detailedProblemController);
-router.get('/status/:queryId', loggingMiddleware, statusController);
 router.get('/leaderboard', loggingMiddleware, leaderboardController);
 router.get('/getcode/:codeId', loggingMiddleware, codesController);
+router.get('/status/:queryId', loggingMiddleware, statusController);
 
 // routes for execution of code
 router.post('/problems/:id', loggingMiddleware, checkExecServiceAvailable, verdictController);
 router.post('/codeExecutor', loggingMiddleware, checkExecServiceAvailable, codeExecutor);
+
 
 module.exports = router;

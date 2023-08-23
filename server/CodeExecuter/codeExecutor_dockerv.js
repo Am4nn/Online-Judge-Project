@@ -83,10 +83,10 @@ const languageSpecificDetails = {
 const execCodeAgainstTestcases = (filePath, language, testcase) => {
 
     // check if language is supported or not
-    if (!languageSpecificDetails[language]) return { msg: languageErrMsg };
+    if (!languageSpecificDetails[language]) throw { msg: languageErrMsg };
 
     let containerId = languageSpecificDetails[language].containerId();
-    if (!containerId) return reject({ msg: languageErrMsg });
+    if (!containerId) throw { msg: languageErrMsg };
 
     if (!filePath.includes("\\") && !filePath.includes("/"))
         filePath = path.join(codeDirectory, filePath);
@@ -125,10 +125,10 @@ const execCode = async (filePath, language, inputString) => {
     if (!inputString) inputString = '';
 
     // check if language is supported or not
-    if (!languageSpecificDetails[language]) return { msg: languageErrMsg };
+    if (!languageSpecificDetails[language]) throw { msg: languageErrMsg };
 
     let containerId = languageSpecificDetails[language].containerId();
-    if (!containerId) return { msg: languageErrMsg };
+    if (!containerId) throw { msg: languageErrMsg };
 
     if (!filePath.includes("\\") && !filePath.includes("/"))
         filePath = path.join(codeDirectory, filePath);

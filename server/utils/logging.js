@@ -16,9 +16,6 @@ const logging = (type, ...args) => {
     // emitSocketLoggerEvent
     if (Socket.getSocketInstance() && Socket.getConnectedUsers().length) {
         Socket.getSocketInstance().emit(`logger-new-${type}`, msg);
-        Socket.getSocketInstance().on("join", (data) => {
-
-        })
     }
     // handlerDevelopmentServerLoggig
     if (process.env.NODE_ENV !== "production") {

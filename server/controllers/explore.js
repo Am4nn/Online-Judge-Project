@@ -52,6 +52,7 @@ const verdictController = async (req, res) => {
         if (!validLanguages.includes(language))
             return res.status(400).json({ msg: 'Please select a language / valid language !' });
 
+        // user specific details update
         let username = 'guest';
         const token = req.cookies.token;
         if (token) {
@@ -68,7 +69,7 @@ const verdictController = async (req, res) => {
         const codeDoc = await Code.createNewCode({ language, code, username });
         const query = await Query.createNewQuery({ language, filepath: filename, testcase, quesId, quesName, username, codeId: codeDoc._id });
 
-        await addQueryToQueue(query, true);
+        await addQueryToQueue(query, true); // this will async now
 
         await Question.incrNoOfSubm(quesId);
 
