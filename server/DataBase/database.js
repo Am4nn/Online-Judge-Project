@@ -3,6 +3,7 @@ const Query = require('./Model/Query');
 const User = require('./Model/User');
 const Code = require('./Model/Code');
 const Note = require('./Model/Note');
+const Logs = require('./Model/Logs');
 
 
 // Question
@@ -105,11 +106,18 @@ const isGuest = username => {
 }
 
 
+// Logs
+const createNewLog = async params => {
+    return await Logs.create(params);
+}
+
+
 module.exports = {
     Question: { getQuestionList, getQuestionById, incrNoOfSubm, incrNoOfSuccess },
     Query: { createNewQuery, getQueryById, getAllQueriesReverseSorted, deleteQueryById, getQueryByIdAndUpdate },
     User: { createNewUser, getUserById, findOneUser, addSolvedQuestionToUser, incrTotalSubmInUser },
     Note: { createNewNote, getNoteById, getNoteByFilter, deleteNoteById },
     Code: { createNewCode, getCodeById, deleteCodeById },
-    Authorization: { isAdmin, isGuest }
+    Authorization: { isAdmin, isGuest },
+    Logs: { createNewLog }
 };

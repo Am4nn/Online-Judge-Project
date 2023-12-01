@@ -1,7 +1,9 @@
 const { Console } = require("console");
 const fs = require("fs");
 const path = require("path");
+const Async = require("async");
 const { Socket } = require("../socketHandler");
+const { Logs } = require("../DataBase/database");
 
 const stdoutDir = path.join(__dirname, "../server.log");
 const stderrDir = path.join(__dirname, "../server.error");
@@ -11,16 +13,53 @@ const ConsoleLogger = new Console({
     stderr: fs.createWriteStream(stderrDir, { flags: 'a' }),
 });
 
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    timeZone: 'Asia/Kolkata', // India time zone
+    timeZoneName: 'short',
+});
+
+
+const LogQueue = Async.queue(async function (logData, callback) {
+    try {
+        await Logs.createNewLog(logData);
+        callback();
+    } catch (error) {
+        callback(error);
+    }
+}, 1); // Limit concurrency to 1 for sequential processing
+
+const asyncLogDB = logData =>
+    LogQueue.push(logData, (error) => {
+        if (error) {
+            ConsoleLogger.error("Error while inserting log into the database:", error);
+        }
+    });
+
 const logging = (type, ...args) => {
     const msg = args.join(' ');
-    // emitSocketLoggerEvent
+    // Emit Socket Logger Event
     if (Socket.getSocketInstance() && Socket.getConnectedUsers().length) {
         Socket.getSocketInstance().emit(`logger-new-${type}`, msg);
     }
-    // handlerDevelopmentServerLoggig
+    // Handle Development Server Logging
     if (process.env.NODE_ENV !== "production") {
         console[type](msg);
     }
+    // Handle Asynchronous Logging to Database
+    asyncLogDB({
+        type,
+        msg,
+        date: dateFormatter.format(new Date()),
+        timestamp: new Date()
+    });
+
     return ConsoleLogger[type](...args);
 }
 

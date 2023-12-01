@@ -12,6 +12,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "async": "^3.2.5",
         "bcryptjs": "^2.4.3",
         "bull": "^4.8.4",
         "cookie-parser": "^1.4.6",
