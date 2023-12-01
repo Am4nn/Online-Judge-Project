@@ -26,21 +26,13 @@ const dateFormatter = new Intl.DateTimeFormat('en-US', {
 });
 
 
-const LogQueue = Async.queue(async function (logData, callback) {
+const LogQueue = Async.queue(async logData => {
     try {
         await Logs.createNewLog(logData);
-        callback();
     } catch (error) {
-        callback(error);
+        ConsoleLogger.error("Error while inserting log into the database:", error);
     }
 }, 1); // Limit concurrency to 1 for sequential processing
-
-const asyncLogDB = logData =>
-    LogQueue.push(logData, (error) => {
-        if (error) {
-            ConsoleLogger.error("Error while inserting log into the database:", error);
-        }
-    });
 
 const logging = (type, ...args) => {
     const msg = args.join(' ');
@@ -53,12 +45,7 @@ const logging = (type, ...args) => {
         console[type](msg);
     }
     // Handle Asynchronous Logging to Database
-    asyncLogDB({
-        type,
-        msg,
-        date: dateFormatter.format(new Date()),
-        timestamp: new Date()
-    });
+    LogQueue.push({ type, msg: msg.trim() });
 
     return ConsoleLogger[type](...args);
 }

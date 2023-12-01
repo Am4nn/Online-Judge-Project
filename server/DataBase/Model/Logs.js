@@ -9,15 +9,6 @@ const LogSchema = new mongoose.Schema({
     msg: {
         type: String,
         required: true
-    },
-    date: {
-        type: String,
-        required: true
-    },
-    timestamp: {
-        type: Date,
-        required: true,
-        default: Date.now
     }
 })
 
