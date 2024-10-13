@@ -13,19 +13,6 @@ const ConsoleLogger = new Console({
     stderr: fs.createWriteStream(stderrDir, { flags: 'a' }),
 });
 
-const dateFormatter = new Intl.DateTimeFormat('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    timeZone: 'Asia/Kolkata', // India time zone
-    timeZoneName: 'short',
-});
-
-
 const LogQueue = Async.queue(async logData => {
     try {
         await Logs.createNewLog(logData);
